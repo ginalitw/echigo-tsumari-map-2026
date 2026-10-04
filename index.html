@@ -774,6 +774,22 @@ ul.lst code,.rlist code{font-size:11px;color:#777;margin-right:4px}
 .danger:active{background:#fbf1f0}
 .cja{font-size:12px;color:#5c5c5c;line-height:1.45;margin:0 0 2px}
 .clink{color:inherit}
+.kmlbox{margin:8px 0 4px}
+.kmlbox[hidden]{display:none}
+.kbtn{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;border:1px solid #cfccc4;border-radius:10px;background:#fff;color:#1d1d1b;font:inherit;font-size:14px;cursor:pointer}
+.knote{font-size:12px;margin-top:4px}
+.sgm{display:inline-block;font-size:12.5px;color:#1a5fc8;margin-top:2px;padding:4px 0}
+.sfan{display:block;font-size:13px;color:#3d3d3d;margin-top:2px}
+.sdet{font-size:13px;margin-top:2px}
+.sdet summary{cursor:pointer;color:#5c5c5c;padding:4px 0}
+.sdet div{color:#3d3d3d;line-height:1.5}
+.tag-fan{background:#efece4;color:#4a4436}
+.tag-fan .lock{vertical-align:-2px}
+.card.locked .ctitle{color:#5c5c5c}
+.fanlock{margin:-2px 0 4px;padding:10px 12px;border:1px solid #e7e5df;border-radius:10px;font-size:13px}
+.fanlock[hidden]{display:none}
+.fanlock p{margin:0 0 8px}
+.pp-gm{text-decoration:none;color:#1a5fc8;box-sizing:border-box}
 
 /* ===== plain overrides (index.html only) ===== */
 .tabs{flex-wrap:nowrap;gap:0;margin:0;padding:0 12px;border-bottom:1px solid var(--line)}
@@ -941,6 +957,7 @@ a{color:inherit}
     <div class="pane-head" id="lhead" hidden><span id="lheadt"></span><button id="clear" type="button" class="danger">清空清單</button></div>
     <label class="chk"><input type="checkbox" id="onlyfav">地圖只顯示清單作品</label>
     <ul class="lst" id="favlist"></ul>
+    <div id="lkml" class="kmlbox" hidden><button id="lkmlbtn" type="button" class="kbtn">匯出到 Google My Maps</button><div class="muted knote">匯入需用電腦：Google My Maps → 建立新地圖 → 匯入 → 選這個檔案。之後在手機 Google 地圖的『已儲存 › 地圖』就看得到這些圖釘。</div></div>
     <div class="box">
       <b>搬到另一台裝置</b>
       <div class="btns" style="margin-top:4px"><button id="copy">複製清單代碼</button><button id="dl">下載 JSON</button></div>
@@ -957,6 +974,7 @@ a{color:inherit}
     <ol class="rlist" id="rlist"></ol>
     <div id="rsum" class="rsum"></div>
     <div id="rgmap"></div>
+    <div id="rkml" class="kmlbox" hidden><button id="rkmlbtn" type="button" class="kbtn">匯出到 Google My Maps</button><div class="muted knote">匯入需用電腦：Google My Maps → 建立新地圖 → 匯入 → 選這個檔案。之後在手機 Google 地圖的『已儲存 › 地圖』就看得到這些圖釘。</div></div>
     <div class="btns" style="margin-top:6px"><button id="raddfav">加入清單全部作品</button><button id="rsel">路線作品加進清單</button></div>
     <div class="btns" style="margin-top:6px"><select id="rplace" class="b" aria-label="選擇車站"><option>十日町站</option><option>越後湯澤站</option><option>まつだい站</option><option>津南站</option></select><button id="raddplace">加入車站</button></div>
     <div class="btns" style="margin-top:6px"><button id="rsave">儲存路線</button><button id="rfit">看整條路線</button></div>
@@ -978,6 +996,24 @@ a{color:inherit}
 <script>window.ETMAP = {style:"plain", sheet:true, presetOrder:[1,0,3,2], onPreset(){ showTab("r"); setTimeout(fitRoute, 320); }};</script>
 <script>
 /* 大地藝術祭2026 作品地圖：共用程式（plain 與 illustrated 兩版共用） */
+/* ===== 飯團路線：之後由 LIFF＋Firebase 取代 ===== */
+const FAN_ENABLED = false;        // 第 4 階段才改 true
+const LINE_ADD_FRIEND_URL = "#";  // 之後填加好友網址
+function isFan(){ return false; }
+function loadFanRoutes(){ return Promise.resolve([]); }
+/* 開發用：?dev=fan 視同已解鎖並載入 1 條假資料；?dev=fan-locked 顯示群組但維持鎖定 */
+const DEV = new URLSearchParams(location.search).get("dev") || "";
+const FAN_ON = FAN_ENABLED || DEV === "fan" || DEV === "fan-locked";
+const fanUnlocked = () => DEV === "fan" ? true : (DEV === "fan-locked" ? false : isFan());
+const FAKE_FAN_ROUTE = {id:"fan_demo", tier:"fan", name:"（範例）", walked:"2026-09-01", summary:"（範例）", caveat:"（範例）", mode:"drive",
+  stops:[
+    {p:"（範例）", lat:37.13482, lng:138.75683, time:"09:00", stay_min:10, tip:"（範例）", parking:"（範例）", toilet:"（範例）"},
+    {c:"T025", time:"09:30", stay_min:60, tip:"（範例）", photo:"（範例）"},
+    {c:"K005", time:"11:00", stay_min:40, tip:"（範例）", lunch:"（範例）", warn:"（範例）"},
+    {c:"D053", time:"13:30", stay_min:50, tip:"（範例）", parking:"（範例）", toilet:"（範例）", photo:"（範例）"}
+  ]};
+const fanRoutesP = () => DEV === "fan" || DEV === "fan-locked" ? Promise.resolve([FAKE_FAN_ROUTE]) : loadFanRoutes();
+let FAN_ROUTES = [];
 const CFG = window.ETMAP || {style:"plain"};
 const ILL = CFG.style === "illustrated";
 const SHEET = !!CFG.sheet;
@@ -1178,6 +1214,9 @@ function kindOf(d){
 }
 const KIND_TXT = {museum:"室內場館", outdoor:"戶外作品", onsen:"溫泉", station:"車站作品"};
 /* ===== popups and markers ===== */
+const llq = (lat, lng) => `${(+lat).toFixed(6)},${(+lng).toFixed(6)}`;
+const gmUrl = (lat, lng) => "https://www.google.com/maps/search/?api=1&query=" + llq(lat, lng);
+const gmLink = (lat, lng, cls) => `<a class="${cls}" href="${gmUrl(lat, lng)}" target="_blank" rel="noopener">在 Google 地圖開啟</a>`;
 function popupHtml(d){
   const di = d._day || {state:"unknown", tags:[]};
   const title = d.中文名 ? `${esc(d.中文名)}<div style="font-size:12px;font-weight:400;color:#666">${esc(d.作品名稱)}</div>` : esc(d.作品名稱);
@@ -1192,6 +1231,7 @@ function popupHtml(d){
   h += `<div class="pp-acts">`;
   if (d.官網連結) h += `<a class="pp-link" href="${esc(d.官網連結)}" target="_blank" rel="noopener">官網作品頁</a>`;
   if (d.marker) h += `<button class="pp-add" data-addroute="${esc(d.作品編號)}">＋加入路線</button>`;
+  if (d.ll) h += gmLink(d.ll[0], d.ll[1], "pp-add pp-gm");
   h += `</div>`;
   const src = (d.開放資訊來源 || "").match(/https?:\/\/\S+/);
   if (src) h += `<a class="pp-src" href="${esc(src[0])}" target="_blank" rel="noopener">開放資訊來源</a>`;
@@ -1349,6 +1389,7 @@ function render(){
 }
 function renderFav(){
   $("favn").textContent = saved.length;
+  const lk = $("lkml"); if (lk) lk.hidden = !saved.some(c => BY[c] && BY[c].ll);
   const lh = $("lhead"); if (lh){ lh.hidden = !saved.length; $("lheadt").textContent = `共 ${saved.length} 件`; }
   const ul = $("favlist");
   ul.innerHTML = saved.length ? "" : '<li style="color:#888;cursor:default">還沒有收藏，在作品卡片或搜尋結果按 ☆ 加入</li>';
@@ -1371,6 +1412,7 @@ const TT = m => m === "bus" || m === "train";
 const TTL = m => m === "train" ? "官方電車" : "官方巴士";
 const stopLL = s => s.c ? (BY[s.c] && BY[s.c].ll) : [s.lat, s.lng];
 const stopName = s => s.c ? (BY[s.c] ? (BY[s.c].中文名 || BY[s.c].作品名稱) : s.c) : s.p;
+const okLL = ll => !!ll && ll[0] != null && ll[1] != null && isFinite(ll[0]) && isFinite(ll[1]);
 const validStops = st => st.filter(s => stopLL(s));
 function hav(a, b){ const R = 6371, r = x => x * Math.PI / 180, dp = r(b[0] - a[0]), dl = r(b[1] - a[1]);
   return 2 * R * Math.asin(Math.sqrt(Math.sin(dp / 2) ** 2 + Math.cos(r(a[0])) * Math.cos(r(b[0])) * Math.sin(dl / 2) ** 2)); }
@@ -1459,9 +1501,14 @@ function renderRouteList(pending){
     if (s.c && BY[s.c]){ const di = dayInfo(BY[s.c], curDay()); if (di.state === "closed") closed++; if (di.state === "unknown") unk++; }
     const li = document.createElement("li");
     li.className = "stop"; li.draggable = true; li.dataset.i = i;
-    li.innerHTML = `<span class="no">${ok ? ++vi : "?"}</span><span class="t">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}${s.c ? ` <code>${esc(s.c)}</code>` : ""}<br>${stopStatus(s)}</span>` +
+    const ll = ok && okLL(stopLL(s)) ? stopLL(s) : null;
+    const fanX = [["lunch", "午餐"], ["parking", "停車"], ["toilet", "廁所"], ["photo", "拍照"], ["warn", "注意"]].filter(([k]) => s[k]);
+    li.innerHTML = `<span class="no">${ok ? ++vi : "?"}</span><span class="t">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}${s.c ? ` <code>${esc(s.c)}</code>` : ""}<br>${stopStatus(s)}` +
+      (s.stay_min != null || s.tip ? `<span class="sfan">${s.stay_min != null ? `停留約 ${esc(s.stay_min)} 分` : ""}${s.stay_min != null && s.tip ? "，" : ""}${s.tip ? esc(s.tip) : ""}</span>` : "") +
+      (fanX.length ? `<details class="sdet"><summary>排程細節</summary>${fanX.map(([k, t]) => `<div><b>${t}</b>：${esc(s[k])}</div>`).join("")}</details>` : "") +
+      (ll ? gmLink(ll[0], ll[1], "sgm") : "") + `</span>` +
       `<span class="ud"><button data-up="${i}" title="往上" aria-label="第 ${vi} 站往上移">↑</button><button data-down="${i}" title="往下" aria-label="第 ${vi} 站往下移">↓</button><button data-del="${i}" title="移除" aria-label="移除第 ${vi} 站">✕</button></span>`;
-    li.onclick = e => { if (e.target.closest("button")) return; if (s.c && BY[s.c]) zoomTo(BY[s.c]); else if (ok) map.setView(stopLL(s), 14); };
+    li.onclick = e => { if (e.target.closest("button,a,details")) return; if (s.c && BY[s.c]) zoomTo(BY[s.c]); else if (ok) map.setView(stopLL(s), 14); };
     ul.appendChild(li);
   });
   const sum = $("rsum");
@@ -1508,7 +1555,32 @@ function gmapsUrls(){
   }
   return out;
 }
+/* ===== KML 匯出（Google My Maps） ===== */
+const xesc = s => String(s == null ? "" : s).replace(/[<>&'"]/g, c => ({"<":"&lt;",">":"&gt;","&":"&amp;","'":"&apos;","\"":"&quot;"}[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
+function kmlDoc(title, items){
+  const pm = items.map(it => `  <Placemark>\n    <name>${xesc(it.name)}</name>\n    <description>${xesc(it.desc)}</description>\n    <Point><coordinates>${(+it.lng).toFixed(6)},${(+it.lat).toFixed(6)},0</coordinates></Point>\n  </Placemark>`).join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n<Document>\n  <name>${xesc(title)}</name>\n${pm}\n</Document>\n</kml>\n`;
+}
+function kmlItem(s, label){
+  const ll = stopLL(s); if (!okLL(ll)) return null;
+  const d = s.c && BY[s.c];
+  const name = d ? (d.中文名 || d.作品名稱) : stopName(s);
+  const desc = d ? [`作品編號：${d.作品編號}`, `地區：${d.地區}`, d.官網連結 ? `官網：${d.官網連結}` : ""].filter(Boolean).join("\n") : (s.tnote || "");
+  return {name:(label ? label + ". " : "") + name, desc, lat:ll[0], lng:ll[1]};
+}
+function downloadKml(base, items){
+  const day = curDay();
+  const title = `${base} ${day}`;
+  const fname = `${base.replace(/[\\/:*?"<>|\n\r]+/g, "_").trim() || "我的路線"}_${day}.kml`;
+  const blob = new Blob([kmlDoc(title, items)], {type:"application/vnd.google-earth.kml+xml;charset=utf-8"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fname;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  return fname;
+}
+function exportRouteKml(){ let n = 0; const items = route.stops.map(s => okLL(stopLL(s)) ? kmlItem(s, ++n) : null).filter(Boolean); if (items.length) downloadKml(route.name || "我的路線", items); }
+function exportListKml(){ const items = saved.map(c => BY[c] && BY[c].ll ? kmlItem({c}) : null).filter(Boolean); if (items.length) downloadKml("我的清單", items); }
 function renderGmaps(){
+  const kb = $("rkml"); if (kb) kb.hidden = !route.stops.some(s => okLL(stopLL(s)));
   const box = $("rgmap"); if (!box) return;
   const urls = TT(route.mode) ? [] : gmapsUrls();
   box.innerHTML = urls.map((u, k) => `<a class="gbtn" href="${esc(u.url)}" target="_blank" rel="noopener">用 Google 地圖開啟${urls.length > 1 ? `（第 ${k + 1} 段：${u.from}～${u.to} 站）` : ""}</a>`).join("") +
@@ -1548,6 +1620,8 @@ function clearRoute(){
   const m = $("rmsg"); if (m) m.textContent = "路線已清除";
 }
 $("rclear").onclick = clearRoute;
+if ($("rkmlbtn")) $("rkmlbtn").onclick = exportRouteKml;
+if ($("lkmlbtn")) $("lkmlbtn").onclick = exportListKml;
 $("rfit").onclick = fitRoute;
 $("rsave").onclick = () => {
   let name = ($("rname").value || "").trim();
@@ -1597,11 +1671,27 @@ function cardHtml(p){
       : `<div class="cmeta">${n} 站，${p.mode === "walk" ? "步行" : "開車"}約 ${fmtMin(p.est ? p.est.min : 0)}${p.est && p.est.src !== "OSRM" ? "（估算）" : ""}</div>`) +
     `<div class="cflag">${p.date ? `${p.date.slice(5).replace("-", "/")}：` : `${f.day.slice(5).replace("-", "/")}：`}${f.closed ? `<span class="warn">${f.closed} 站休館</span>，` : ""}${f.unk ? `${f.unk} 站未公布` : "皆有開放資訊"}${f.miss ? `，${f.miss} 站不在 2026 清單` : ""}</div></div></div>`;
 }
+const LOCK_SVG = '<svg class="lock" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+function fanCardHtml(p){
+  const locked = !fanUnlocked();
+  return `<div class="card fan${locked ? " locked" : ""}" data-fan="${esc(p.id)}" tabindex="0" role="button" aria-label="${esc(p.name)}${locked ? "（需解鎖）" : ""}">${thumb(p)}<div class="cbody"><span class="ctag tag-fan">${locked ? LOCK_SVG + " " : ""}越後飯實踩 ${esc((p.walked || "").replace(/-/g, "/"))}</span>` +
+    `<div class="ctitle">${esc(p.name)}</div><div class="cmeta">${p.stops.length} 站</div>` + (!locked && p.summary ? `<div class="cdesc">${esc(p.summary)}</div>` : "") + `</div></div>` +
+    (locked ? `<div class="fanlock" id="fanlock-${esc(p.id)}" hidden><p>加入富搖小幫手（越後飯服務窗口）即可解鎖飯團路線</p><a class="gbtn" href="${esc(LINE_ADD_FRIEND_URL)}" target="_blank" rel="noopener">用 LINE 加入好友</a></div>` : "");
+}
+function loadFanRoute(id){
+  const p = FAN_ROUTES.find(x => x.id === id); if (!p) return;
+  if (!fanUnlocked()){ const m = $("fanlock-" + id); if (m){ m.hidden = !m.hidden; } return; }
+  setRoute({name:p.name, stops:p.stops, mode:p.mode || "drive"}, true);
+  render();
+  const note = $("rnote"); if (note) note.innerHTML = `<span class="ctag tag-fan">越後飯實踩 ${esc((p.walked || "").replace(/-/g, "/"))}</span> ${esc(p.summary || "")}${p.caveat ? `<br><span class="muted">${esc(p.caveat)}</span>` : ""}`;
+  if (CFG.onPreset) CFG.onPreset(p); else showTab("r");
+}
 function renderPresets(){
   const box = $("presetlist"); if (!box) return;
   const groups = [["主題路線", p => p.kind === "theme"], ["其他行程", p => p.date], ["官方巡迴路線", p => p.src === "官方 2024 地圖"], ["官方建議行程", p => p.kind === "model"]];
   const order = CFG.presetOrder || [0, 1, 2];
   box.innerHTML = order.filter(gi => PRESETS.some(groups[gi][1])).map(gi => { const [t, fn] = groups[gi]; return `<div class="cgroup"><div class="cgt">${t}</div><div class="cards">${PRESETS.filter(fn).map(cardHtml).join("")}</div></div>`; }).join("");
+  if (FAN_ON) box.insertAdjacentHTML("afterbegin", `<div class="cgroup"><div class="cgt">越後飯實踩路線</div><div class="cards">${FAN_ROUTES.length ? FAN_ROUTES.map(fanCardHtml).join("") : '<div class="muted">目前還沒有實踩路線</div>'}</div></div>`);
 }
 function loadPreset(id){
   const p = PRESETS.find(x => x.id === id); if (!p) return;
@@ -1612,7 +1702,8 @@ function loadPreset(id){
   if (CFG.onPreset) CFG.onPreset(p); else showTab("r");
 }
 document.addEventListener("click", e => {
-  if (e.target.closest("a.clink")) return;
+  if (e.target.closest("a.clink") || e.target.closest(".fanlock")) return;
+  const fc = e.target.closest("[data-fan]"); if (fc){ loadFanRoute(fc.dataset.fan); return; }
   const c = e.target.closest("[data-preset]"); if (c){ loadPreset(c.dataset.preset); return; }
 }, false);
 document.addEventListener("keydown", e => { if (e.key === "Enter"){ const c = e.target.closest && e.target.closest("[data-preset]"); if (c) loadPreset(c.dataset.preset); } });
@@ -1857,6 +1948,7 @@ if (H.get("open") && BY[H.get("open")]) zoomTo(BY[H.get("open")]);
 if (H.get("q")){ q.value = H.get("q"); render(); }
 if (/^\d+(\.\d+)?$/.test(H.get("z") || "")) map.setView(H.get("c") ? H.get("c").split(",").map(Number) : map.getCenter(), +H.get("z"), {animate:false});
 CFG.map = map;
+if (FAN_ON) fanRoutesP().then(r => { FAN_ROUTES = Array.isArray(r) ? r : []; renderPresets(); });
 if (CFG.init) CFG.init();
 if (zoomUpdate) zoomUpdate();
 </script>
