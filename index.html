@@ -922,9 +922,14 @@ path.area{transition:fill-opacity .25s ease;cursor:default}
 .z-over path.area{fill-opacity:.1;cursor:pointer}
 .route-view path.area{fill-opacity:.02!important}
 .leaflet-tile-pane{filter:grayscale(.65) contrast(.94) brightness(1.03)}
-.area-count{display:flex;justify-content:center;align-items:center}
-.area-count span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;background:rgba(255,255,255,.96);border:none;border-left:4px solid;border-radius:6px;padding:0 10px;min-height:32px;font-size:14px;color:var(--ink);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.1),0 2px 8px rgba(0,0,0,.08)}
-.area-count b{margin-left:2px;font-variant-numeric:tabular-nums}
+.area-count{width:auto!important;height:auto!important}
+.ac-box{display:inline-flex;flex-direction:column;align-items:stretch;background:rgba(255,255,255,.96);border-left:4px solid;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.1),0 2px 8px rgba(0,0,0,.08);white-space:nowrap;overflow:hidden}
+.ac-box button{display:flex;align-items:center;border:none;background:none;font:inherit;color:var(--ink);cursor:pointer;text-align:left;padding:0 10px;margin:0}
+.ac-area{min-height:32px;font-size:14px;gap:4px}
+.ac-area b{margin-left:2px;font-variant-numeric:tabular-nums}
+.ac-rep{min-height:32px;font-size:12px!important;color:var(--mute)!important;border-top:1px solid var(--line)!important}
+.ac-box button:hover{background:rgba(0,0,0,.04)}
+.ac-box button:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
 .area-count,.clu,.wlabel{animation:fadein .25s ease}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 .clu span{display:flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-size:13px;font-weight:700;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.25);box-sizing:border-box;text-shadow:0 0 2px rgba(0,0,0,.35)}
@@ -1100,6 +1105,15 @@ const AREAS_GEO = {"type":"FeatureCollection","features":[{"type":"Feature","pro
 const RIVER = {"type":"Feature","properties":{"name":"信濃川"},"geometry":{"type":"LineString","coordinates":[[138.2723,36.6684],[138.2752,36.6712],[138.2771,36.6797],[138.2815,36.6871],[138.2837,36.6947],[138.2908,36.7031],[138.305,36.7125],[138.3089,36.7168],[138.3085,36.7396],[138.3115,36.7429],[138.3235,36.7495],[138.3254,36.7531],[138.3245,36.7581],[138.3201,36.7625],[138.3205,36.765],[138.3312,36.7687],[138.3338,36.7782],[138.3357,36.7787],[138.3406,36.7768],[138.3431,36.7787],[138.3426,36.7826],[138.3372,36.7857],[138.3363,36.7885],[138.3467,36.7936],[138.3444,36.8017],[138.3456,36.8043],[138.3542,36.8036],[138.358,36.8055],[138.3591,36.8099],[138.357,36.8149],[138.3547,36.8173],[138.3534,36.8228],[138.3631,36.8364],[138.3684,36.8473],[138.3715,36.8614],[138.3774,36.8683],[138.3993,36.8802],[138.4041,36.8866],[138.4041,36.89],[138.3993,36.9008],[138.3977,36.9081],[138.398,36.9163],[138.4028,36.9218],[138.407,36.9302],[138.4209,36.9357],[138.4225,36.9467],[138.4249,36.9472],[138.4285,36.9448],[138.4312,36.9448],[138.4341,36.9486],[138.4303,36.9529],[138.4307,36.9549],[138.442,36.9594],[138.4554,36.9696],[138.461,36.9764],[138.4717,36.9774],[138.4826,36.9766],[138.4922,36.9805],[138.4997,36.9775],[138.5034,36.9799],[138.5177,36.9845],[138.5253,36.982],[138.5372,36.9845],[138.5431,36.983],[138.5443,36.9778],[138.5488,36.9758],[138.5516,36.9791],[138.5594,36.9815],[138.5625,36.9754],[138.5665,36.9737],[138.57,36.9762],[138.5648,36.9847],[138.5648,36.9868],[138.5666,36.9881],[138.5728,36.989],[138.5741,36.9862],[138.578,36.9858],[138.5854,36.9887],[138.5878,36.9932],[138.592,36.994],[138.5986,36.9986],[138.6014,36.9987],[138.6096,36.9935],[138.6158,36.9964],[138.6162,36.9987],[138.6138,37.0],[138.6156,37.0019],[138.6203,37.0028],[138.6261,37.0019],[138.6339,37.0055],[138.64,37.0042],[138.6411,37.0095],[138.6382,37.015],[138.6437,37.0249],[138.6471,37.027],[138.6566,37.0246],[138.6613,37.0262],[138.6636,37.0315],[138.6611,37.0377],[138.6619,37.0404],[138.6697,37.0445],[138.6735,37.0482],[138.6841,37.0513],[138.6842,37.0581],[138.6938,37.0667],[138.7055,37.065],[138.7084,37.0655],[138.7102,37.0673],[138.7127,37.0737],[138.7103,37.08],[138.7112,37.083],[138.7182,37.0953],[138.7188,37.1043],[138.7219,37.1081],[138.7256,37.1097],[138.7319,37.1185],[138.7314,37.1264],[138.7335,37.1328],[138.7422,37.1432],[138.7438,37.1479],[138.756,37.1563],[138.7667,37.1673],[138.7684,37.1769],[138.7715,37.1836],[138.7696,37.1963],[138.7703,37.2031],[138.772,37.2086],[138.7786,37.2188],[138.7808,37.2249],[138.781,37.2303],[138.7781,37.2354],[138.779,37.2389],[138.7843,37.242],[138.7918,37.2436],[138.7992,37.2472],[138.8096,37.2464],[138.8116,37.2479],[138.8117,37.2542],[138.8146,37.2591],[138.8177,37.2627],[138.8217,37.2646],[138.8271,37.2645],[138.8306,37.2628],[138.8323,37.261],[138.8333,37.2536],[138.8386,37.2528],[138.8413,37.2631],[138.8491,37.2641],[138.8515,37.2673]]}};
 const HOLIDAYS = new Set(["2026-01-01", "2026-01-12", "2026-02-11", "2026-02-23", "2026-03-20", "2026-04-29", "2026-05-03", "2026-05-04", "2026-05-05", "2026-05-06", "2026-07-20", "2026-08-11", "2026-09-21", "2026-09-22", "2026-09-23", "2026-10-12", "2026-11-03", "2026-11-23", "2027-01-01", "2027-01-11", "2027-02-11", "2027-02-23", "2027-03-21", "2027-03-22", "2027-04-29", "2027-05-03", "2027-05-04", "2027-05-05", "2027-07-19", "2027-08-11", "2027-09-20", "2027-09-23", "2027-10-11", "2027-11-03", "2027-11-23", "2028-01-01", "2028-01-10", "2028-02-11", "2028-02-23", "2028-03-20", "2028-04-29", "2028-05-03", "2028-05-04", "2028-05-05", "2028-07-17", "2028-08-11", "2028-09-18", "2028-09-22", "2028-10-09", "2028-11-03", "2028-11-23"]);
 const PRESETS = [{"id": "tourA", "name": "官方 Tour A：越後妻有路線", "src": "官方 2024 地圖", "stops": [{"p": "越後湯澤站", "lat": 36.9356674, "lng": 138.8090903}, {"c": "N079"}, {"c": "N028"}, {"p": "M088 The Objects from Another Place", "lat": 37.0514859, "lng": 138.6597953, "note": "不在 2026 清單"}, {"c": "Y052"}, {"c": "D331"}, {"c": "D053"}, {"c": "T173"}, {"c": "T025"}, {"p": "越後湯澤站", "lat": 36.9356674, "lng": 138.8090903}], "est": {"min": 116, "km": 110.9, "src": "OSRM"}}, {"id": "tourB", "name": "官方 Tour B：十日町與川西路線", "src": "官方 2024 地圖", "stops": [{"p": "十日町站", "lat": 37.1348206, "lng": 138.7568316}, {"p": "T456 cubu", "lat": 37.0678352, "lng": 138.7329489, "note": "不在 2026 清單"}, {"p": "T427 Karekimata Project", "lat": 37.1308915, "lng": 138.8512592, "note": "不在 2026 清單"}, {"c": "T120"}, {"c": "K005"}, {"p": "K114 Nakago WonderLand–Breath and Rebirth of Animals", "lat": 37.1873629, "lng": 138.7335394, "note": "不在 2026 清單"}, {"p": "K115 Passages of Time Tokamachi Takakura Museum", "lat": 37.1577842, "lng": 138.6875924, "note": "不在 2026 清單"}, {"p": "K118 Sphinx of the three mountains", "lat": 37.1590461, "lng": 138.7376322, "note": "不在 2026 清單"}, {"c": "T450"}, {"p": "十日町站", "lat": 37.1348206, "lng": 138.7568316}], "est": {"min": 104, "km": 98.3, "src": "OSRM"}}, {"id": "t_first", "name": "第一次來就看這些", "src": "建議路線", "kind": "theme", "note": "幾個代表性的場館與作品，一天開車繞一圈。多數場館週二、三休館。時間以開車估算，未含停留時間；若不自駕，請改查巴士或計程車。", "stops": [{"p": "十日町站", "lat": 37.13482, "lng": 138.75683}, {"c": "K005"}, {"c": "T025"}, {"c": "T173"}, {"c": "D053"}, {"c": "Y052"}, {"c": "N079"}, {"p": "越後湯澤站", "lat": 36.93567, "lng": 138.80909}], "est": {"min": 98, "km": 93.5, "src": "OSRM"}}, {"id": "t_rain", "name": "下雨天也能看", "src": "建議路線", "kind": "theme", "note": "全部是室內場館，下雨也不怕。多數場館週二、三休館，キョロロ只休週二。時間以開車估算，未含停留時間；若不自駕，請改查巴士或計程車。", "stops": [{"p": "十日町站", "lat": 37.13482, "lng": 138.75683}, {"c": "T025"}, {"c": "T173"}, {"c": "D053"}, {"c": "D247"}, {"c": "Y019"}, {"c": "Y052"}, {"p": "十日町站", "lat": 37.13482, "lng": 138.75683}], "est": {"min": 70, "km": 61.1, "src": "OSRM"}}, {"id": "t_onsen", "name": "泡湯加三件作品", "src": "建議路線", "kind": "theme", "note": "光の館、繪本與木果實美術館、MonET，最後在明石の湯泡湯。明石の湯週二、三休。時間以開車估算，未含停留時間；若不自駕，請改查巴士或計程車。", "stops": [{"p": "十日町站", "lat": 37.13482, "lng": 138.75683}, {"c": "K005"}, {"c": "T173"}, {"c": "T025"}, {"c": "T461"}], "est": {"min": 39, "km": 32.4, "src": "OSRM"}}, {"id": "t_walk_toka", "name": "不開車也到得了：十日町站", "src": "建議路線", "kind": "theme", "mode": "walk", "note": "從十日町站走路就到，MonET 與明石の湯就在隔壁。步行時間以直線距離乘 1.3、時速 4.5 公里估算。", "stops": [{"p": "十日町站", "lat": 37.13482, "lng": 138.75683}, {"c": "T320"}, {"c": "T309"}, {"c": "T025"}, {"c": "T461"}, {"c": "T317"}, {"p": "十日町站", "lat": 37.13482, "lng": 138.75683}], "est": {"min": 29, "km": 2.2, "src": "直線估算"}}, {"id": "t_walk_matsu", "name": "不開車也到得了：まつだい站", "src": "建議路線", "kind": "theme", "mode": "walk", "note": "まつだい站出站就是農舞台，城山的戶外作品可步行串連。步行時間以直線距離乘 1.3、時速 4.5 公里估算。", "stops": [{"p": "まつだい站", "lat": 37.13221, "lng": 138.61373}, {"c": "D053"}, {"c": "D063"}, {"c": "D002"}, {"c": "D365"}, {"c": "D377"}, {"c": "D247"}, {"p": "まつだい站", "lat": 37.13221, "lng": 138.61373}], "est": {"min": 34, "km": 2.5, "src": "直線估算"}}, {"id": "t_wed", "name": "週三也有開", "src": "建議路線", "kind": "theme", "note": "依官方資料週三有開的場館，加上沒有休館資訊的戶外作品。時間以開車估算，未含停留時間；若不自駕，請改查巴士或計程車。", "stops": [{"p": "越後湯澤站", "lat": 36.93567, "lng": 138.80909}, {"c": "N079"}, {"c": "Y019"}, {"c": "D002"}, {"c": "K005"}, {"p": "十日町站", "lat": 37.13482, "lng": 138.75683}], "est": {"min": 87, "km": 78.0, "src": "OSRM"}}, {"id": "w_toka", "name": "冬季・十日町站步行線", "src": "建議路線", "kind": "theme", "winter": true, "mode": "walk", "note": "冬季也能步行參觀，不需開車。搭北越急行ほくほく線到站即可。", "stops": [{"p": "十日町站", "lat": 37.13482, "lng": 138.75683}, {"c": "T025"}, {"c": "T467", "tnote": "明石の湯入口"}, {"c": "T468", "tnote": "明石の湯入口"}, {"c": "T461", "tnote": "明石の湯入口"}, {"c": "T320", "tnote": "十日町站西口"}, {"c": "T309"}, {"c": "T388", "tnote": "段十ろう，傍晚後"}, {"c": "T390", "tnote": "段十ろう，傍晚後"}], "est": {"min": 51, "km": 3.9, "src": "OSRM 步行"}}, {"id": "w_matsu", "name": "冬季・松代農舞台步行線", "src": "建議路線", "kind": "theme", "winter": true, "mode": "walk", "note": "冬季也能步行參觀，不需開車。搭北越急行ほくほく線到站即可。", "stops": [{"p": "まつだい站", "lat": 37.13221, "lng": 138.61373}, {"c": "D053"}, {"c": "D054", "tnote": "農舞台館內"}, {"c": "D055", "tnote": "農舞台館內"}, {"c": "D057", "tnote": "農舞台館內"}, {"c": "D362", "tnote": "農舞台館內"}, {"c": "D363", "tnote": "農舞台館內"}, {"c": "D364", "tnote": "農舞台館內"}, {"c": "D380", "tnote": "農舞台館內"}, {"c": "D058", "tnote": "農舞台館內"}, {"c": "D218", "tnote": "農舞台館內"}], "est": {"min": 4, "km": 0.3, "src": "OSRM 步行"}}, {"id": "mc_autumn2", "name": "從長岡、新潟出發：下車走走看秋天名作的自駕行程", "ja": "【長岡・新潟方面から】歩いて巡る、秋の名作ドライブ旅", "mode": "drive", "period": "7/18～11/8 週六、週日及國定假日", "lunch": "うぶすなの家", "stops": [{"p": "越後川口交流道", "lat": 37.26593, "lng": 138.84471, "time": "09:00", "tnote": "出發"}, {"c": "T253", "time": "09:30"}, {"c": "T351", "time": "09:50"}, {"c": "T450", "time": "10:15"}, {"c": "T025", "time": "10:35", "tnote": "含明石の湯"}, {"c": "T112", "time": "11:25"}, {"c": "T021", "time": "11:25"}, {"c": "T020", "time": "11:25"}, {"c": "T120", "time": "11:55", "tnote": "午餐"}, {"c": "K033", "time": "13:20"}, {"c": "K003", "time": "13:40"}, {"c": "K023", "time": "13:40"}, {"c": "K002", "time": "13:40"}, {"c": "K005", "time": "14:05"}, {"c": "T173", "time": "15:15", "tnote": "含 Hachi Café"}, {"p": "越後川口交流道", "lat": 37.26593, "lng": 138.84471, "time": "17:00", "tnote": "抵達"}], "kind": "model", "src": "官方建議行程", "url": "https://www.echigo-tsumari.jp/visit/2026autumn2/", "note": "官方モデルコース「【長岡・新潟方面から】歩いて巡る、秋の名作ドライブ旅」。7/18～11/8 週六、週日及國定假日，午餐：うぶすなの家。時刻依官方頁面。"}, {"id": "mc_autumn", "name": "從東京出發：藝術與紅葉自駕行程", "ja": "【東京方面から】アートと紅葉をめぐる、越後妻有のドライブ旅", "mode": "drive", "period": "7/18～11/8 週六、週日及國定假日", "lunch": "越後まつだい里山食堂", "stops": [{"p": "鹽澤石打交流道", "lat": 36.99954, "lng": 138.82086, "time": "09:00", "tnote": "出發"}, {"c": "N079", "time": "09:30"}, {"c": "N072", "time": "10:35"}, {"c": "N028", "time": "11:25"}, {"c": "Y052", "time": "11:50"}, {"c": "D053", "time": "12:45", "tnote": "午餐在農舞台內的越後まつだい里山食堂"}, {"c": "D331", "time": "14:30"}, {"c": "D047", "time": "15:30"}, {"c": "T025", "time": "15:50", "tnote": "含明石の湯"}, {"p": "鹽澤石打交流道", "lat": 36.99954, "lng": 138.82086, "time": "17:50", "tnote": "抵達"}], "kind": "model", "src": "官方建議行程", "url": "https://www.echigo-tsumari.jp/visit/2026autumn/", "note": "官方モデルコース「【東京方面から】アートと紅葉をめぐる、越後妻有のドライブ旅」。7/18～11/8 週六、週日及國定假日，午餐：越後まつだい里山食堂。時刻依官方頁面。"}, {"id": "mc_light", "name": "追尋光與記憶的藝術之旅", "ja": "光と記憶をたどるアートトリップ", "mode": "drive", "period": "7/18～8/30 週六、週日及國定假日", "lunch": "うぶすなの家（僅週六、週日及國定假日）", "caveat": "夏季行程，期間已過", "stops": [{"c": "T025", "time": "10:00"}, {"c": "T120", "time": "12:00", "tnote": "午餐"}, {"c": "K005", "time": "13:20"}, {"c": "D053", "time": "14:30"}, {"c": "D331", "time": "15:50"}], "kind": "model", "src": "官方建議行程", "url": "https://www.echigo-tsumari.jp/visit/lightwithmemory/", "note": "官方モデルコース「光と記憶をたどるアートトリップ」。7/18～8/30 週六、週日及國定假日，午餐：うぶすなの家（僅週六、週日及國定假日）。時刻依官方頁面。"}, {"id": "mc_family", "name": "親子體驗藝術之旅", "ja": "体験いっぱい親子アート旅", "mode": "drive", "period": "4/25～11/8，週二、三休（國定假日照常）", "lunch": "越後まつだい里山食堂", "stops": [{"c": "Y019", "time": "09:00"}, {"c": "D331", "time": "10:10"}, {"c": "D053", "time": "11:20", "tnote": "午餐在農舞台內的越後まつだい里山食堂"}, {"c": "T173", "time": "13:00"}, {"c": "T025", "time": "14:15", "tnote": "含明石の湯"}], "kind": "model", "src": "官方建議行程", "url": "https://www.echigo-tsumari.jp/visit/familytrip/", "note": "官方モデルコース「体験いっぱい親子アート旅」。4/25～11/8，週二、三休（國定假日照常），午餐：越後まつだい里山食堂。時刻依官方頁面。"}, {"id": "mc_satoyama", "name": "第一次來推薦：品嘗里山午餐的一日自駕", "ja": "【はじめての方におすすめ】里山のランチを堪能できる日帰りコース", "mode": "drive", "period": "4/25～11/8，週二、三休（國定假日照常）", "lunch": "越後まつだい里山食堂", "stops": [{"p": "越後湯澤站", "lat": 36.93567, "lng": 138.80909, "time": "09:30", "tnote": "租車"}, {"c": "N079", "time": "10:00"}, {"c": "N028", "time": "11:20"}, {"c": "Y052", "time": "12:00"}, {"c": "D053", "time": "13:00", "tnote": "午餐在農舞台內的越後まつだい里山食堂"}, {"c": "T173", "time": "14:45"}, {"c": "T025", "time": "16:00", "tnote": "含明石の湯"}, {"p": "越後湯澤站", "lat": 36.93567, "lng": 138.80909, "time": "18:00", "tnote": "還車"}], "kind": "model", "src": "官方建議行程", "url": "https://www.echigo-tsumari.jp/visit/satoyamasyokudo_daytrip/", "note": "官方モデルコース「【はじめての方におすすめ】里山のランチを堪能できる日帰りコース」。4/25～11/8，週二、三休（國定假日照常），午餐：越後まつだい里山食堂。時刻依官方頁面。"}, {"id": "mc_train", "name": "搭ほくほく線看兩大美術館", "ja": "ほくほく線で二大美術館の旅", "mode": "train", "period": "4/25～11/8，週二、三休（國定假日照常）", "lunch": "越後まつだい里山食堂", "caveat": "春季撰寫，車次僅供參考", "stops": [{"p": "越後湯澤站", "lat": 36.93567, "lng": 138.80909, "time": "09:14", "tnote": "發車，東京 07:48 出發"}, {"p": "十日町站", "lat": 37.13482, "lng": 138.75683, "time": "09:52", "tnote": "抵達"}, {"c": "T025", "time": "10:10", "tnote": "含明石の湯，步行 15 分"}, {"p": "十日町站", "lat": 37.13482, "lng": 138.75683, "time": "12:16", "tnote": "發車"}, {"p": "まつだい站", "lat": 37.13221, "lng": 138.61373, "time": "12:26", "tnote": "抵達"}, {"c": "D053", "time": "12:30", "tnote": "午餐在越後まつだい里山食堂"}, {"c": "D392", "time": "12:30", "tnote": "まつだい郷土資料館"}, {"p": "まつだい站", "lat": 37.13221, "lng": 138.61373, "time": "16:44", "tnote": "發車"}, {"p": "越後湯澤站", "lat": 36.93567, "lng": 138.80909, "time": "17:30", "tnote": "抵達，東京 19:00 到"}], "kind": "model", "src": "官方建議行程", "url": "https://www.echigo-tsumari.jp/visit/train2026/", "note": "官方モデルコース「ほくほく線で二大美術館の旅」。4/25～11/8，週二、三休（國定假日照常），午餐：越後まつだい里山食堂。時刻依官方頁面。"}, {"id": "mc_akiyama1", "name": "秘境秋山鄉住一晚：第 1 天", "ja": "秘境・秋山郷に泊まる1泊2日（1日目）", "mode": "drive", "period": "官方頁面未標示日期", "lunch": "", "stops": [{"p": "越後湯澤站", "lat": 36.93567, "lng": 138.80909, "time": "14:06", "tnote": "抵達後租車，東京 12:56 出發"}, {"c": "N079", "time": "14:45"}, {"p": "見玉不動尊", "lat": 36.95154, "lng": 138.66776, "time": "16:10"}, {"p": "かたくりの宿", "lat": 36.9191752, "lng": 138.6369526, "time": "16:50", "tnote": "入住，晚餐"}], "kind": "model", "src": "官方建議行程", "url": "https://www.echigo-tsumari.jp/visit/hegi-soba_katakuri_onsen/", "note": "官方モデルコース「秘境・秋山郷に泊まる1泊2日（1日目）」。官方頁面未標示日期。時刻依官方頁面。"}, {"id": "mc_akiyama2", "name": "秘境秋山鄉住一晚：第 2 天", "ja": "秘境・秋山郷に泊まる1泊2日（2日目）", "mode": "drive", "period": "官方頁面未標示日期", "lunch": "小嶋屋総本店（へぎそば）", "stops": [{"p": "かたくりの宿", "lat": 36.9191752, "lng": 138.6369526, "time": "06:00", "tnote": "晨間散步與早餐"}, {"c": "M092", "time": "10:00"}, {"c": "T025", "time": "11:50", "tnote": "含博物館商店"}, {"p": "小嶋屋総本店", "lat": 37.1664069, "lng": 138.7369764, "time": "12:50", "tnote": "午餐"}, {"p": "千年の市 じろばた", "lat": 37.1624221, "lng": 138.7379562, "time": "13:45", "tnote": "直賣所"}, {"p": "千手溫泉 千年の湯", "lat": 37.1626251, "lng": 138.7367803, "time": "14:00", "tnote": "溫泉"}, {"p": "越後湯澤站", "lat": 36.93567, "lng": 138.80909, "time": "17:00", "tnote": "還車，16:16 發車回東京"}], "kind": "model", "src": "官方建議行程", "url": "https://www.echigo-tsumari.jp/visit/hegi-soba_katakuri_onsen/", "note": "官方モデルコース「秘境・秋山郷に泊まる1泊2日（2日目）」。官方頁面未標示日期，午餐：小嶋屋総本店（へぎそば）。時刻依官方頁面。"}, {"id": "mc_2025car", "name": "越後妻有精華自駕行程", "ja": "越後妻有のいいとこどりドライブコース", "mode": "drive", "period": "4/25～11/8，週二、三休（國定假日照常）", "lunch": "越後まつだい里山食堂", "caveat": "2025 年舊頁面，日期已改為 2026", "stops": [{"p": "越後湯澤站", "lat": 36.93567, "lng": 138.80909, "time": "09:15", "tnote": "租車"}, {"c": "N079", "time": "10:00"}, {"c": "Y052", "time": "11:10"}, {"c": "Y019", "time": "11:50"}, {"c": "D053", "time": "13:10", "tnote": "13:10 午餐在越後まつだい里山食堂，14:10 看農舞台"}, {"c": "T025", "time": "15:10"}, {"p": "越後湯澤站", "lat": 36.93567, "lng": 138.80909, "time": "17:00", "tnote": "還車"}], "kind": "model", "src": "官方建議行程", "url": "https://www.echigo-tsumari.jp/visit/2025_car/", "note": "官方モデルコース「越後妻有のいいとこどりドライブコース」。4/25～11/8，週二、三休（國定假日照常），午餐：越後まつだい里山食堂。時刻依官方頁面。"}];
+/* ===== 各區代表作品：拉遠時區域標籤下方顯示的兩件作品 [作品編號, 短名稱]，想換就改這裡 ===== */
+const AREA_REPS = {
+  "十日町":[["T025", "MonET"], ["T173", "繪本美術館"]],
+  "川西":[["K005", "光之館"], ["K023", "綠色莊園"]],
+  "中里":[["N079", "清津峽隧道"], ["N028", "失去之窗"]],
+  "松代":[["D053", "農舞台"], ["D331", "奴奈川校園"]],
+  "松之山":[["Y052", "最後的教室"], ["Y019", "KYORORO"]],
+  "津南":[["M001", "龍現代美術館"], ["M028", "跨越國境・山"]],
+};
 const COLORS = {"十日町":"#E4572E","川西":"#2E86AB","中里":"#3BB273","松代":"#7768AE","松之山":"#D81E5B","津南":"#F18F01","廣域":"#8D6E63"};
 const ORDER = ["十日町","川西","中里","松代","松之山","津南","廣域"];
 const LS_KEY = "etmap2026_saved", LS_ROUTE = "etmap2026_route", LS_ROUTES = "etmap2026_routes";
@@ -2134,7 +2148,7 @@ $("clear").onclick = () => {
 };
 
 /* ===== breathing zoom (plain version only) ===== */
-var zoomUpdate = null;
+var zoomUpdate = null, areaRedraw = null;
 if (!ILL){
   const CLOSE_Z = 14, NOCLU_Z = 17;
   const areaLbl = L.layerGroup().addTo(map), cluLayer = L.layerGroup().addTo(map), lblLayer = L.layerGroup().addTo(map);
@@ -2148,19 +2162,64 @@ if (!ILL){
     if (q.value.trim()) DATA.forEach(d => { if (d.marker && map.hasLayer(d.marker) && d.hay.includes(norm(q.value.trim()))) p.add(d.作品編號); });
     return p;
   };
+  /* 區域標籤避讓：先試原位置，再依序試這些偏移（px），並保持在可見地圖範圍內 */
+  const AREA_OFFS = [[0,0],[0,-30],[0,30],[-40,0],[40,0],[-40,-30],[40,-30],[-40,30],[40,30],[0,-50],[0,50],[-55,0],[55,0],[-55,-50],[55,-50],[-55,50],[55,50],[0,-70],[0,70],[-70,0],[70,0],[-70,-70],[70,-70],[-70,70],[70,70]];
+  /* 等瀏覽器畫完這一幀再量標籤尺寸，避免強制重排 */
+  let areaPend = 0;
   function drawAreaLabels(){
+    if (areaPend) return;
+    areaPend = requestAnimationFrame(() => setTimeout(() => { areaPend = 0; if (level() === "over" && !document.body.classList.contains("route-view")) drawAreaNow(); }, 0));
+  }
+  function drawAreaNow(){
+    const I = insets(), sz = map.getSize(), mr = map.getContainer().getBoundingClientRect();
     areaLbl.clearLayers();
     const cnt = {};
     DATA.forEach(d => { if (d.marker && map.hasLayer(d.marker)) cnt[d.地區] = (cnt[d.地區] || 0) + 1; });
     const z = map.getZoom(), pins = pinnedSet();
     const pp = DATA.filter(d => d.marker && pins.has(d.作品編號) && map.hasLayer(d.marker)).map(d => map.project(d.marker.getLatLng(), z));
+    /* 地圖可用高度不足（例如手機面板半開）或縮放 9 以下時，只顯示區名與件數 */
+    const availH = sz.y - I.top - I.bottom + 32;
+    const showReps = z > 9 && availH >= 500;
+    const els = [];
     Object.entries(areaCenters).forEach(([a, o]) => {
       if (!cnt[a]) return;
       let p = map.project(o.ll, z);
       for (let k = 0; k < 4 && pp.some(q => Math.abs(q.x - p.x) < 52 && Math.abs(q.y - p.y) < 22); k++) p = p.add([0, 26]);
-      L.marker(map.unproject(p, z), {icon:L.divIcon({className:"area-count", html:`<span style="border-color:${COLORS[a]}">${esc(a)} <b>${cnt[a]}</b></span>`, iconSize:[90, 28], iconAnchor:[45, 14]})})
-        .on("click", () => map.flyToBounds(o.b, Object.assign(anim(.6), pads())))
+      const reps = showReps ? (AREA_REPS[a] || []).filter(r => BY[r[0]] && BY[r[0]].marker) : [];
+      const repHtml = reps.map(([c, t]) => { const d = BY[c]; return `<button type="button" class="ac-rep" data-rep="${esc(c)}" aria-label="${esc(t)}，${esc(d.中文名 || d.作品名稱)}，開啟作品">${esc(t)}</button>`; }).join("");
+      const m = L.marker(map.unproject(p, z), {keyboard:false, icon:L.divIcon({className:"area-count", html:`<div class="ac-box" style="border-color:${COLORS[a]}"><button type="button" class="ac-area" aria-label="${esc(a)} ${cnt[a]} 件，放大到此區">${esc(a)} <b>${cnt[a]}</b></button>${repHtml}</div>`, iconSize:null, iconAnchor:[0, 0]})})
+        .on("click", e => {
+          const t = e.originalEvent && e.originalEvent.target.closest && e.originalEvent.target.closest("[data-rep]");
+          if (t && BY[t.dataset.rep]) zoomTo(BY[t.dataset.rep]);
+          else map.flyToBounds(o.b, Object.assign(anim(.6), pads()));
+        })
         .addTo(areaLbl);
+      const el = m.getElement(); if (el) els.push(el);
+    });
+    /* 置中後依由上而下的順序做避讓 */
+    const V = {l:Math.max(4, I.left - 16), r:Math.min(sz.x - 4, sz.x - I.right + 16), t:Math.max(4, I.top - 12), b:Math.min(sz.y - 4, sz.y - I.bottom + 12)};
+    /* 先一次讀完尺寸與位置，再一次寫入，避免反覆重排 */
+    const info = els.map(el => { const r = el.firstElementChild.getBoundingClientRect(); return [el, {x:r.left - mr.left - r.width / 2, y:r.top - mr.top - r.height / 2, w:r.width, h:r.height}]; });
+    info.forEach(([el, r]) => { el._m = [-r.w / 2, -r.h / 2]; });
+    const placed = [], G = 4;
+    const hit = r => placed.some(o => r.x < o.x + o.w + G && r.x + r.w + G > o.x && r.y < o.y + o.h + G && r.y + r.h + G > o.y);
+    const inV = r => r.x >= V.l && r.x + r.w <= V.r && r.y >= V.t && r.y + r.h <= V.b;
+    info.sort((p, q) => p[1].y - q[1].y).forEach(([el, r0]) => {
+      let best = null;
+      for (const [dx, dy] of AREA_OFFS){
+        const r = {x:r0.x + dx, y:r0.y + dy, w:r0.w, h:r0.h};
+        if (!hit(r) && inV(r)){ best = [dx, dy, r]; break; }
+      }
+      if (!best){ /* 找不到就選重疊最少的位置 */
+        let bs = Infinity;
+        for (const [dx, dy] of AREA_OFFS){
+          const r = {x:r0.x + dx, y:r0.y + dy, w:r0.w, h:r0.h};
+          const ov = placed.reduce((s, o) => s + Math.max(0, Math.min(r.x + r.w, o.x + o.w) - Math.max(r.x, o.x)) * Math.max(0, Math.min(r.y + r.h, o.y + o.h) - Math.max(r.y, o.y)), 0) + (inV(r) ? 0 : 1e5);
+          if (ov < bs){ bs = ov; best = [dx, dy, r]; }
+        }
+      }
+      el.style.marginLeft = el._m[0] + best[0] + "px"; el.style.marginTop = el._m[1] + best[1] + "px";
+      placed.push(best[2]);
     });
   }
   let groups = [];
@@ -2241,7 +2300,11 @@ if (!ILL){
   };
   let tmr = null;
   map.on("zoomend", () => zoomUpdate());
-  map.on("moveend", () => { clearTimeout(tmr); tmr = setTimeout(() => { if (level() === "close"){ const pins = pinnedSet(); labels("close", pins); } }, 80); });
+  let atm = null;
+  const redrawArea = () => { clearTimeout(atm); atm = setTimeout(() => { if (level() === "over" && !document.body.classList.contains("route-view")) drawAreaLabels(); }, 60); };
+  map.on("resize", redrawArea);
+  areaRedraw = redrawArea;
+  map.on("moveend", () => { if (level() === "over") redrawArea(); clearTimeout(tmr); tmr = setTimeout(() => { if (level() === "close"){ const pins = pinnedSet(); labels("close", pins); } }, 80); });
   q.addEventListener("input", () => zoomUpdate());
 }
 
@@ -2271,6 +2334,7 @@ if (SHEET){
     sheetState = s;
     if (!useSheet()){ panel.style.height = ""; root.style.setProperty("--sheet-h", "0px"); return; }
     apply(snapH(s)); panel.dataset.state = s;
+    if (areaRedraw){ areaRedraw(); clearTimeout(panel._art); panel._art = setTimeout(areaRedraw, 320); }
     handle.setAttribute("aria-expanded", s !== "peek");
     handle.setAttribute("aria-label", s === "full" ? "收合面板" : "展開面板");
   };
