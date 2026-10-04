@@ -767,6 +767,11 @@ ul.lst code,.rlist code{font-size:11px;color:#777;margin-right:4px}
 .cflag{font-size:11px;color:#888}
 .btime{color:#1B4F8A}
 .tabs .n{margin-left:3px;font-size:.85em;opacity:.75}
+.pane-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
+.pane-head[hidden]{display:none}
+.pane-head span{font-size:13px;color:#5c5c5c}
+.danger{min-height:44px;padding:0 14px;border:1px solid #e3c9c6;border-radius:10px;background:#fff;color:#A3271F;font:inherit;font-size:14px;cursor:pointer}
+.danger:active{background:#fbf1f0}
 
 /* ===== plain overrides (index.html only) ===== */
 .tabs{flex-wrap:nowrap;gap:0;margin:0;padding:0 12px;border-bottom:1px solid var(--line)}
@@ -930,18 +935,20 @@ a{color:inherit}
     <ul class="lst" id="list"></ul>
   </div>
   <div id="pane-l" role="tabpanel" style="display:none">
+    <div class="pane-head" id="lhead" hidden><span id="lheadt"></span><button id="clear" type="button" class="danger">清空清單</button></div>
     <label class="chk"><input type="checkbox" id="onlyfav">地圖只顯示清單作品</label>
     <ul class="lst" id="favlist"></ul>
     <div class="box">
       <b>搬到另一台裝置</b>
       <div class="btns" style="margin-top:4px"><button id="copy">複製清單代碼</button><button id="dl">下載 JSON</button></div>
       <textarea id="io" aria-label="清單代碼或 JSON" placeholder="把清單代碼或 JSON 內容貼在這裡，再按匯入"></textarea>
-      <div class="btns"><button id="imp">匯入（合併）</button><label class="b">選擇 JSON 檔<input type="file" id="file" accept=".json,application/json,text/plain" hidden></label><button id="clear">清空清單</button></div>
+      <div class="btns"><button id="imp">匯入（合併）</button><label class="b">選擇 JSON 檔<input type="file" id="file" accept=".json,application/json,text/plain" hidden></label></div>
       <div id="msg"></div>
       <div class="muted">代碼與 JSON 都包含我的清單和已儲存的路線。</div>
     </div>
   </div>
   <div id="pane-r" role="tabpanel" style="display:none">
+    <div class="pane-head" id="rhead" hidden><span id="rheadt"></span><button id="rclear" type="button" class="danger">清除路線</button></div>
     <div id="rnote" class="rnote"></div>
     <div class="rrow"><input id="rname" aria-label="路線名稱" placeholder="路線名稱，例如 10/31 明石之湯日"><select id="rmode" aria-label="交通方式"><option value="drive">開車</option><option value="walk">步行</option><option value="bus">巴士</option></select></div>
     <ol class="rlist" id="rlist"></ol>
@@ -949,7 +956,7 @@ a{color:inherit}
     <div id="rgmap"></div>
     <div class="btns" style="margin-top:6px"><button id="raddfav">加入清單全部作品</button><button id="rsel">路線作品加進清單</button></div>
     <div class="btns" style="margin-top:6px"><select id="rplace" class="b" aria-label="選擇車站"><option>十日町站</option><option>越後湯澤站</option><option>まつだい站</option><option>津南站</option></select><button id="raddplace">加入車站</button></div>
-    <div class="btns" style="margin-top:6px"><button id="rsave">儲存路線</button><button id="rfit">看整條路線</button><button id="rclear">清空路線</button></div>
+    <div class="btns" style="margin-top:6px"><button id="rsave">儲存路線</button><button id="rfit">看整條路線</button></div>
     <div id="rmsg" class="okmsg"></div>
     <div class="box"><b>已儲存的路線</b><ul class="lst" id="rsaved"></ul></div>
     <div class="muted" style="margin-top:6px">可拖曳或用 ↑ ↓ 調整順序。路線時間由 OSRM 免費路線服務估算，連不上時改用直線估算。</div>
@@ -1334,6 +1341,7 @@ function render(){
 }
 function renderFav(){
   $("favn").textContent = saved.length;
+  const lh = $("lhead"); if (lh){ lh.hidden = !saved.length; $("lheadt").textContent = `共 ${saved.length} 件`; }
   const ul = $("favlist");
   ul.innerHTML = saved.length ? "" : '<li style="color:#888;cursor:default">還沒有收藏，在作品卡片或搜尋結果按 ☆ 加入</li>';
   saved.forEach(c => {
@@ -1472,6 +1480,7 @@ function renderRouteList(pending){
   renderGmaps();
   renderSavedRoutes();
   const rn = $("routen"); if (rn) rn.textContent = route.stops.length;
+  const rh = $("rhead"); if (rh){ rh.hidden = !route.stops.length; $("rheadt").textContent = `目前路線 ${route.stops.length} 站`; }
 }
 function gmapsUrls(){
   const st = validStops(route.stops); if (st.length < 2) return [];
@@ -1516,7 +1525,18 @@ $("rname").addEventListener("change", e => { route.name = e.target.value.trim();
 $("rmode").addEventListener("change", e => { route.mode = e.target.value; persist(); updateRoute(false); });
 $("raddfav").onclick = () => { saved.forEach(c => { if (BY[c] && BY[c].marker && !route.stops.some(s => s.c === c)) route.stops.push({c}); }); persist(); updateRoute(true); };
 $("raddplace").onclick = () => { const n = $("rplace").value; if (PLACES[n]) addStop({p:n, lat:PLACES[n][0], lng:PLACES[n][1]}); };
-$("rclear").onclick = () => { if (!route.stops.length || confirm("確定要清空目前路線嗎？")){ route = {name:"", stops:[], mode:route.mode}; persist(); updateRoute(false); } };
+function clearRoute(){
+  if (!route.stops.length) return;
+  if (!confirm(`確定要清除目前路線（${route.stops.length} 站）嗎？\n已儲存的路線不受影響。`)) return;
+  route = {name:"", stops:[], mode:route.mode, url:""};
+  persist();
+  const note = $("rnote"); if (note) note.innerHTML = "";
+  const rn = $("rname"); if (rn) rn.value = "";
+  updateRoute(false);
+  if (typeof zoomUpdate === "function" && zoomUpdate) zoomUpdate();
+  const m = $("rmsg"); if (m) m.textContent = "路線已清除";
+}
+$("rclear").onclick = clearRoute;
 $("rfit").onclick = fitRoute;
 $("rsave").onclick = () => {
   let name = ($("rname").value || "").trim();
@@ -1631,7 +1651,10 @@ $("dl").onclick = () => {
 };
 $("imp").onclick = () => say(impMsg(importText(io.value)));
 $("file").onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { say(impMsg(importText(t))); e.target.value = ""; }); };
-$("clear").onclick = () => { if (confirm("確定要清空我的清單嗎？（路線不受影響）")){ saved = []; persist(); refreshAll(); say("清單已清空"); } };
+$("clear").onclick = () => {
+  if (!saved.length) return;
+  if (confirm(`確定要清空我的清單（${saved.length} 件）嗎？\n想先備份，請按取消，再用下方「複製清單代碼」或「下載 JSON」。\n路線不受影響。`)){ saved = []; persist(); refreshAll(); say("清單已清空"); }
+};
 
 /* ===== breathing zoom (plain version only) ===== */
 var zoomUpdate = null;
