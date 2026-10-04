@@ -915,6 +915,7 @@ a{color:inherit}
   #toast{top:calc(68px + env(safe-area-inset-top))}
 }
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media (min-width:701px){#panel>.sheet-body{flex:1 1 auto}}
 </style>
 </head>
 <body>
@@ -925,7 +926,7 @@ a{color:inherit}
   <button id="sheet-handle" type="button" aria-label="展開面板" aria-expanded="false" aria-controls="sheet-body"></button>
   <h1>大地藝術祭 2026 作品地圖</h1>
   <div class="sub">越後妻有常設與公開作品 <b id="total"></b> 件</div>
-  <div class="daterow"><label for="day">今天開不開</label><input type="date" id="day"><button id="today" type="button">今天</button></div>
+  <div class="daterow"><label for="day">今天開不開</label><input type="date" id="day" min="2026-04-25" max="2026-11-08"><button id="today" type="button">今天</button></div>
   <div id="daystat" aria-live="polite"></div>
   <div class="tabs" id="tabs" role="tablist" aria-label="面板分頁"><button id="tab-s" class="on" role="tab" aria-selected="true" aria-controls="pane-s">搜尋</button><button id="tab-l" role="tab" aria-selected="false" aria-controls="pane-l">我的清單<span class="n" id="favn">0</span></button><button id="tab-r" role="tab" aria-selected="false" aria-controls="pane-r">路線<span class="n" id="routen">0</span></button><button id="tab-p" role="tab" aria-selected="false" aria-controls="pane-p">推薦路線</button></div>
   <div class="sheet-body" id="sheet-body">
@@ -1052,9 +1053,13 @@ function parseRule(text){
 }
 function dayInfo(d, dateStr){
   const out = {state:"unknown", tags:[]};
+  if (dateStr < SEASON[0] || dateStr > SEASON[1]){ out.state = "closed"; out.tags.push("不在 2026 會期內（4/25～11/8）"); return out; }
   if (/預約/.test(d.開放類型 || "")) out.tags.push("需預約");
   const R = d._rule;
-  if (!R) return out;
+  if (!R){
+    if (d.kind === "outdoor"){ out.state = "open"; out.tags.push("戶外作品，會期內自由參觀"); }
+    return out;
+  }
   if (R.bad.length) out.tags.push("休館日格式有看不懂的字：" + R.bad.join(" "));
   const [y, m, dd] = dateStr.split("-").map(Number);
   const v = m * 100 + dd, wd = new Date(y, m - 1, dd).getDay(), hol = HOLIDAYS.has(dateStr);
@@ -1077,6 +1082,7 @@ function dayInfo(d, dateStr){
   else if (ruled) out.state = "open";
   return out;
 }
+const SEASON = ["2026-04-25", "2026-11-08"];
 const STATE_TXT = {open:"這天開放", closed:"這天休館", unknown:"尚未公布開放資訊"};
 const STATE_SHORT = {open:"開放", closed:"休館", unknown:"未公布"};
 
