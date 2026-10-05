@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>大地藝術祭 2026 作品地圖｜越後妻有</title>
-<meta name="build" content="2026-10-06 07:27">
+<meta name="build" content="2026-10-06 07:38">
 <meta name="description" content="越後妻有大地藝術祭 2026 常設與公開作品地圖：依日期查看開館與休館，收藏我的清單，排出開車、步行或巴士路線。">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
@@ -1161,7 +1161,7 @@ a{color:inherit}
   <h1>大地藝術祭 2026 作品地圖</h1>
   <div class="sub">越後妻有常設與公開作品 <b id="total"></b> 件</div>
   <div id="mdesc">選日期看作品當天能不能參觀，點地圖上的點看詳情</div>
-  <div class="daterow" id="daterow"><label for="day">今天開不開</label><input type="date" id="day" min="2026-04-25" max="2026-11-08"><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
+  <div class="daterow" id="daterow"><label for="day">今天開不開</label><input type="date" id="day" min="2026-04-25" max="2027-03-31"><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
   <div id="daystat" aria-live="polite"></div>
   <div class="tabs" id="tabs" role="tablist" aria-label="面板分頁"><button id="tab-s" class="on" role="tab" aria-selected="true" aria-controls="pane-s">搜尋</button><button id="tab-l" role="tab" aria-selected="false" aria-controls="pane-l"><span class="tl-long">我的</span>清單<span class="n" id="favn">0</span></button><button id="tab-r" role="tab" aria-selected="false" aria-controls="pane-r">路線<span class="n" id="routen">0</span></button><button id="tab-p" role="tab" aria-selected="false" aria-controls="pane-p">推薦路線</button></div>
   <div class="sheet-body" id="sheet-body">
@@ -1781,8 +1781,14 @@ if ($("bd")) $("bd").onclick = () => { bdOn = !bdOn; bdOn ? boundary.addTo(map) 
 
 const dayEl = $("day");
 const tokyoToday = () => new Intl.DateTimeFormat("en-CA", {timeZone:"Asia/Tokyo", year:"numeric", month:"2-digit", day:"2-digit"}).format(new Date());
-dayEl.value = tokyoToday();
-const curDay = () => dayEl.value || tokyoToday();
+const clampDay = d => {
+  const v = d || tokyoToday();
+  if (dayEl.min && v < dayEl.min) return dayEl.min;
+  if (dayEl.max && v > dayEl.max) return dayEl.max;
+  return v;
+};
+dayEl.value = clampDay(tokyoToday());
+const curDay = () => dayEl.value || clampDay(tokyoToday());
 
 /* ===== marker types (illustrated icons) ===== */
 const INDOOR = new Set(["越後妻有里山現代美術館 MonET","越後妻成里山現代美術館 MonET","うぶすなの家","絵本と木の実の美術館","清津倉庫美術館","清津峡トンネル","まつだい「農舞台」","まつだい郷土資料館","手をたずさえる塔","松代城","奴奈川キャンパス","華園（中国ハウス）","脱皮する家","越後松之山 「森の学校」キョロロ","最後の教室","オーストラリア・ハウス","三省ハウス","上郷クローブ座","香港ハウス","アケヤマ －秋山郷立大赤沢小学校－","かたくりの宿","越後妻有文化ホール 段十ろう","清水ミュージアム","商店街／関谷邸","市街地/產業發信館"]);
@@ -2015,9 +2021,9 @@ function syncDayLabel(){
   const lab = document.querySelector('label[for="day"]');
   if (lab) lab.textContent = (dayEl.value === tokyoToday()) ? "今天開不開" : "這天開不開";
 }
-dayEl.addEventListener("change", () => { if (!dayEl.value) dayEl.value = tokyoToday(); syncDayLabel(); render(); });
+dayEl.addEventListener("change", () => { dayEl.value = clampDay(dayEl.value || tokyoToday()); syncDayLabel(); render(); });
 syncDayLabel();
-$("today").onclick = () => { dayEl.value = tokyoToday(); syncDayLabel(); render(); };
+$("today").onclick = () => { dayEl.value = clampDay(tokyoToday()); syncDayLabel(); render(); };
 $("total").textContent = DATA.length;
 const TABS = ["s", "l", "r", "p"];
 let detailCode = null, lastTab = "s";
