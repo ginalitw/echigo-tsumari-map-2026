@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>大地藝術祭 2026 作品地圖｜越後妻有</title>
-<meta name="build" content="2026-10-06 07:54">
+<meta name="build" content="2026-10-06 07:59">
 <meta name="description" content="越後妻有大地藝術祭 2026 常設與公開作品地圖：依日期查看開館與休館，收藏我的清單，排出開車、步行或巴士路線。">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
@@ -2780,6 +2780,7 @@ if (!ILL){
   /* 先試三行標籤（區名＋兩件代表作品）；只要有標籤重疊或超出可見地圖就退回只顯示區名與件數。
      手機面板半開或全開時一律只顯示區名與件數，縮放 8 以下也不顯示代表作品。 */
   function drawAreaNow(){
+    if (document.body.classList.contains("route-view") || validStops(route.stops).length > 0){ areaLbl.clearLayers(); return; }
     const I = insets(), sz = map.getSize(), mr = map.getContainer().getBoundingClientRect();
     const sheetOpen = useSheet() && sheetState !== "peek";
     if (map.getZoom() >= 9 && !sheetOpen && placeAreaLabels(true, I, sz, mr)) return;
@@ -2900,7 +2901,9 @@ if (!ILL){
     document.body.classList.toggle("z-mid", lv === "mid");
     document.body.classList.toggle("z-close", lv === "close");
     const tb = document.body.dataset.tab;
-    const routeView = (tb === "r" && route.stops.length > 0) || (tb === "l" && saved.length > 0);
+    /* 有路線時（任一頁）隱藏區域／代表作標籤，避免與站號徽章重疊；清路線後才恢復 */
+    const hasRoute = validStops(route.stops).length > 0;
+    const routeView = hasRoute || (tb === "l" && saved.length > 0);
     document.body.classList.toggle("route-view", routeView);
     if (lv === "over" && !routeView) drawAreaLabels(); else areaLbl.clearLayers();
     cluster(lv, pins);
@@ -3003,11 +3006,13 @@ if (H.get("r")){
 }
 if (/^\d{4}-\d{2}-\d{2}$/.test(H.get("rd") || "") && H.get("rd") >= dayEl.min && H.get("rd") <= dayEl.max) dayEl.value = H.get("rd");
 render();
-updateRoute(false);
+/* 進頁若已有路線（本機儲存／分享 #r=／之後載入的預設），對齊路線範圍，不要停在全區縮放 */
+const bootRoute = !!(sharedRoute || validStops(route.stops).length);
+updateRoute(bootRoute);
 const tabMap = {list:"l", route:"r", presets:"p", search:"s"};
 if (H.get("preset")) loadPreset(H.get("preset"));
 if (H.get("tab")) showTab(tabMap[H.get("tab")] || H.get("tab"));
-if (sharedRoute){ showTab("r"); updateRoute(true); toast(`已載入分享的路線「${sharedRoute.name}」`); }
+if (sharedRoute){ showTab("r"); if (!bootRoute) updateRoute(true); toast(`已載入分享的路線「${sharedRoute.name}」`); }
 if (H.get("open") && BY[H.get("open")]) zoomTo(BY[H.get("open")]);
 if (H.get("q")){ q.value = H.get("q"); render(); }
 if (/^\d+(\.\d+)?$/.test(H.get("z") || "")) map.setView(H.get("c") ? H.get("c").split(",").map(Number) : map.getCenter(), +H.get("z"), {animate:false});
