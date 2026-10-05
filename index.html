@@ -988,6 +988,33 @@ path.area{transition:fill-opacity .25s ease;cursor:default}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 button:focus:not(:focus-visible){outline:none}
 a{color:inherit}
+/* 說明卡（第一次使用） */
+#mhelp{height:40px;padding:0 12px;border:none;border-radius:10px;background:rgba(255,255,255,.96);box-shadow:0 1px 2px rgba(0,0,0,.1),0 4px 14px rgba(0,0,0,.1);font:inherit;font-size:14px;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+#mhelp .mh-q{width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;font-size:12px;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+.onb{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+.onb[hidden]{display:none}
+.onb-bg{position:absolute;inset:0;background:rgba(29,29,27,.42)}
+.onb-box{position:relative;width:min(400px,100%);max-height:calc(100% - 16px);overflow-y:auto;box-sizing:border-box;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:12px 18px 14px;color:var(--ink);touch-action:pan-y}
+.onb-top{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin:-4px -8px 0 0}
+.onb-n{font-size:12.5px;color:var(--mute)}
+.onb-skip{min-height:44px;min-width:44px;padding:0 12px;border:none;background:none;font:inherit;font-size:14px;color:var(--mute);cursor:pointer;border-radius:8px}
+.onb-skip[hidden]{display:block;visibility:hidden}
+.onb-card{min-height:188px;animation:onbIn .18s ease-out}
+.onb-ic{display:block;width:48px;height:48px;margin:2px 0 10px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.onb-ic .f{fill:var(--accent);stroke:var(--ink)}
+.onb-card h2{font-size:18px;line-height:1.4;margin:0 0 8px;outline:none}
+.onb-card p{font-size:14.5px;line-height:1.65;margin:0 0 6px}
+.onb-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.onb-prev,.onb-next{min-height:44px;min-width:84px;padding:0 14px;border-radius:10px;font:inherit;font-size:14.5px;cursor:pointer}
+.onb-prev{border:1px solid var(--line,#d9d6ce);background:#fff;color:var(--ink)}
+.onb-prev:disabled{opacity:.4;cursor:default}
+.onb-next{border:1px solid var(--ink);background:var(--ink);color:#fff}
+.onb-dots{display:flex;gap:2px}
+.onb-dot{width:24px;height:44px;border:none;background:none;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.onb-dot:before{content:"";width:8px;height:8px;border-radius:50%;background:#d0cdc5}
+.onb-dot.on:before{background:var(--ink);width:18px;border-radius:4px}
+@keyframes onbIn{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.onb-card{animation:none}}
 /* ===== mobile: bottom sheet ===== */
 @media (max-width:700px){
   #panel{top:auto;left:0;right:0;bottom:0;width:auto;max-height:none;height:calc(158px + env(safe-area-inset-bottom));border-radius:16px 16px 0 0;box-shadow:0 -1px 0 rgba(0,0,0,.06),0 -8px 28px rgba(0,0,0,.12);padding-bottom:env(safe-area-inset-bottom);transition:height .28s cubic-bezier(.2,.8,.2,1)}
@@ -1007,6 +1034,11 @@ a{color:inherit}
   #mtools{top:calc(12px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right))}
   #mtools #mall{position:static}
   #mlegend{height:44px}
+  #mhelp{height:44px;width:44px;padding:0;justify-content:center}
+  #mtools{gap:6px}
+  #mlegend,#mall{padding:0 12px!important}
+  #mhelp .mh-t{display:none}
+  #mhelp .mh-q{width:22px;height:22px;font-size:13.5px}
   #legendpop{top:calc(64px + env(safe-area-inset-top));left:12px;right:12px;width:auto;max-width:400px;margin-left:auto;max-height:calc(100% - 80px - var(--sheet-h))}
   #mdesc{display:block;font-size:13px;color:var(--mute);margin:0 16px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #mtitle,#mall{display:flex;position:absolute;z-index:999;top:calc(12px + env(safe-area-inset-top));height:44px;align-items:center;background:rgba(255,255,255,.96);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.1),0 4px 14px rgba(0,0,0,.1);box-sizing:border-box}
@@ -3709,6 +3741,89 @@ if (FAN_ON) fanRoutesP().then(r => { r = Array.isArray(r) ? r : [];
   FAN_ROUTES = r.filter(x => (x.tier || "fan") === "fan"); FAN_NOTES = r.filter(x => x.tier === "notes" && PRESETS.some(p => p.id === x.attach_to)); renderPresets(); });
 if (CFG.init) CFG.init();
 if (zoomUpdate) zoomUpdate();
+
+/* ===== 第一次使用的說明卡：只出現一次（localStorage），「怎麼用」可再打開；從分享連結進來時這次先不顯示 ===== */
+const ONB_KEY = "etmap2026_onb1";
+const ONB_ICON = {
+  date:'<rect x="9" y="12" width="30" height="27" rx="4"/><path d="M9 20h30M17 8v8M31 8v8"/><circle cx="19" cy="28" r="2.2" class="f"/><circle cx="29" cy="28" r="2.2"/><circle cx="19" cy="34" r="2.2"/>',
+  tap:'<path d="M24 41s-11-11.5-11-19a11 11 0 0 1 22 0c0 7.5-11 19-11 19z"/><circle cx="24" cy="22" r="4"/>',
+  route:'<circle cx="12" cy="36" r="3.5"/><circle cx="36" cy="12" r="3.5"/><path d="M15 34c8-3 2-12 10-14s6-5 8-6" stroke-dasharray="3 3"/><path d="M30 34h8M34 30l4 4-4 4"/>',
+  stamp:'<circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="11" stroke-dasharray="2 2.5"/><path d="M18 25l4 4 8-9"/>',
+  qr:'<rect x="5" y="10" width="26" height="18" rx="2"/><path d="M2 32h32"/><rect x="30" y="18" width="15" height="24" rx="3"/><path d="M34 24h3v3h-3zM38 30h3v3h-3zM34 30h1M41 24v1"/>',
+  star:'<path d="M24 9l4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3L24 32.6l-9.3 4.9 1.8-10.3L9 19.9l10.4-1.5z"/>'
+};
+let ONB_CARDS = () => [
+  {icon:"date", t:"選日期，看開放狀態", x:["在「今天開不開」選日期，地圖上的點會顯示那天開放、休館或僅限住宿者。", "看不懂點的樣式，按右上角「圖例」。"]},
+  {icon:"tap", t:"點作品，看詳情與導航", x:["點地圖上的點或清單裡的作品名稱，就能看介紹和開放日。", "按「在 Google 地圖開啟」直接導航，按 ☆ 存進我的清單。"]},
+  {icon:"route", t:"加入路線，分享出去", x:["按「＋路線」把作品排成一條路線，會算出每段車程或步行時間。", "到「路線」分頁按「複製分享連結」，傳給同行的朋友。"]}
+];
+const onbSkip = !!(H.get("r") || H.get("it") || H.get("list") || H.get("open") || H.get("preset"));
+let onbI = 0, onbBack = null;
+function onbSeen(){ try { localStorage.setItem(ONB_KEY, "1"); } catch(e){} }
+function onbIsSeen(){ try { return localStorage.getItem(ONB_KEY) === "1"; } catch(e){ return true; } }
+function onbRender(){
+  const el = $("onb"), cs = ONB_CARDS(), c = cs[onbI], last = onbI === cs.length - 1;
+  el.querySelector(".onb-card").innerHTML = `<svg class="onb-ic" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${ONB_ICON[c.icon] || ""}</svg>` +
+    `<h2 id="onb-t" tabindex="-1">${esc(c.t)}</h2>${c.x.map(x => `<p>${esc(x)}</p>`).join("")}`;
+  el.querySelector(".onb-n").textContent = `第 ${onbI + 1} 張，共 ${cs.length} 張`;
+  el.querySelector(".onb-dots").innerHTML = cs.map((_, i) => `<button type="button" class="onb-dot${i === onbI ? " on" : ""}" data-onbi="${i}" aria-label="第 ${i + 1} 張：${esc(cs[i].t)}"${i === onbI ? ' aria-current="step"' : ""}></button>`).join("");
+  const pv = el.querySelector(".onb-prev"), nx = el.querySelector(".onb-next");
+  pv.disabled = onbI === 0; nx.textContent = last ? "開始使用" : "下一張";
+  el.querySelector(".onb-skip").hidden = last;
+}
+function onbGo(i, focusTitle){ const n = ONB_CARDS().length; if (i < 0 || i >= n) return; onbI = i; onbRender(); if (focusTitle) $("onb-t").focus(); }
+function onbOpen(){
+  const el = $("onb"); if (!el) return;
+  onbBack = document.activeElement; onbI = 0; onbRender(); el.hidden = false; document.body.classList.add("onb-on");
+  setTimeout(() => $("onb-t").focus(), 0);
+}
+function onbClose(){
+  const el = $("onb"); if (!el || el.hidden) return;
+  el.hidden = true; document.body.classList.remove("onb-on"); onbSeen();
+  const b = onbBack && document.contains(onbBack) && onbBack !== document.body ? onbBack : $("mhelp"); if (b && b.focus) b.focus();
+}
+(function(){
+  if (ILL) return;
+  document.body.insertAdjacentHTML("beforeend", `<div id="onb" class="onb" hidden><div class="onb-bg" data-onbx="1"></div>` +
+    `<div class="onb-box" role="dialog" aria-modal="true" aria-labelledby="onb-t" aria-describedby="onb-n"><div class="onb-top"><span class="onb-n" id="onb-n" aria-live="polite"></span><button type="button" class="onb-skip" data-onbx="1">略過</button></div>` +
+    `<div class="onb-card"></div><div class="onb-foot"><button type="button" class="onb-prev">上一張</button><div class="onb-dots"></div><button type="button" class="onb-next">下一張</button></div></div></div>`);
+  const el = $("onb"), box = el.querySelector(".onb-box");
+  el.addEventListener("click", e => {
+    if (e.target.closest("[data-onbx]")) onbClose();
+    else if (e.target.closest(".onb-prev")) onbGo(onbI - 1, true);
+    else if (e.target.closest(".onb-next")){ if (onbI === ONB_CARDS().length - 1) onbClose(); else onbGo(onbI + 1, true); }
+    else { const d = e.target.closest("[data-onbi]"); if (d) onbGo(+d.dataset.onbi, false); }
+  });
+  /* 放在 document：手指點到卡片空白處時焦點會落到 body，鍵盤仍要能用 */
+  document.addEventListener("keydown", e => {
+    if (el.hidden) return;
+    if (e.key === "Escape"){ e.preventDefault(); e.stopPropagation(); onbClose(); return; }
+    if ((e.key === "ArrowRight" || e.key === "ArrowLeft") && !/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){ e.preventDefault(); onbGo(onbI + (e.key === "ArrowRight" ? 1 : -1), false); const d = el.querySelector(".onb-dot.on"); if (e.target.classList.contains("onb-dot") && d) d.focus(); return; }
+    if (e.key !== "Tab") return;
+    const f = [...box.querySelectorAll("button:not([disabled]):not([hidden]), [href], [tabindex]:not([tabindex='-1'])")].filter(x => x.offsetParent !== null);
+    if (!f.length) return;
+    const a = f[0], z = f[f.length - 1];
+    const ae = document.activeElement, atTitle = ae && ae.id === "onb-t" && (ae.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING);
+    if (!box.contains(ae)){ e.preventDefault(); (e.shiftKey ? z : a).focus(); }
+    else if (e.shiftKey && (ae === a || atTitle)){ e.preventDefault(); z.focus(); }
+    else if (!e.shiftKey && ae === z){ e.preventDefault(); a.focus(); }
+  }, true);
+  /* 焦點跑到對話框外面時拉回來 */
+  document.addEventListener("focusin", e => { if (!el.hidden && !box.contains(e.target)) $("onb-t").focus(); });
+  /* 左右滑動換張 */
+  let x0 = null, y0 = 0;
+  box.addEventListener("pointerdown", e => { if (e.pointerType === "mouse") return; x0 = e.clientX; y0 = e.clientY; });
+  box.addEventListener("pointerup", e => { if (x0 == null) return; const dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) onbGo(onbI + (dx < 0 ? 1 : -1), false); });
+  box.addEventListener("pointercancel", () => { x0 = null; });
+  const tools = $("mtools"), lg = $("mlegend");
+  if (tools){ const b = document.createElement("button"); b.id = "mhelp"; b.type = "button"; b.setAttribute("aria-haspopup", "dialog"); b.title = "怎麼用";
+    b.innerHTML = '<span class="mh-q" aria-hidden="true">?</span><span class="mh-t">怎麼用</span>'; b.setAttribute("aria-label", "怎麼用");
+    b.onclick = () => { if ($("legendpop") && !$("legendpop").hidden && lg) lg.click(); onbOpen(); };
+    lg && lg.nextSibling ? tools.insertBefore(b, lg.nextSibling) : tools.appendChild(b); }
+  /* 等飯團擴充（附加在後面的程式）換好卡片內容再決定要不要顯示 */
+  setTimeout(() => { if (!onbSkip && !onbIsSeen()) onbOpen(); }, 0);
+})();
 
 /* ===== 離線：service worker 快取網頁與看過的底圖；離線時顯示小提示 ===== */
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
