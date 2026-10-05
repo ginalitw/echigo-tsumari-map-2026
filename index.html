@@ -968,6 +968,7 @@ path.area{transition:fill-opacity .25s ease;cursor:default}
 #mtitle,#mall{display:none}
 #mdesc{display:none}
 #mtools{position:absolute;z-index:999;top:10px;right:62px;display:flex;gap:8px}
+#mmenu,#mmenupop{display:none}
 #mlegend{height:40px;padding:0 14px;border:none;border-radius:10px;background:rgba(255,255,255,.96);box-shadow:0 1px 2px rgba(0,0,0,.1),0 4px 14px rgba(0,0,0,.1);font:inherit;font-size:14px;color:var(--ink);cursor:pointer}
 #mlegend[aria-expanded="true"]{box-shadow:0 0 0 2px var(--ink)}
 #legendpop{position:absolute;z-index:1100;top:58px;right:62px;width:320px;max-height:calc(100% - 80px);overflow-y:auto;box-sizing:border-box;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.1),0 8px 28px rgba(0,0,0,.16);padding:12px 14px 14px;font-size:13.5px;line-height:1.55;color:var(--ink)}
@@ -987,6 +988,13 @@ path.area{transition:fill-opacity .25s ease;cursor:default}
 #legendpop .lpbase label{display:inline-flex;align-items:center;gap:5px;min-height:36px;cursor:pointer}
 #legendpop .lpbase small{flex-basis:100%;color:var(--mute);font-size:12px}
 #legendpop .lpbase small:empty{display:none}
+#legendpop .lp-daystat{font-size:13px;line-height:1.5;color:var(--ink);margin:0 0 4px}
+.rhead-acts{display:inline-flex;gap:6px;align-items:center;margin-left:auto}
+#rhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#rquick{display:none}
+#pback{display:none}
+#redit{display:none}
+.day-more{display:none}
 #legendpop li small{display:block;color:var(--mute);font-size:12.5px}
 #toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translate(-50%,-8px);z-index:2000;max-width:calc(100% - 32px);box-sizing:border-box;background:var(--ink);color:#fff;font-size:14px;line-height:1.5;padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 #toast.on{opacity:1;transform:translate(-50%,0)}
@@ -1052,6 +1060,52 @@ a{color:inherit}
   #mtitle a{font-size:13px;font-weight:400;color:var(--mute);text-decoration:none;padding:0 10px;height:44px;display:flex;align-items:center;border-left:1px solid var(--line);margin-left:6px}
   #mall{right:calc(12px + env(safe-area-inset-right));border:none;font:inherit;font-size:14px;color:var(--ink);padding:0 14px;cursor:pointer}
   #toast{top:calc(68px + env(safe-area-inset-top))}
+
+  /* ===== 手機簡化：首屏地圖＋精簡日期、⋯選單、三個分頁、路線兩層編輯 ===== */
+  #mdesc{display:none}
+  #daystat{display:none;margin:4px 16px 6px;font-size:12.5px;line-height:1.45;color:var(--mute)}
+  body.daystat-open #daystat{display:block}
+  .daterow{margin:0 12px;gap:6px}
+  .daterow label{font-size:13px}
+  #day{font-size:15px;min-height:40px}
+  #today{min-height:40px;padding:0 12px}
+  .daterow{cursor:pointer}
+  .daterow .day-more{display:inline-flex;align-items:center;margin-left:auto;font-size:12px;color:var(--mute);border:none;background:none;padding:0 4px;min-height:40px;cursor:pointer}
+  /* 標題精簡，右上改 ⋯ 選單 */
+  #mtitle{max-width:calc(100vw - 72px);overflow:hidden;text-overflow:ellipsis;padding-right:12px}
+  #mtitle a{display:none}  /* 公開／飯團切換改到 ⋯ 選單 */
+  #mtools{gap:0}
+  #mlegend,#mhelp,#mall{display:none!important}
+  #mmenu{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:none;border-radius:12px;background:rgba(255,255,255,.96);box-shadow:0 1px 2px rgba(0,0,0,.1),0 4px 14px rgba(0,0,0,.1);font:inherit;font-size:22px;line-height:1;color:var(--ink);cursor:pointer;padding:0}
+  #mmenu[aria-expanded="true"]{box-shadow:0 0 0 2px var(--ink)}
+  #mmenupop{position:absolute;z-index:1200;top:calc(60px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));min-width:180px;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.1),0 8px 28px rgba(0,0,0,.16);padding:6px;display:flex;flex-direction:column;gap:2px}
+  #mmenupop[hidden]{display:none}
+  #mmenupop button,#mmenupop a{appearance:none;-webkit-appearance:none;display:flex;align-items:center;min-height:44px;padding:0 14px;border:none;border-radius:8px;background:none;font:inherit;font-size:15px;color:var(--ink);text-decoration:none;text-align:left;cursor:pointer;width:100%;box-sizing:border-box}
+  #mmenupop button:hover,#mmenupop a:hover,#mmenupop button:focus-visible,#mmenupop a:focus-visible{background:var(--wash);outline:none}
+  /* 三個分頁；推薦路線改由路線分頁「選建議」進入 */
+  #tabs .tl-long{display:none}
+  #tab-p{display:none!important}
+  .tabs button{flex:1 1 0;font-size:15px}
+  #pback{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  #rquick{display:flex;gap:8px;margin-bottom:8px}
+  #pane-r #rfit{display:none}  /* 改用上方「看整條路線」 */
+  #rquick .b{flex:1;min-height:40px}
+  .rhead-acts{display:inline-flex;gap:6px;align-items:center}
+  #redit{display:inline-flex;min-height:36px;padding:0 12px;font-size:13px;align-items:center;border:1px solid var(--line);border-radius:8px;background:#fff}
+  /* 路線預設精簡：隱藏編輯控件；按「編輯」後 body.redit-on 顯示 */
+  body:not(.redit-on) .redit-only{display:none!important}
+  body:not(.redit-on) #rlist .ud{display:none!important}
+  body:not(.redit-on) #rkml{display:none!important}
+  body:not(.redit-on) #rlist .stop{cursor:pointer;user-select:none}
+  body.redit-on #redit{background:#1d1d1b;color:#fff;border-color:#1d1d1b}
+  #rlist .stop .rst{display:inline-block;margin-left:6px;font-size:12px;color:var(--mute)}
+  #rlist .stop .rst.rst-closed{color:#b45309}
+  #rlist .stop .rst.rst-stay{color:#6b5b2a}
+  .fanbar{display:none}  /* 飯團提示改到 ⋯ 選單，首屏不佔空間 */
+}
+@media (min-width:701px){
+  #mmenu,#mmenupop,#rquick,#pback,#redit{display:none!important}
+  .rhead-acts #rclear{display:inline-flex}
 }
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 @media (min-width:701px){#panel>.sheet-body{flex:1 1 auto}}
@@ -1060,16 +1114,17 @@ a{color:inherit}
 <body>
 <div id="map" role="application" aria-label="作品地圖"></div>
 <header id="mtitle">大地藝術祭 2026</header>
-<div id="mtools"><button id="mlegend" type="button" aria-expanded="false" aria-controls="legendpop">圖例</button><button id="mall" type="button">看全區</button></div>
+<div id="mtools"><button id="mlegend" type="button" aria-expanded="false" aria-controls="legendpop">圖例</button><button id="mall" type="button">看全區</button><button id="mmenu" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mmenupop" aria-label="更多" title="更多">⋯</button></div>
+<div id="mmenupop" role="menu" aria-label="地圖選單" hidden></div>
 <div id="legendpop" role="dialog" aria-label="圖例" hidden></div>
 <div id="panel" role="region" aria-label="作品面板">
   <button id="sheet-handle" type="button" aria-label="展開面板" aria-expanded="false" aria-controls="sheet-body"></button>
   <h1>大地藝術祭 2026 作品地圖</h1>
   <div class="sub">越後妻有常設與公開作品 <b id="total"></b> 件</div>
   <div id="mdesc">選日期看作品當天能不能參觀，點地圖上的點看詳情</div>
-  <div class="daterow"><label for="day">今天開不開</label><input type="date" id="day" min="2026-04-25" max="2027-03-31"><button id="today" type="button">今天</button></div>
+  <div class="daterow" id="daterow"><label for="day">今天開不開</label><input type="date" id="day" min="2026-04-25" max="2027-03-31"><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
   <div id="daystat" aria-live="polite"></div>
-  <div class="tabs" id="tabs" role="tablist" aria-label="面板分頁"><button id="tab-s" class="on" role="tab" aria-selected="true" aria-controls="pane-s">搜尋</button><button id="tab-l" role="tab" aria-selected="false" aria-controls="pane-l">我的清單<span class="n" id="favn">0</span></button><button id="tab-r" role="tab" aria-selected="false" aria-controls="pane-r">路線<span class="n" id="routen">0</span></button><button id="tab-p" role="tab" aria-selected="false" aria-controls="pane-p">推薦路線</button></div>
+  <div class="tabs" id="tabs" role="tablist" aria-label="面板分頁"><button id="tab-s" class="on" role="tab" aria-selected="true" aria-controls="pane-s">搜尋</button><button id="tab-l" role="tab" aria-selected="false" aria-controls="pane-l"><span class="tl-long">我的</span>清單<span class="n" id="favn">0</span></button><button id="tab-r" role="tab" aria-selected="false" aria-controls="pane-r">路線<span class="n" id="routen">0</span></button><button id="tab-p" role="tab" aria-selected="false" aria-controls="pane-p">推薦路線</button></div>
   <div class="sheet-body" id="sheet-body">
   <div id="pane-s" role="tabpanel">
     <input id="q" type="search" enterkeyhint="search" autocomplete="off" aria-label="搜尋作品" placeholder="搜尋作品名稱、編號、藝術家或場館">
@@ -1098,23 +1153,24 @@ a{color:inherit}
   <div id="pane-r" role="tabpanel" style="display:none">
     <div id="rwinter" hidden></div>
     <div id="rcheck" class="rcheck" hidden aria-live="polite"></div>
-    <div class="pane-head" id="rhead" hidden><span id="rheadt"></span><button id="rclear" type="button" class="danger">清除路線</button></div>
+    <div class="pane-head" id="rhead" hidden><span id="rheadt"></span><span class="rhead-acts"><button type="button" class="b" id="redit" aria-pressed="false">編輯</button><button id="rclear" type="button" class="danger redit-only">清除路線</button></span></div>
     <div id="rnote" class="rnote"></div>
-    <div class="rrow"><input id="rname" aria-label="路線名稱" placeholder="路線名稱，例如 10/31 明石之湯日"><select id="rmode" aria-label="交通方式"><option value="drive">開車</option><option value="walk">步行</option><option value="bus">巴士</option><option value="train">電車</option></select></div>
-    <div class="rstart" id="rstart"><span class="rsl">起點</span></div>
-    <div class="btns rtools" id="rtools"><button id="ropt" type="button">自動排順序</button><label class="b chkb"><input type="checkbox" id="rloop">回到起點</label></div>
+    <div class="btns rquick" id="rquick"><button type="button" class="b" id="rpresets">選建議</button><button type="button" class="b" id="rfit2">看整條路線</button></div>
+    <div class="rrow"><input id="rname" aria-label="路線名稱" placeholder="路線名稱，例如 10/31 明石之湯日" class="redit-only"><select id="rmode" aria-label="交通方式"><option value="drive">開車</option><option value="walk">步行</option><option value="bus">巴士</option><option value="train">電車</option></select></div>
+    <div class="rstart redit-only" id="rstart"><span class="rsl">起點</span></div>
+    <div class="btns rtools redit-only" id="rtools"><button id="ropt" type="button">自動排順序</button><label class="b chkb"><input type="checkbox" id="rloop">回到起點</label></div>
     <ol class="rlist" id="rlist"></ol>
     <div id="rsum" class="rsum"></div>
     <div id="rgmap"></div>
     <div id="rkml" class="kmlbox" hidden><button id="rkmlbtn" type="button" class="kbtn">匯出到 Google My Maps</button><div class="muted knote">匯入需用電腦：Google My Maps → 建立新地圖 → 匯入 → 選這個檔案。之後在手機 Google 地圖的『已儲存 › 地圖』就看得到這些圖釘。</div></div>
-    <div class="btns" style="margin-top:6px"><button id="raddfav">加入清單全部作品</button><button id="rsel">路線作品加進清單</button></div>
-    <div class="btns" style="margin-top:6px"><select id="rplace" class="b" aria-label="選擇車站"><option>十日町站</option><option>越後湯澤站</option><option>まつだい站</option><option>津南站</option></select><button id="raddplace">加入車站</button></div>
-    <div class="btns" style="margin-top:6px"><button id="rsave">儲存路線</button><button id="rfit">看整條路線</button><button id="rshare" type="button">複製分享連結</button></div>
+    <div class="btns redit-only" style="margin-top:6px"><button id="raddfav">加入清單全部作品</button><button id="rsel">路線作品加進清單</button></div>
+    <div class="btns redit-only" style="margin-top:6px"><select id="rplace" class="b" aria-label="選擇車站"><option>十日町站</option><option>越後湯澤站</option><option>まつだい站</option><option>津南站</option></select><button id="raddplace">加入車站</button></div>
+    <div class="btns" style="margin-top:6px"><button id="rsave" class="redit-only">儲存路線</button><button id="rfit">看整條路線</button><button id="rshare" type="button">複製分享連結</button></div>
     <div id="rmsg" class="okmsg"></div>
-    <div class="box"><b>已儲存的路線</b><ul class="lst" id="rsaved"></ul></div>
-    <div class="muted" style="margin-top:6px">可拖曳或用 ↑ ↓ 調整順序，或按「自動排順序」（起點不動）。路線時間由 OSRM 免費路線服務估算；開車或步行連不上時改用直線估算並註明。</div>
+    <div class="box redit-only"><b>已儲存的路線</b><ul class="lst" id="rsaved"></ul></div>
+    <div class="muted redit-only" style="margin-top:6px">可拖曳或用 ↑ ↓ 調整順序，或按「自動排順序」（起點不動）。路線時間由 OSRM 免費路線服務估算；開車或步行連不上時改用直線估算並註明。</div>
   </div>
-  <div id="pane-p" role="tabpanel" style="display:none"><div id="presetlist"></div></div>
+  <div id="pane-p" role="tabpanel" style="display:none"><div class="pane-head pback" id="pback"><button type="button" class="b" id="pbackb" data-back-r="1">← 回路線</button><span>推薦路線</span></div><div id="presetlist"></div></div>
   <div id="pane-d" style="display:none" aria-live="polite"></div>
   </div>
 
@@ -1565,6 +1621,7 @@ if ($("legendpop")){
     `<div class="lps">點的顏色代表地區</div><div class="lpa">${ORDER.map(a => `<span><i style="background:${COLORS[a]}"></i>${a}</span>`).join("")}</div>` +
     `<div class="lps">點的樣式代表上方所選日期的狀態</div><ul>${LEGEND_ITEMS.map(([k, t, x]) => `<li>${legendSw(k)}<span>${t}<small>${x}</small></span></li>`).join("")}</ul>` +
     `<div class="lps">有數字的圓圈是同一處的多件作品，點一下放大。</div>` +
+    `<div class="lps">當日統計</div><div id="lp-daystat" class="lp-daystat" aria-live="polite"></div>` +
     (ILL ? "" : `<fieldset class="lpbase"><legend>底圖</legend>${Object.entries(BASES).map(([k, b]) => `<label><input type="radio" name="lpbase" value="${k}">${b.label}</label>`).join("")}<small id="lpbase-n" aria-live="polite"></small></fieldset>`);
   pop.addEventListener("change", e => { if (e.target.name !== "lpbase") return; store(BASE_KEY, e.target.value); baseWarned = false; setBase(e.target.value); });
   const setPop = on => { pop.hidden = !on; btn.setAttribute("aria-expanded", on); if (on) pop.querySelector(".lpx").focus(); };
@@ -1580,6 +1637,7 @@ function renderBaseSwitch(){
   const n = $("lpbase-n"); if (n) n.textContent = baseAuto ? "預設底圖載不到，暫時改用國土地理院。" : "";
 }
 renderBaseSwitch();
+if ($("lp-daystat") && $("daystat") && $("daystat").textContent) $("lp-daystat").textContent = $("daystat").textContent;
 if (SHEET) MQ.addEventListener("change", bindMarkers);
 function styleMarker(d){
   if (!d.marker) return;
@@ -1767,7 +1825,9 @@ function render(){
   $("stat").textContent = (t ? `找到 ${shown} 件` : `顯示 ${shown} 件`) + (nopt ? `，其中 ${nopt} 件無定點` : "") + (t && shown && fnote ? `。${fnote}` : "") +
     (todayOnly && offS ? "。會期外的冬季開放作品日期未公布，未列入" : "");
   const hol = HOLIDAYS.has(day) ? "（日本國定假日）" : "";
-  $("daystat").textContent = `${day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）${hol}${offS ? "，會期外" : ""}：開放 ${cnt.open}，定休日可觀看 ${cnt.view}，僅限住宿者 ${cnt.stay}，休館 ${cnt.closed}，未公布 ${cnt.unknown}${nwin ? `（含冬季開放 ${nwin}，以官方公告為準）` : ""}`;
+  const dayTxt = `${day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）${hol}${offS ? "，會期外" : ""}：開放 ${cnt.open}，定休日可觀看 ${cnt.view}，僅限住宿者 ${cnt.stay}，休館 ${cnt.closed}，未公布 ${cnt.unknown}${nwin ? `（含冬季開放 ${nwin}，以官方公告為準）` : ""}`;
+  $("daystat").textContent = dayTxt;
+  const dsL = $("lp-daystat"); if (dsL) dsL.textContent = dayTxt;
   renderFav();
   renderRouteList();
   renderPresets();
@@ -1915,7 +1975,7 @@ function renderRouteList(pending){
   $("rmode").value = route.mode || "drive";
   ul.innerHTML = "";
   const st = route.stops;
-  if (!st.length){ ul.innerHTML = '<li class="empty">還沒有站點。先點上面的起點，再到「搜尋」分頁按作品旁的「＋路線」，或從「推薦路線」載入一條再修改。</li>'; }
+  if (!st.length){ ul.innerHTML = '<li class="empty">還沒有站點。先點上面的起點，再到「搜尋」分頁按作品旁的「＋路線」，或按「選建議」載入一條再修改。</li>'; }
   let vi = 0, closed = 0, unk = 0, nview = 0, nstay = 0, nwin = 0;
   renderStartChips();
   st.forEach((s, i) => {
@@ -1928,10 +1988,12 @@ function renderRouteList(pending){
     } else if (ok && vi > 0 && pending && !TT(route.mode)){ const leg = document.createElement("li"); leg.className = "leg"; leg.textContent = "↓ 計算中"; ul.appendChild(leg); }
     if (s.c && BY[s.c] && !s.ret){ const di = dayInfo(BY[s.c], curDay()); if (di.state === "closed") closed++; if (di.state === "unknown"){ if (di.reason === "winter") nwin++; else unk++; } if (di.state === "view") nview++; if (di.state === "stay") nstay++; }
     const li = document.createElement("li");
-    li.className = "stop"; li.draggable = true; li.dataset.i = i;
+    li.className = "stop"; li.draggable = !useSheet() || document.body.classList.contains("redit-on"); li.dataset.i = i;
     const ll = ok && okLL(stopLL(s)) ? stopLL(s) : null;
     const fanX = [["lunch", "午餐"], ["parking", "停車"], ["toilet", "廁所"], ["photo", "拍照"], ["warn", "注意"]].filter(([k]) => s[k]);
-    li.innerHTML = `<span class="no">${ok ? ++vi : "?"}</span><span class="t">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${s.c && BY[s.c] && BY[s.c].中文名 && BY[s.c].中文名 !== BY[s.c].作品名稱 ? `<span class="tja" lang="ja">${esc(BY[s.c].作品名稱)}</span>` : ""}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}${s.c ? ` <code>${esc(s.c)}</code>` : ""}<br>${stopStatus(s)}` +
+    const _di = s.c && BY[s.c] && !s.ret ? dayInfo(BY[s.c], curDay()) : null;
+    const stLabel = _di ? ({open:"開放", view:"定休日可觀看", stay:"僅限住宿者", closed:"休館", unknown:"未公布"})[_di.state] : "";
+    li.innerHTML = `<span class="no">${ok ? ++vi : "?"}</span><span class="t">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${stLabel ? `<span class="rst rst-${_di.state}">${stLabel}</span>` : ""}${s.c && BY[s.c] && BY[s.c].中文名 && BY[s.c].中文名 !== BY[s.c].作品名稱 ? `<span class="tja" lang="ja">${esc(BY[s.c].作品名稱)}</span>` : ""}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}${s.c ? ` <code>${esc(s.c)}</code>` : ""}<br>${stopStatus(s)}` +
       (s.stay_min != null || s.tip ? `<span class="sfan">${s.stay_min != null ? `停留約 ${esc(s.stay_min)} 分` : ""}${s.stay_min != null && s.tip ? "，" : ""}${s.tip ? esc(s.tip) : ""}</span>` : "") +
       (fanX.length ? `<details class="sdet"><summary>排程細節</summary>${fanX.map(([k, t]) => `<div><b>${t}</b>：${esc(s[k])}</div>`).join("")}</details>` : "") +
       (ll ? gmLink(ll[0], ll[1], "sgm") : "") + `</span>` +
@@ -2572,7 +2634,7 @@ if (SHEET){
   q.addEventListener("keydown", e => { if (e.key === "Enter" && useSheet()){ q.blur(); setSheet("half"); } });
   window.addEventListener("resize", () => setSheet(sheetState));
   MQ.addEventListener("change", () => setSheet(sheetState));
-  setSheet(useSheet() ? "peek" : "half");
+  setSheet("half");  /* 手機預設半開，約一半地圖可見；可再往下收 */
   if ($("mall")) $("mall").onclick = () => fitAll(true);
 }
 fitAll();
@@ -2698,6 +2760,74 @@ function onbClose(){
     lg && lg.nextSibling ? tools.insertBefore(b, lg.nextSibling) : tools.appendChild(b); }
   /* 等飯團擴充（附加在後面的程式）換好卡片內容再決定要不要顯示 */
   setTimeout(() => { if (!onbSkip && !onbIsSeen()) onbOpen(); }, 0);
+})();
+
+/* ===== 手機簡化：⋯選單、日期統計展開、路線兩層編輯、推薦路線收進「選建議」 ===== */
+(function(){
+  const mob = () => useSheet();
+  /* ⋯ 選單 */
+  const menuBtn = $("mmenu"), menuPop = $("mmenupop");
+  if (menuBtn && menuPop){
+    const fill = () => {
+      const fanLink = ($("mtitle") && $("mtitle").querySelector("a")) ? $("mtitle").querySelector("a") : null;
+      const items = [
+        ["legend", "圖例"],
+        ["help", "怎麼用"],
+        ["all", "看全區"]
+      ];
+      let extra = "";
+      if (fanLink) extra += `<a role="menuitem" href="${fanLink.getAttribute("href")}">${fanLink.textContent.trim() || "公開地圖"}</a>`;
+      menuPop.innerHTML = items.map(([k, t]) => `<button type="button" role="menuitem" data-mm="${k}">${t}</button>`).join("") + extra;
+    };
+    fill();
+    const setMenu = on => { menuPop.hidden = !on; menuBtn.setAttribute("aria-expanded", on); if (on){ fill(); menuPop.querySelector("button,a").focus(); } };
+    menuBtn.onclick = e => { e.stopPropagation(); setMenu(menuPop.hidden); };
+    menuPop.addEventListener("click", e => {
+      const b = e.target.closest("[data-mm]"); if (!b) { if (e.target.closest("a")) setMenu(false); return; }
+      const k = b.dataset.mm; setMenu(false);
+      if (k === "legend"){ const lg = $("mlegend"); if (lg) lg.click(); }
+      else if (k === "help"){ const h = $("mhelp"); if (h) h.click(); else if (typeof onbOpen === "function") onbOpen(); }
+      else if (k === "all"){ if (typeof fitAll === "function") fitAll(true); }
+    });
+    document.addEventListener("click", e => { if (!menuPop.hidden && !e.target.closest("#mmenu,#mmenupop")) setMenu(false); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !menuPop.hidden){ setMenu(false); menuBtn.focus(); } });
+    map.on("click movestart", () => { if (!menuPop.hidden) setMenu(false); });
+  }
+  /* 日期列：點「統計」或日期旁展開當日件數（完整統計也在圖例裡） */
+  const more = $("daymore"), row = $("daterow");
+  const setDayStat = on => {
+    document.body.classList.toggle("daystat-open", on);
+    if (more) more.setAttribute("aria-expanded", on);
+    if (more) more.textContent = on ? "收合" : "統計";
+  };
+  if (more) more.onclick = e => { e.stopPropagation(); if (!mob()) return; setDayStat(!document.body.classList.contains("daystat-open")); };
+  /* 路線編輯兩層 */
+  const LS_REDIT = "etmap2026_redit";
+  const setEdit = on => {
+    document.body.classList.toggle("redit-on", on);
+    const b = $("redit"); if (b){ b.setAttribute("aria-pressed", on); b.textContent = on ? "完成" : "編輯"; }
+    try { if (mob()) localStorage.setItem(LS_REDIT, on ? "1" : "0"); } catch(e){}
+    if (typeof renderRouteList === "function") renderRouteList();
+  };
+  if ($("redit")){
+    $("redit").onclick = () => setEdit(!document.body.classList.contains("redit-on"));
+    /* 手機預設精簡；桌機永遠可視為編輯模式（CSS 不藏） */
+    if (mob()) setEdit(localStorage.getItem(LS_REDIT) === "1");
+    else document.body.classList.add("redit-on");
+  }
+  MQ.addEventListener("change", () => {
+    if (!mob()){ document.body.classList.add("redit-on"); document.body.classList.remove("daystat-open"); }
+    else if ($("redit")) setEdit(localStorage.getItem(LS_REDIT) === "1");
+  });
+  /* 選建議：打開推薦路線分頁（手機沒有第四個 tab） */
+  if ($("rpresets")) $("rpresets").onclick = () => { showTab("p"); if (typeof setSheet === "function" && sheetState === "peek") setSheet("half"); };
+  if ($("rfit2")) $("rfit2").onclick = () => { if ($("rfit")) $("rfit").click(); else if (typeof fitRoute === "function") fitRoute(); };
+  if ($("pbackb")) $("pbackb").onclick = () => showTab("r");
+  /* 載入建議路線後回路線分頁 */
+  if (typeof loadPreset === "function"){
+    const orig = loadPreset;
+    loadPreset = function(id){ orig(id); if (mob()) showTab("r"); };
+  }
 })();
 
 /* ===== 離線：service worker 快取網頁與看過的底圖；離線時顯示小提示 ===== */
