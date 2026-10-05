@@ -2170,16 +2170,20 @@ if (!ILL){
     if (areaPend) return;
     areaPend = requestAnimationFrame(() => setTimeout(() => { areaPend = 0; if (level() === "over" && !document.body.classList.contains("route-view")) drawAreaNow(); }, 0));
   }
+  /* 先試三行標籤（區名＋兩件代表作品）；只要有標籤重疊或超出可見地圖就退回只顯示區名與件數。
+     手機面板半開或全開時一律只顯示區名與件數，縮放 8 以下也不顯示代表作品。 */
   function drawAreaNow(){
     const I = insets(), sz = map.getSize(), mr = map.getContainer().getBoundingClientRect();
+    const sheetOpen = useSheet() && sheetState !== "peek";
+    if (map.getZoom() >= 9 && !sheetOpen && placeAreaLabels(true, I, sz, mr)) return;
+    placeAreaLabels(false, I, sz, mr);
+  }
+  function placeAreaLabels(showReps, I, sz, mr){
     areaLbl.clearLayers();
     const cnt = {};
     DATA.forEach(d => { if (d.marker && map.hasLayer(d.marker)) cnt[d.地區] = (cnt[d.地區] || 0) + 1; });
     const z = map.getZoom(), pins = pinnedSet();
     const pp = DATA.filter(d => d.marker && pins.has(d.作品編號) && map.hasLayer(d.marker)).map(d => map.project(d.marker.getLatLng(), z));
-    /* 地圖可用高度不足（例如手機面板半開）或縮放 9 以下時，只顯示區名與件數 */
-    const availH = sz.y - I.top - I.bottom + 32;
-    const showReps = z > 9 && availH >= 500;
     const els = [];
     Object.entries(areaCenters).forEach(([a, o]) => {
       if (!cnt[a]) return;
@@ -2202,6 +2206,7 @@ if (!ILL){
     const info = els.map(el => { const r = el.firstElementChild.getBoundingClientRect(); return [el, {x:r.left - mr.left - r.width / 2, y:r.top - mr.top - r.height / 2, w:r.width, h:r.height}]; });
     info.forEach(([el, r]) => { el._m = [-r.w / 2, -r.h / 2]; });
     const placed = [], G = 4;
+    let clean = true;
     const hit = r => placed.some(o => r.x < o.x + o.w + G && r.x + r.w + G > o.x && r.y < o.y + o.h + G && r.y + r.h + G > o.y);
     const inV = r => r.x >= V.l && r.x + r.w <= V.r && r.y >= V.t && r.y + r.h <= V.b;
     info.sort((p, q) => p[1].y - q[1].y).forEach(([el, r0]) => {
@@ -2211,6 +2216,7 @@ if (!ILL){
         if (!hit(r) && inV(r)){ best = [dx, dy, r]; break; }
       }
       if (!best){ /* 找不到就選重疊最少的位置 */
+        clean = false;
         let bs = Infinity;
         for (const [dx, dy] of AREA_OFFS){
           const r = {x:r0.x + dx, y:r0.y + dy, w:r0.w, h:r0.h};
@@ -2221,6 +2227,7 @@ if (!ILL){
       el.style.marginLeft = el._m[0] + best[0] + "px"; el.style.marginTop = el._m[1] + best[1] + "px";
       placed.push(best[2]);
     });
+    return clean;
   }
   let groups = [];
   function cluster(lv, pins){
