@@ -1,6 +1,6 @@
 /* 大地藝術祭 2026 作品地圖：離線快取
    網頁：先連網，連不上用快取；底圖與路線計算：先連網，成功就存一份，離線時用存過的。
-   底圖只存看過的圖磚（不預先下載），最多約 1500 張，超過就刪最舊的。 */
+   底圖（OpenStreetMap 與國土地理院）只存看過的圖磚（不預先下載），合計最多約 1500 張，超過就刪最舊的。 */
 const V = "v2";  // 每次改快取內容就加一，讓舊快取被清掉
 const PAGE = "etmap-page-" + V, TILE = "etmap-tiles-" + V, API = "etmap-api-" + V;
 const MAX = {[TILE]: 1500, [API]: 150};
@@ -35,6 +35,6 @@ self.addEventListener("fetch", e => {
   const u = new URL(req.url);
   if (req.mode === "navigate" && u.origin === location.origin){ e.respondWith(netFirst(req, PAGE, u.origin + u.pathname)); return; }
   if (u.origin === location.origin){ e.respondWith(netFirst(req, PAGE)); return; }
-  if (u.hostname === "tile.openstreetmap.org"){ e.respondWith(netFirst(req, TILE)); return; }
+  if (u.hostname === "tile.openstreetmap.org" || u.hostname === "cyberjapandata.gsi.go.jp"){ e.respondWith(netFirst(req, TILE)); return; }  // 兩種底圖共用同一個 1500 張上限
   if (u.hostname === "router.project-osrm.org" || u.hostname === "routing.openstreetmap.de"){ e.respondWith(netFirst(req, API)); return; }
 });

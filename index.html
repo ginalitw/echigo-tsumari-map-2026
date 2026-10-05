@@ -982,6 +982,11 @@ path.area{transition:fill-opacity .25s ease;cursor:default}
 #legendpop ul{list-style:none;margin:0;padding:0}
 #legendpop li{display:flex;align-items:flex-start;gap:8px;padding:3px 0}
 #legendpop li svg{flex:none;margin-top:2px}
+#legendpop .lpbase{border:none;margin:10px 0 0;padding:8px 0 0;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+#legendpop .lpbase legend{float:left;color:var(--mute);font-size:13px;padding:0;margin-right:4px}
+#legendpop .lpbase label{display:inline-flex;align-items:center;gap:5px;min-height:36px;cursor:pointer}
+#legendpop .lpbase small{flex-basis:100%;color:var(--mute);font-size:12px}
+#legendpop .lpbase small:empty{display:none}
 #legendpop li small{display:block;color:var(--mute);font-size:12.5px}
 #toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translate(-50%,-8px);z-index:2000;max-width:calc(100% - 32px);box-sizing:border-box;background:var(--ink);color:#fff;font-size:14px;line-height:1.5;padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 #toast.on{opacity:1;transform:translate(-50%,0)}
@@ -1346,13 +1351,35 @@ var ICONS = {
 /* ===== map ===== */
 const map = L.map("map", {zoomControl:false, zoomSnap: ILL ? 0.25 : 1, renderer: L.svg({tolerance: L.Browser.touch ? 12 : 0}), keyboard:true}).setView([37.08, 138.68], 11);
 L.control.zoom({position:"topright", zoomInTitle:"放大", zoomOutTitle:"縮小"}).addTo(map);
+/* 底圖：預設 OpenStreetMap；連續載不到（或離線又沒快取）就自動改用國土地理院淡色地圖。
+   圖例裡可手動切換「預設／國土地理院」，選擇存在 localStorage（自動切換不存） */
+const BASE_KEY = "etmap2026_base";
+const BASES = {
+  osm: {label:"預設", make: () => L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19, className:"soft-tiles", crossOrigin:"anonymous",
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 貢獻者，區域界線：國土數值情報 N03'})},
+  gsi: {label:"國土地理院", make: () => L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png", {maxZoom:19, maxNativeZoom:18, className:"soft-tiles soft-gsi", crossOrigin:"anonymous",
+    attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">出典：国土地理院</a>，區域界線：國土數值情報 N03'})}
+};
+const BASE_FAILS = 4;  // 連續幾張圖磚失敗就換底圖
+let baseLayer = null, baseNow = "", baseAuto = false, baseErr = 0, baseWarned = false;
+function setBase(k, auto){
+  if (ILL || !BASES[k]) return;
+  if (baseLayer){ map.removeLayer(baseLayer); baseLayer = null; }
+  baseNow = k; baseAuto = !!auto; baseErr = 0;
+  const lay = BASES[k].make();
+  lay.on("tileload", () => { baseErr = 0; });
+  lay.on("tileerror", () => {
+    if (lay !== baseLayer) return;
+    if (++baseErr < BASE_FAILS) return;
+    if (baseNow === "osm"){ setBase("gsi", true); if (typeof toast === "function") toast("預設底圖載不到，已改用國土地理院地圖"); return; }
+    if (!baseWarned && baseErr >= 6){ baseWarned = true; if (typeof toast === "function") toast("底圖暫時無法載入，作品與路線仍可使用"); }
+  });
+  baseLayer = lay.addTo(map); baseLayer.bringToBack();
+  if (typeof renderBaseSwitch === "function") renderBaseSwitch();
+}
 if (!ILL){
-  let tileErr = 0;
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19, className: "soft-tiles", crossOrigin: "anonymous",
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 貢獻者，區域界線：國土數值情報 N03'
-  }).on("tileerror", () => { if (++tileErr === 6 && typeof toast === "function") toast("底圖暫時無法載入，作品與路線仍可使用"); }).addTo(map);
-  document.head.insertAdjacentHTML("beforeend", "<style>.soft-tiles{filter:grayscale(.85) brightness(1.06) contrast(.9)}</style>");
+  document.head.insertAdjacentHTML("beforeend", "<style>.soft-tiles{filter:grayscale(.85) brightness(1.06) contrast(.9)}.soft-gsi{filter:grayscale(.7) brightness(1.02) contrast(.95)}</style>");
+  setBase(load(BASE_KEY, "osm") === "gsi" ? "gsi" : "osm");
 } else {
   map.attributionControl.addAttribution('區域界線：國土數值情報 N03（2000年），信濃川與車站：&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 貢獻者');
 }
@@ -1537,13 +1564,22 @@ if ($("legendpop")){
   pop.innerHTML = `<div class="lph"><b>圖例</b><button class="lpx" type="button" aria-label="關閉圖例">✕</button></div>` +
     `<div class="lps">點的顏色代表地區</div><div class="lpa">${ORDER.map(a => `<span><i style="background:${COLORS[a]}"></i>${a}</span>`).join("")}</div>` +
     `<div class="lps">點的樣式代表上方所選日期的狀態</div><ul>${LEGEND_ITEMS.map(([k, t, x]) => `<li>${legendSw(k)}<span>${t}<small>${x}</small></span></li>`).join("")}</ul>` +
-    `<div class="lps">有數字的圓圈是同一處的多件作品，點一下放大。</div>`;
+    `<div class="lps">有數字的圓圈是同一處的多件作品，點一下放大。</div>` +
+    (ILL ? "" : `<fieldset class="lpbase"><legend>底圖</legend>${Object.entries(BASES).map(([k, b]) => `<label><input type="radio" name="lpbase" value="${k}">${b.label}</label>`).join("")}<small id="lpbase-n" aria-live="polite"></small></fieldset>`);
+  pop.addEventListener("change", e => { if (e.target.name !== "lpbase") return; store(BASE_KEY, e.target.value); baseWarned = false; setBase(e.target.value); });
   const setPop = on => { pop.hidden = !on; btn.setAttribute("aria-expanded", on); if (on) pop.querySelector(".lpx").focus(); };
   btn.onclick = () => setPop(pop.hidden);
   pop.querySelector(".lpx").onclick = () => { setPop(false); btn.focus(); };
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !pop.hidden){ setPop(false); btn.focus(); } });
   map.on("click movestart", () => { if (!pop.hidden) setPop(false); });
 }
+/* 圖例裡的底圖切換：顯示目前用的底圖；自動改用時加註 */
+function renderBaseSwitch(){
+  const pop = $("legendpop"); if (!pop) return;
+  pop.querySelectorAll('input[name="lpbase"]').forEach(r => { r.checked = r.value === baseNow; });
+  const n = $("lpbase-n"); if (n) n.textContent = baseAuto ? "預設底圖載不到，暫時改用國土地理院。" : "";
+}
+renderBaseSwitch();
 if (SHEET) MQ.addEventListener("change", bindMarkers);
 function styleMarker(d){
   if (!d.marker) return;
