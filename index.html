@@ -10,7 +10,17 @@
 <meta property="og:locale" content="zh_TW">
 <meta property="og:title" content="大地藝術祭 2026 作品地圖">
 <meta property="og:description" content="越後妻有 231 件作品，依日期查看開館，收藏清單，排出巡遊路線。">
-<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://map.echigo.fans/">
+<meta property="og:url" content="https://map.echigo.fans/">
+<meta property="og:site_name" content="越後飯 ECHIGO FAN">
+<meta property="og:image" content="https://map.echigo.fans/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="大地藝術祭 2026 作品地圖｜越後飯 ECHIGO FAN">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json" id="ld-app">{"@context":"https://schema.org","@type":"WebApplication","name":"大地藝術祭 2026 作品地圖","alternateName":"越後妻有大地藝術祭 2026 作品地圖","url":"https://map.echigo.fans/","description":"越後妻有大地藝術祭 2026 常設與公開作品地圖：依日期查看開館與休館，收藏清單，排出開車、步行或巴士路線。","inLanguage":"zh-Hant","applicationCategory":"TravelApplication","operatingSystem":"Web","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"},"image":"https://map.echigo.fans/og.jpg","about":{"@type":"Thing","name":"大地の芸術祭 越後妻有アートトリエンナーレ","alternateName":"越後妻有大地藝術祭"},"spatialCoverage":{"@type":"Place","name":"越後妻有（十日町市・津南町）","address":{"@type":"PostalAddress","addressRegion":"新潟県","addressCountry":"JP"}},"publisher":{"@type":"Organization","@id":"https://echigo.fans/#org","name":"越後飯 ECHIGO FAN","url":"https://echigo.fans/"},"isPartOf":{"@type":"WebSite","@id":"https://echigo.fans/#website","url":"https://echigo.fans/","name":"越後飯 ECHIGO FAN"}}</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WV5P4V2MWM" id="ga-src"></script>
+<script id="ga-init">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-WV5P4V2MWM");</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23F2C200'/%3E%3Ccircle cx='16' cy='14' r='6.5' fill='none' stroke='%231d1d1b' stroke-width='3'/%3E%3Cpath d='M16 20.5v6' stroke='%231d1d1b' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
 <style>/* required styles */
@@ -1109,6 +1119,10 @@ a{color:inherit}
 }
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 @media (min-width:701px){#panel>.sheet-body{flex:1 1 auto}}
+.about{margin:20px 0 4px;padding:14px 0 0;border-top:1px solid var(--line);font-size:13px;line-height:1.7;color:var(--mute)}
+.about h2{font-size:14px;margin:0 0 4px;color:var(--ink);font-weight:600}
+.about p{margin:0 0 6px}
+.about a{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -1135,6 +1149,11 @@ a{color:inherit}
     <div id="wwarn-f" hidden></div>
     <div id="stat" aria-live="polite"></div>
     <ul class="lst" id="list"></ul>
+    <footer class="about" id="about">
+      <h2>關於這張地圖</h2>
+      <p>收錄越後妻有大地藝術祭 2026 的常設與公開作品，分布在十日町、川西、中里、松代、松之山、津南六區。選日期就能看作品當天開不開，把想去的收進清單，再排出開車、步行或巴士路線。開放資訊以官方公告為準。</p>
+      <p>由 <a href="https://echigo.fans/">越後飯 ECHIGO FAN</a> 製作。作品的實地走訪紀錄，請看<a href="https://echigo.fans/category/%E8%B6%8A%E5%BE%8C%E5%A4%A7%E5%9C%B0%E8%97%9D%E8%A1%93%E7%A5%AD/">越後妻有大地藝術祭文章</a>。</p>
+    </footer>
   </div>
   <div id="pane-l" role="tabpanel" style="display:none">
     <div class="pane-head" id="lhead" hidden><span id="lheadt"></span><button id="clear" type="button" class="danger">清空清單</button></div>
@@ -1439,6 +1458,7 @@ if (!ILL){
 } else {
   map.attributionControl.addAttribution('區域界線：國土數值情報 N03（2000年），信濃川與車站：&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 貢獻者');
 }
+map.attributionControl.setPrefix('<a href="https://echigo.fans/">越後飯 ECHIGO FAN</a> | <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
 let boundary;
 if (ILL){
   // two offset sketchy strokes + area labels
@@ -2777,6 +2797,7 @@ function onbClose(){
       ];
       let extra = "";
       if (fanLink) extra += `<a role="menuitem" href="${fanLink.getAttribute("href")}">${fanLink.textContent.trim() || "公開地圖"}</a>`;
+      extra += `<a role="menuitem" href="https://echigo.fans/">越後飯 ECHIGO FAN</a>`;
       menuPop.innerHTML = items.map(([k, t]) => `<button type="button" role="menuitem" data-mm="${k}">${t}</button>`).join("") + extra;
     };
     fill();
