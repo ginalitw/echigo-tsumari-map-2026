@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>大地藝術祭 2026 作品地圖｜越後妻有</title>
+<meta name="build" content="2026-10-06 07:27">
 <meta name="description" content="越後妻有大地藝術祭 2026 常設與公開作品地圖：依日期查看開館與休館，收藏我的清單，排出開車、步行或巴士路線。">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
@@ -746,7 +747,7 @@ ul.lst code,.rlist code{font-size:11px;color:#777;margin-right:4px}
 .rlist li.leg{font-size:12px;color:#8A6D00;padding:2px 0 2px 28px}
 .rsum{font-size:13px;margin:8px 0 4px;line-height:1.5}
 .gbtn{display:block;text-align:center;background:#1a73e8;color:#fff;text-decoration:none;border-radius:6px;padding:6px;margin:4px 0;font-size:13px}
-.rnum span{display:flex;width:24px;height:24px;border-radius:50%;background:#222;color:#F2C200;font-weight:700;font-size:13px;align-items:center;justify-content:center;border:2px solid #F2C200;box-sizing:border-box;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.rnum span{display:flex;width:24px;height:24px;border-radius:6px;background:#222;color:#F2C200;font-weight:700;font-size:13px;align-items:center;justify-content:center;border:2px solid #F2C200;box-sizing:border-box;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .rnum.rclosed span{background:#9E9E9E;color:#fff;border-color:#B3261E}
 .leaflet-popup-content{font-size:13px;line-height:1.55;min-width:210px}
 .pp-head{display:flex;align-items:center;gap:6px}
@@ -799,7 +800,7 @@ ul.lst code,.rlist code{font-size:11px;color:#777;margin-right:4px}
 .fanlock{margin:-2px 0 4px;padding:10px 12px;border:1px solid #e7e5df;border-radius:10px;font-size:13px}
 .fanlock[hidden]{display:none}
 .fanlock p{margin:0 0 8px}
-.pp-gm{text-decoration:none;color:#1a5fc8;box-sizing:border-box}
+.pp-gm{display:inline-flex;align-items:center;min-height:40px;padding:0 6px;text-decoration:none;color:#1a5fc8;box-sizing:border-box}
 .cnotes{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 8px;border-radius:8px;background:#efece4;color:#4a4436;font-size:12.5px}
 .cnotes.locked{cursor:pointer;min-height:32px}
 .cnotes .lock{vertical-align:-2px}
@@ -867,6 +868,14 @@ ul.lst li.grp:hover{background:none}
   .listbar{margin:4px 0 2px}
   .lsort button{padding:4px 9px;font-size:11.5px;min-height:28px}
 }
+
+#all-works{margin:12px 0 4px;font-size:13px;color:#3d3d3d}
+#all-works summary{cursor:pointer;font-weight:600;color:#1d1d1b;padding:6px 0}
+#all-works h3{font-size:13px;margin:12px 0 4px;color:#1d1d1b}
+#all-works ul{list-style:none;margin:0;padding:0}
+#all-works li{margin:0;padding:0;border-bottom:1px solid #eee}
+#all-works li button{display:block;width:100%;text-align:left;border:none;background:none;padding:8px 0;font:inherit;font-size:13px;color:inherit;cursor:pointer}
+#all-works li button:hover,#all-works li button:focus-visible{color:#1a5fc8}
 
 /* ===== plain overrides (index.html only) ===== */
 .tabs{flex-wrap:nowrap;gap:0;margin:0;padding:0 12px;border-bottom:1px solid var(--line)}
@@ -979,6 +988,10 @@ path.area{transition:fill-opacity .25s ease;cursor:default}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 .clu span{display:flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-size:13px;font-weight:700;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.25);box-sizing:border-box;text-shadow:0 0 2px rgba(0,0,0,.35)}
 .clu.clu-closed span{background:#8a8a8a!important;opacity:.7}
+#map.route-on path.mk,#map.route-on .clu{opacity:.4}
+#map.route-on .clu span{font-size:11px}
+#map.route-on .rnum{opacity:1}
+#map.route-on .leaflet-marker-icon.rnum{z-index:1000}
 .wlabel{pointer-events:none}
 .wlabel span{display:inline-block;white-space:nowrap;font-size:12px;line-height:17px;color:var(--ink);background:rgba(255,255,255,.9);border-radius:4px;padding:0 5px}
 .wlabel.wl-closed span{color:#6b6b6b}
@@ -993,7 +1006,7 @@ path.area{transition:fill-opacity .25s ease;cursor:default}
 #mmenu,#mmenupop{display:none}
 #mlegend{height:40px;padding:0 14px;border:none;border-radius:10px;background:rgba(255,255,255,.96);box-shadow:0 1px 2px rgba(0,0,0,.1),0 4px 14px rgba(0,0,0,.1);font:inherit;font-size:14px;color:var(--ink);cursor:pointer}
 #mlegend[aria-expanded="true"]{box-shadow:0 0 0 2px var(--ink)}
-#legendpop{position:absolute;z-index:1100;top:58px;right:62px;width:320px;max-height:calc(100% - 80px);overflow-y:auto;box-sizing:border-box;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.1),0 8px 28px rgba(0,0,0,.16);padding:12px 14px 14px;font-size:13.5px;line-height:1.55;color:var(--ink)}
+#legendpop{position:absolute;z-index:2100;top:58px;right:62px;width:320px;max-height:calc(100% - 80px);overflow-y:auto;box-sizing:border-box;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.1),0 8px 28px rgba(0,0,0,.16);padding:12px 14px 14px;font-size:13.5px;line-height:1.55;color:var(--ink)}
 #legendpop[hidden]{display:none}
 #legendpop .lph{display:flex;align-items:center;justify-content:space-between;margin:-4px -6px 4px 0}
 #legendpop .lph b{font-size:15px}
@@ -1095,12 +1108,12 @@ a{color:inherit}
   .daterow .day-more{display:inline-flex;align-items:center;margin-left:auto;font-size:12px;color:var(--mute);border:none;background:none;padding:0 4px;min-height:40px;cursor:pointer}
   /* 標題精簡，右上改 ⋯ 選單 */
   #mtitle{max-width:calc(100vw - 72px);overflow:hidden;text-overflow:ellipsis;padding-right:12px}
-  #mtitle a{display:none}  /* 公開／飯團切換改到 ⋯ 選單 */
+  #mtitle a{display:none}  /* 公開地圖連結改到 ⋯ 選單 */
   #mtools{gap:0}
   #mlegend,#mhelp,#mall{display:none!important}
   #mmenu{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:none;border-radius:12px;background:rgba(255,255,255,.96);box-shadow:0 1px 2px rgba(0,0,0,.1),0 4px 14px rgba(0,0,0,.1);font:inherit;font-size:22px;line-height:1;color:var(--ink);cursor:pointer;padding:0}
   #mmenu[aria-expanded="true"]{box-shadow:0 0 0 2px var(--ink)}
-  #mmenupop{position:absolute;z-index:1200;top:calc(60px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));min-width:180px;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.1),0 8px 28px rgba(0,0,0,.16);padding:6px;display:flex;flex-direction:column;gap:2px}
+  #mmenupop{position:absolute;z-index:2100;top:calc(60px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));min-width:180px;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.1),0 8px 28px rgba(0,0,0,.16);padding:6px;display:flex;flex-direction:column;gap:2px}
   #mmenupop[hidden]{display:none}
   #mmenupop button,#mmenupop a{appearance:none;-webkit-appearance:none;display:flex;align-items:center;min-height:44px;padding:0 14px;border:none;border-radius:8px;background:none;font:inherit;font-size:15px;color:var(--ink);text-decoration:none;text-align:left;cursor:pointer;width:100%;box-sizing:border-box}
   #mmenupop button:hover,#mmenupop a:hover,#mmenupop button:focus-visible,#mmenupop a:focus-visible{background:var(--wash);outline:none}
@@ -1123,7 +1136,7 @@ a{color:inherit}
   #rlist .stop .rst{display:inline-block;margin-left:6px;font-size:12px;color:var(--mute)}
   #rlist .stop .rst.rst-closed{color:#b45309}
   #rlist .stop .rst.rst-stay{color:#6b5b2a}
-  .fanbar{display:none}  /* 飯團提示改到 ⋯ 選單，首屏不佔空間 */
+  .fanbar{display:none}  /* 專頁提示改到 ⋯ 選單，首屏不佔空間 */
 }
 @media (min-width:701px){
   #mmenu,#mmenupop,#rquick,#pback,#redit{display:none!important}
@@ -1148,7 +1161,7 @@ a{color:inherit}
   <h1>大地藝術祭 2026 作品地圖</h1>
   <div class="sub">越後妻有常設與公開作品 <b id="total"></b> 件</div>
   <div id="mdesc">選日期看作品當天能不能參觀，點地圖上的點看詳情</div>
-  <div class="daterow" id="daterow"><label for="day">今天開不開</label><input type="date" id="day" min="2026-04-25" max="2027-03-31"><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
+  <div class="daterow" id="daterow"><label for="day">今天開不開</label><input type="date" id="day" min="2026-04-25" max="2026-11-08"><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
   <div id="daystat" aria-live="polite"></div>
   <div class="tabs" id="tabs" role="tablist" aria-label="面板分頁"><button id="tab-s" class="on" role="tab" aria-selected="true" aria-controls="pane-s">搜尋</button><button id="tab-l" role="tab" aria-selected="false" aria-controls="pane-l"><span class="tl-long">我的</span>清單<span class="n" id="favn">0</span></button><button id="tab-r" role="tab" aria-selected="false" aria-controls="pane-r">路線<span class="n" id="routen">0</span></button><button id="tab-p" role="tab" aria-selected="false" aria-controls="pane-p">推薦路線</button></div>
   <div class="sheet-body" id="sheet-body">
@@ -1156,7 +1169,7 @@ a{color:inherit}
     <input id="q" type="search" enterkeyhint="search" autocomplete="off" aria-label="搜尋作品" placeholder="搜尋作品名稱、編號、藝術家或場館">
     <div class="areas" id="areas"></div>
     <div class="btns"><button id="all">全選</button><button id="none">全不選</button><button id="bd">區域界線</button><button id="locate" type="button" aria-pressed="false">定位</button></div>
-    <label class="chk"><input type="checkbox" id="todayonly">只看今天可參觀（含定休日可觀看）</label>
+    <label class="chk"><input type="checkbox" id="todayonly">只看這天可參觀（含定休日可觀看）</label>
     <label class="chk"><input type="checkbox" id="winteronly">冬季線：只顯示冬季也開放的作品</label>
     <div id="wwarn-f" hidden></div>
     <div class="listbar"><div id="stat" aria-live="polite"></div>
@@ -1169,6 +1182,253 @@ a{color:inherit}
       <h2>關於這張地圖</h2>
       <p>收錄越後妻有大地藝術祭 2026 的常設與公開作品，分布在十日町、川西、中里、松代、松之山、津南六區。選日期就能看作品當天開不開，把想去的收進清單，再排出開車、步行或巴士路線。開放資訊以官方公告為準。</p>
       <p>由 <a href="https://echigo.fans/">越後飯 ECHIGO FAN</a> 製作。作品的實地走訪紀錄，請看<a href="https://echigo.fans/category/%E8%B6%8A%E5%BE%8C%E5%A4%A7%E5%9C%B0%E8%97%9D%E8%A1%93%E7%A5%AD/">越後妻有大地藝術祭文章</a>。</p>
+      <details id="all-works"><summary>全部 231 件作品一覽</summary>
+<h3>十日町（56）</h3><ul>
+<li><button type="button" data-open="T020">T020 小屋－不要忘記聆聽－</button></li>
+<li><button type="button" data-open="T021">T021 石魚</button></li>
+<li><button type="button" data-open="T025">T025 越後妻有里山現代美術館 MonET</button></li>
+<li><button type="button" data-open="T026">T026 護火蛇神</button></li>
+<li><button type="button" data-open="T027">T027 絹絲之水</button></li>
+<li><button type="button" data-open="T028">T028 三重門</button></li>
+<li><button type="button" data-open="T067">T067 瀝青停車場</button></li>
+<li><button type="button" data-open="T074">T074 Ommane kaze</button></li>
+<li><button type="button" data-open="T076">T076 稻殼公園</button></li>
+<li><button type="button" data-open="T112">T112 蝶之鏡亭</button></li>
+<li><button type="button" data-open="T120">T120 產土神之家</button></li>
+<li><button type="button" data-open="T121">T121 澡盆</button></li>
+<li><button type="button" data-open="T122">T122 灶</button></li>
+<li><button type="button" data-open="T123">T123 表面波／圍爐裏</button></li>
+<li><button type="button" data-open="T124">T124 洗臉台</button></li>
+<li><button type="button" data-open="T134">T134 胎盤－石神</button></li>
+<li><button type="button" data-open="T139">T139 魚板屋臉</button></li>
+<li><button type="button" data-open="T154">T154 泥人</button></li>
+<li><button type="button" data-open="T173">T173 鉢＆田島征三・絵本與樹木果實美術館</button></li>
+<li><button type="button" data-open="T207">T207 赤倉</button></li>
+<li><button type="button" data-open="T214">T214 另一處奇妙點</button></li>
+<li><button type="button" data-open="T221">T221 幽靈衛星</button></li>
+<li><button type="button" data-open="T222">T222 Two River</button></li>
+<li><button type="button" data-open="T226">T226 Wellenwanne LFO</button></li>
+<li><button type="button" data-open="T230">T230 LOST #6</button></li>
+<li><button type="button" data-open="T253">T253 下条茅葺塔</button></li>
+<li><button type="button" data-open="T268">T268 大地的記憶</button></li>
+<li><button type="button" data-open="T280">T280 土壤檔案館／新潟</button></li>
+<li><button type="button" data-open="T304">T304 鼴鼠電視台</button></li>
+<li><button type="button" data-open="T305">T305 Three Travellers</button></li>
+<li><button type="button" data-open="T309">T309 十日町產業文化館 IKOTE</button></li>
+<li><button type="button" data-open="T317">T317 苧麻森林</button></li>
+<li><button type="button" data-open="T320">T320 Winter Circlet</button></li>
+<li><button type="button" data-open="T323">T323 鍬柄沢藝術村構想</button></li>
+<li><button type="button" data-open="T351">T351 repetitive objects</button></li>
+<li><button type="button" data-open="T352">T352 Palimpsest: 天空之池</button></li>
+<li><button type="button" data-open="T388">T388 THE BIRTH OF THE SPRING</button></li>
+<li><button type="button" data-open="T390">T390 光織</button></li>
+<li><button type="button" data-open="T411">T411 Ariel</button></li>
+<li><button type="button" data-open="T412">T412 movements</button></li>
+<li><button type="button" data-open="T413">T413 遠方的聲音</button></li>
+<li><button type="button" data-open="T414">T414 Resounding Tsumari</button></li>
+<li><button type="button" data-open="T415">T415 Force</button></li>
+<li><button type="button" data-open="T416">T416 16根繩子</button></li>
+<li><button type="button" data-open="T419">T419 彼岸在輪迴</button></li>
+<li><button type="button" data-open="T421">T421 physis</button></li>
+<li><button type="button" data-open="T450">T450 MAN: ROCK Ⅴ</button></li>
+<li><button type="button" data-open="T451">T451 聆聽我的歌，水之女王的回旋曲</button></li>
+<li><button type="button" data-open="T457">T457 白色的衣服 未來的回憶</button></li>
+<li><button type="button" data-open="T461">T461 25個譜架——現象學的城市符號場</button></li>
+<li><button type="button" data-open="T466">T466 妻有與霍斯特梅里的旗幟</button></li>
+<li><button type="button" data-open="T467">T467 小鎮漫遊</button></li>
+<li><button type="button" data-open="T468">T468 The Long and Winding River (tunnel and table)</button></li>
+<li><button type="button" data-open="T469">T469 來自別處的東西</button></li>
+<li><button type="button" data-open="T470">T470 轉轉桑巴</button></li>
+<li><button type="button" data-open="T471">T471 FILL</button></li>
+</ul>
+<h3>川西（18）</h3><ul>
+<li><button type="button" data-open="K002">K002 時空</button></li>
+<li><button type="button" data-open="K003">K003 致敬Rachel Carson 四個小故事</button></li>
+<li><button type="button" data-open="K004">K004 河岸段丘休息站</button></li>
+<li><button type="button" data-open="K005">K005 光之館</button></li>
+<li><button type="button" data-open="K007">K007 森林的守衛</button></li>
+<li><button type="button" data-open="K008">K008 石座</button></li>
+<li><button type="button" data-open="K009">K009 節黑城跡露營場 小木屋A棟</button></li>
+<li><button type="button" data-open="K010">K010 節黑城跡露營場 小木屋B棟</button></li>
+<li><button type="button" data-open="K011">K011 節黑城跡露營場 小木屋C棟</button></li>
+<li><button type="button" data-open="K012">K012 詩人暝想之路</button></li>
+<li><button type="button" data-open="K013">K013 巨人園丁</button></li>
+<li><button type="button" data-open="K014">K014 天地瞭望台</button></li>
+<li><button type="button" data-open="K019">K019 天地之間</button></li>
+<li><button type="button" data-open="K022">K022 看得見風景的小屋·妻有</button></li>
+<li><button type="button" data-open="K023">K023 綠色莊園</button></li>
+<li><button type="button" data-open="K033">K033 邊界神話</button></li>
+<li><button type="button" data-open="K034">K034 passage</button></li>
+<li><button type="button" data-open="K107">K107 記憶的痕跡與明日之森</button></li>
+</ul>
+<h3>中里（21）</h3><ul>
+<li><button type="button" data-open="N001">N001 鳥屋</button></li>
+<li><button type="button" data-open="N002">N002 Blooming Spiral</button></li>
+<li><button type="button" data-open="N003">N003 河岸的燈籠</button></li>
+<li><button type="button" data-open="N004">N004 為了溫暖的印象 信濃川</button></li>
+<li><button type="button" data-open="N005">N005 妻有植樹</button></li>
+<li><button type="button" data-open="N006">N006 最長的河流</button></li>
+<li><button type="button" data-open="N009">N009 克雪人</button></li>
+<li><button type="button" data-open="N010">N010 向北至日本 (74°33’2”）</button></li>
+<li><button type="button" data-open="N012">N012 中里稻草人庭園</button></li>
+<li><button type="button" data-open="N017">N017 LIKE SWIMMING</button></li>
+<li><button type="button" data-open="N019">N019 POTEMKIN</button></li>
+<li><button type="button" data-open="N021">N021 蛇道</button></li>
+<li><button type="button" data-open="N028">N028 為了無數失去之窗</button></li>
+<li><button type="button" data-open="N046">N046 與遠方相遇的地方</button></li>
+<li><button type="button" data-open="N058">N058 清津川新聞中心</button></li>
+<li><button type="button" data-open="N071">N071 田間之圓／白羽毛</button></li>
+<li><button type="button" data-open="N072">N072 磯邊行久越後妻有清津倉庫美術館（SoKo）</button></li>
+<li><button type="button" data-open="N079">N079 光之隧道</button></li>
+<li><button type="button" data-open="N082">N082 大地藝術祭與地域環境－越後妻有地域資源的繼承</button></li>
+<li><button type="button" data-open="N088">N088 陣雨來臨之前：嘗試從自然科學觀點解讀《秋山紀行》</button></li>
+<li><button type="button" data-open="N089">N089 その時すでにことは始まっていた</button></li>
+</ul>
+<h3>松代（80）</h3><ul>
+<li><button type="button" data-open="D001">D001 棚田</button></li>
+<li><button type="button" data-open="D002">D002 城堡61</button></li>
+<li><button type="button" data-open="D003">D003 ○△□塔與紅蜻蜓</button></li>
+<li><button type="button" data-open="D004">D004 水池</button></li>
+<li><button type="button" data-open="D005">D005 關係－大地．北斗七星</button></li>
+<li><button type="button" data-open="D006">D006 稻草人計劃</button></li>
+<li><button type="button" data-open="D007">D007 夏日新月</button></li>
+<li><button type="button" data-open="D008">D008 名為希望的種子</button></li>
+<li><button type="button" data-open="D010">D010 觀測塔</button></li>
+<li><button type="button" data-open="D011">D011 和平庭園</button></li>
+<li><button type="button" data-open="D012">D012 觀光歩道整備計劃</button></li>
+<li><button type="button" data-open="D013">D013 如光合作用而成的时空～来自濒临灭绝的植物的讯息</button></li>
+<li><button type="button" data-open="D014">D014 雪國的杉樹下</button></li>
+<li><button type="button" data-open="D015">D015 西洋料理店 山貓軒</button></li>
+<li><button type="button" data-open="D016">D016 樹木</button></li>
+<li><button type="button" data-open="D046">D046 在松代的「時光復甦」柿子樹計畫</button></li>
+<li><button type="button" data-open="D047">D047 回到自然的人類</button></li>
+<li><button type="button" data-open="D048">D048 Milutown 車站</button></li>
+<li><button type="button" data-open="D050">D050 Jack in the Box 松代</button></li>
+<li><button type="button" data-open="D051">D051 視点</button></li>
+<li><button type="button" data-open="D053">D053 松代雪國農耕文化村「農舞台」</button></li>
+<li><button type="button" data-open="D054">D054 松代住民博物館</button></li>
+<li><button type="button" data-open="D055">D055 Café Reflet</button></li>
+<li><button type="button" data-open="D057">D057 沙漠之中．火之周圍</button></li>
+<li><button type="button" data-open="D058">D058 關係－黑板的教室</button></li>
+<li><button type="button" data-open="D060">D060 魚板屋倉庫計劃</button></li>
+<li><button type="button" data-open="D061">D061 花開妻有</button></li>
+<li><button type="button" data-open="D063">D063 旅人的迷宮</button></li>
+<li><button type="button" data-open="D064">D064 記憶 - 再生</button></li>
+<li><button type="button" data-open="D066">D066 米之家</button></li>
+<li><button type="button" data-open="D067">D067 融</button></li>
+<li><button type="button" data-open="D068">D068 Fichte</button></li>
+<li><button type="button" data-open="D070">D070 松代小塔</button></li>
+<li><button type="button" data-open="D099">D099 創作庭院</button></li>
+<li><button type="button" data-open="D101">D101 翼／飛行演習裝置</button></li>
+<li><button type="button" data-open="D104">D104 BUNAGA池植物公園「母親樹的空中庭園」</button></li>
+<li><button type="button" data-open="D106">D106 與自然文化相遇的公園</button></li>
+<li><button type="button" data-open="D125">D125 地震計</button></li>
+<li><button type="button" data-open="D129">D129 田間蝗蟲</button></li>
+<li><button type="button" data-open="D132">D132 Mountain</button></li>
+<li><button type="button" data-open="D143">D143 脫皮之家</button></li>
+<li><button type="button" data-open="D155">D155 青蛙合唱團</button></li>
+<li><button type="button" data-open="D184">D184 反轉城市</button></li>
+<li><button type="button" data-open="D186">D186 Space Slitar交響樂團</button></li>
+<li><button type="button" data-open="D194">D194 回來的紅色丁字褲少年</button></li>
+<li><button type="button" data-open="D218">D218 抽屜藝術</button></li>
+<li><button type="button" data-open="D247">D247 松代鄉土資料館</button></li>
+<li><button type="button" data-open="D248">D248 小黃花</button></li>
+<li><button type="button" data-open="D311">D311 圓－緣－演</button></li>
+<li><button type="button" data-open="D312">D312 人生拱橋</button></li>
+<li><button type="button" data-open="D317">D317 松代商店街周辺における土壁による修景プロジェクト</button></li>
+<li><button type="button" data-open="D320">D320 黃金遊戲場</button></li>
+<li><button type="button" data-open="D331">D331 奴奈川校園</button></li>
+<li><button type="button" data-open="D332">D332 來自大地的禮物</button></li>
+<li><button type="button" data-open="D334">D334 模糊的記憶</button></li>
+<li><button type="button" data-open="D338">D338 導言之路</button></li>
+<li><button type="button" data-open="D344">D344 五百筆</button></li>
+<li><button type="button" data-open="D346">D346 梯田階梯</button></li>
+<li><button type="button" data-open="D348">D348 彩風</button></li>
+<li><button type="button" data-open="D351">D351 暗箱計畫</button></li>
+<li><button type="button" data-open="D353">D353 hi 8 way</button></li>
+<li><button type="button" data-open="D362">D362 10本相冊 迷宮</button></li>
+<li><button type="button" data-open="D363">D363 計劃宮殿</button></li>
+<li><button type="button" data-open="D364">D364 藝術家的圖書館</button></li>
+<li><button type="button" data-open="D365">D365 攜手之塔</button></li>
+<li><button type="button" data-open="D366">D366 攜手之船</button></li>
+<li><button type="button" data-open="D377">D377 憧憬的眺望</button></li>
+<li><button type="button" data-open="D378">D378 樂聚第</button></li>
+<li><button type="button" data-open="D379">D379 脫皮的時候</button></li>
+<li><button type="button" data-open="D380">D380 讓自己變得更好的方法</button></li>
+<li><button type="button" data-open="D385">D385 樂暮D.I.Y.之家 iju</button></li>
+<li><button type="button" data-open="D387">D387 妻有檔案中心</button></li>
+<li><button type="button" data-open="D389">D389 為田野美術館準備的furniture</button></li>
+<li><button type="button" data-open="D392">D392 松代鄉土Shiryo館</button></li>
+<li><button type="button" data-open="D393">D393 被大地擁抱的田野美術館</button></li>
+<li><button type="button" data-open="D397">D397 木湯</button></li>
+<li><button type="button" data-open="D398">D398 在奴奈川校園的惑星特拉里斯</button></li>
+<li><button type="button" data-open="D399">D399 Saiyah #2.10</button></li>
+<li><button type="button" data-open="D400">D400 除雪儀式·奴奈川公主</button></li>
+<li><button type="button" data-open="D402">D402 視野／窺視燈籠</button></li>
+</ul>
+<h3>松之山（30）</h3><ul>
+<li><button type="button" data-open="Y002">Y002 分岔點庭院</button></li>
+<li><button type="button" data-open="Y003">Y003 悠久的営営—The Eternal</button></li>
+<li><button type="button" data-open="Y005">Y005 與大地同行——記憶的風景</button></li>
+<li><button type="button" data-open="Y006">Y006 ※（因作品名稱無法以符號標示，故以「※」替代）</button></li>
+<li><button type="button" data-open="Y011">Y011 溪谷的燈籠</button></li>
+<li><button type="button" data-open="Y012">Y012 變形記——場域的記憶——「探索松之山的植生」</button></li>
+<li><button type="button" data-open="Y013">Y013 夢之家</button></li>
+<li><button type="button" data-open="Y019">Y019 十日町市立里山科學館 越後松之山「森林學校」KYORORO</button></li>
+<li><button type="button" data-open="Y020">Y020 變形記——場域的記憶——松之山——</button></li>
+<li><button type="button" data-open="Y021">Y021 基羅羅的Tin-Kin-Pin —音之泉</button></li>
+<li><button type="button" data-open="Y022">Y022 大地、水、宇宙</button></li>
+<li><button type="button" data-open="Y023">Y023 腳下的水（200立方公尺）</button></li>
+<li><button type="button" data-open="Y025">Y025 散步自然</button></li>
+<li><button type="button" data-open="Y026">Y026 Step in Plan</button></li>
+<li><button type="button" data-open="Y027">Y027 名字儲存館</button></li>
+<li><button type="button" data-open="Y029">Y029 星星的誕生</button></li>
+<li><button type="button" data-open="Y041">Y041 超高解析度大型昆蟲寫真 ［life-size］</button></li>
+<li><button type="button" data-open="Y045">Y045 ラトビアから遠い日本へ</button></li>
+<li><button type="button" data-open="Y052">Y052 最後的教室</button></li>
+<li><button type="button" data-open="Y065">Y065 Sky Catcher 09</button></li>
+<li><button type="button" data-open="Y068">Y068 掃天帶土（そうてんたいち）−天水越之塔−</button></li>
+<li><button type="button" data-open="Y072">Y072 家之記憶</button></li>
+<li><button type="button" data-open="Y082">Y082 澳洲館</button></li>
+<li><button type="button" data-open="Y083">Y083 山間小屋</button></li>
+<li><button type="button" data-open="Y101">Y101 影子劇場</button></li>
+<li><button type="button" data-open="Y106">Y106 黑色標誌</button></li>
+<li><button type="button" data-open="Y107">Y107 Guardian</button></li>
+<li><button type="button" data-open="Y109">Y109 Lost Winter</button></li>
+<li><button type="button" data-open="Y110">Y110 ZooMuSee</button></li>
+<li><button type="button" data-open="Y122">Y122 生成するドローイング －松之山野鳥ノ図－</button></li>
+</ul>
+<h3>津南（24）</h3><ul>
+<li><button type="button" data-open="M001">M001 龍現代美術館</button></li>
+<li><button type="button" data-open="M002">M002 羚羊家族</button></li>
+<li><button type="button" data-open="M003">M003 樹林</button></li>
+<li><button type="button" data-open="M005">M005 再生</button></li>
+<li><button type="button" data-open="M011">M011 喜鵲之家</button></li>
+<li><button type="button" data-open="M019">M019 記憶－記錄，足瀧的人們</button></li>
+<li><button type="button" data-open="M024">M024 0121-1110=109071</button></li>
+<li><button type="button" data-open="M026">M026 穿越時空之旅</button></li>
+<li><button type="button" data-open="M028">M028 跨越國境・山</button></li>
+<li><button type="button" data-open="M052">M052 越後妻有「上鄉劇場館」</button></li>
+<li><button type="button" data-open="M057">M057 「上鄉劇場館」招牌標誌</button></li>
+<li><button type="button" data-open="M063">M063 上鄉樂團－四季之歌</button></li>
+<li><button type="button" data-open="M064">M064 上郷クローブ座レストラン</button></li>
+<li><button type="button" data-open="M065">M065 香港部屋（香港之家）</button></li>
+<li><button type="button" data-open="M074">M074 弗洛吉斯頓</button></li>
+<li><button type="button" data-open="M076">M076 妻有雙六</button></li>
+<li><button type="button" data-open="M083">M083 農具是樂器！</button></li>
+<li><button type="button" data-open="M090">M090 太陽的流轉</button></li>
+<li><button type="button" data-open="M091">M091 續秋山紀行編輯室</button></li>
+<li><button type="button" data-open="M092">M092 開山藝術中心</button></li>
+<li><button type="button" data-open="M093">M093 神上大人們的茶會：信仰之家的故事</button></li>
+<li><button type="button" data-open="M094">M094 山之口</button></li>
+<li><button type="button" data-open="M095">M095 山的腹地</button></li>
+<li><button type="button" data-open="M097">M097 胸中山水·秋山鄉圖</button></li>
+</ul>
+<h3>廣域（2）</h3><ul>
+<li><button type="button" data-open="A001">A001 妻有路標／松代雪國農耕文化村「農舞台」路標</button></li>
+<li><button type="button" data-open="A003">A003 庭園計劃</button></li>
+</ul>
+</details>
     </footer>
   </div>
   <div id="pane-l" role="tabpanel" style="display:none">
@@ -1191,7 +1451,7 @@ a{color:inherit}
     <div class="pane-head" id="rhead" hidden><span id="rheadt"></span><span class="rhead-acts"><button type="button" class="b" id="redit" aria-pressed="false">編輯</button><button id="rclear" type="button" class="danger redit-only">清除路線</button></span></div>
     <div id="rnote" class="rnote"></div>
     <div class="btns rquick" id="rquick"><button type="button" class="b" id="rpresets">選建議</button><button type="button" class="b" id="rfit2">看整條路線</button></div>
-    <div class="rrow"><input id="rname" aria-label="路線名稱" placeholder="路線名稱，例如 10/31 明石之湯日" class="redit-only"><select id="rmode" aria-label="交通方式"><option value="drive">開車</option><option value="walk">步行</option><option value="bus">巴士</option><option value="train">電車</option></select></div>
+    <div class="rrow"><input id="rname" aria-label="路線名稱" placeholder="路線名稱，例如 松代一日遊" class="redit-only"><select id="rmode" aria-label="交通方式"><option value="drive">開車</option><option value="walk">步行</option><option value="bus">巴士</option><option value="train">電車</option></select></div>
     <div class="rstart redit-only" id="rstart"><span class="rsl">起點</span></div>
     <div class="btns rtools redit-only" id="rtools"><button id="ropt" type="button">自動排順序</button><label class="b chkb"><input type="checkbox" id="rloop">回到起點</label></div>
     <ol class="rlist" id="rlist"></ol>
@@ -1219,15 +1479,13 @@ a{color:inherit}
 <script>window.ETMAP = {style:"plain", sheet:true, presetOrder:[1,0,3,2], onPreset(){ showTab("r"); setTimeout(fitRoute, 320); }};</script>
 <script>
 /* 大地藝術祭2026 作品地圖：共用程式（plain 與 illustrated 兩版共用） */
-/* ===== 飯團路線：之後由 LIFF＋Firebase 取代 ===== */
 const FAN_ENABLED = false;        // 第 4 階段才改 true
 const LINE_ADD_FRIEND_URL = "#";  // 之後填加好友網址
 function isFan(){ return false; }
 function loadFanRoutes(){ return Promise.resolve([]); }
-/* 開發用：?dev=fan 視同已解鎖並載入 1 條假資料；?dev=fan-locked 顯示群組但維持鎖定 */
-const DEV = new URLSearchParams(location.search).get("dev") || "";
-const FAN_ON = FAN_ENABLED || DEV === "fan" || DEV === "fan-locked";
-const fanUnlocked = () => DEV === "fan" ? true : (DEV === "fan-locked" ? false : isFan());
+const DEV = "";
+const FAN_ON = FAN_ENABLED;
+const fanUnlocked = () => isFan();
 const FAKE_FAN_ROUTE = {id:"fan_demo", tier:"fan", name:"（範例）", walked:"2026-09-01", summary:"（範例）", caveat:"（範例）", mode:"drive",
   stops:[
     {p:"（範例）", lat:37.13482, lng:138.75683, time:"09:00", stay_min:10, tip:"（範例）", parking:"（範例）", toilet:"（範例）"},
@@ -1243,7 +1501,7 @@ const FAKE_FAN_NOTES = {id:"notes_demo", tier:"notes", attach_to:"tourA", walked
     {c:"Y052", stay_min:30, tip:"（範例）", lunch:"（範例）"},
     {c:"D053", stay_min:60, tip:"（範例）", parking:"（範例）", toilet:"（範例）"}
   ]};
-const fanRoutesP = () => DEV === "fan" || DEV === "fan-locked" ? Promise.resolve([FAKE_FAN_ROUTE, FAKE_FAN_NOTES]) : loadFanRoutes();
+const fanRoutesP = () => loadFanRoutes();
 let FAN_ROUTES = [], FAN_NOTES = [];
 const CFG = window.ETMAP || {style:"plain"};
 const ILL = CFG.style === "illustrated";
@@ -1389,8 +1647,9 @@ function dayInfo(d, dateStr){
       if (segs.length){ evalSegs(segs, v, wd, hol, out); return fin(); }
     }
     if (R.winter){ out.state = "unknown"; out.reason = "winter"; return out; }
-    out.tags.push("不在 2026 會期內（4/25～11/8）"); return closed("season");
+    return closed("season");  /* 文案改由 stateTxt／stateShort（reason===season）統一輸出，避免重複 */
   }
+  if (!inSeason && R.allYear) out.tags.push("會期外：冬季只有部分室內設施開放，年末年始與大雪時可能休館，出發前請查官方公告");
   if (R.resv === true || (R.resv && y === 2026 && inList(v, R.resv))) out.tags.push("需預約");
   if (offDay) closed("off");
   else if (extraDay) out.state = "open";
@@ -1413,8 +1672,8 @@ const SEASON = ["2026-04-25", "2026-11-08"];
 const STATE_TXT = {open:"這天開放", view:"定休日可觀看（當天是定休日，戶外部分仍可觀看，官方說明）", stay:"僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀", closed:"這天休館", unknown:"尚未公布開放資訊"};
 const STATE_SHORT = {open:"開放", view:"定休日可觀看", stay:"僅限住宿者", closed:"休館", unknown:"未公布"};
 const WINTER_OPEN_TXT = "冬季開放，日期與時間以官方公告為準";
-const stateTxt = di => di.reason === "winter" ? WINTER_OPEN_TXT : STATE_TXT[di.state];
-const stateShort = di => di.reason === "winter" ? "冬季開放（以官方公告為準）" : STATE_SHORT[di.state];
+const stateTxt = di => di.reason === "winter" ? WINTER_OPEN_TXT : di.reason === "season" ? "不在 2026 會期內（4/25～11/8）" : STATE_TXT[di.state];
+const stateShort = di => di.reason === "winter" ? "冬季開放（以官方公告為準）" : di.reason === "season" ? "會期外" : STATE_SHORT[di.state];
 const canVisit = di => di.state === "open" || di.state === "view";  /* 只看今天可參觀：不含僅限住宿者與未公布 */
 const WINTER_WARN = "11 月底至 3 月底為越後妻有的積雪期，山區道路可能積雪結冰，不建議不熟悉雪地駕駛的旅客自駕。建議參加 NPO 越後妻有里山協働機構的官方行程，或選擇十日町站、松代農舞台的步行路線。冬季開放日與時間以官方公告為準。";
 const winterWarnHtml = () => `<div class="wwarn" role="note"><span class="wwi" aria-hidden="true">⚠</span>${esc(WINTER_WARN)}</div>`;
@@ -1585,7 +1844,7 @@ function nearbyHtml(d){
   const ns = nearbyOf(d); if (!ns.length) return "";
   const show = ns.slice(0, 8), day = curDay();
   return `<div class="pp-near"><div class="pp-nh">附近還有什麼<span>直線 ${NEAR_M} 公尺內，步行約 10 分以內</span></div><ul>` +
-    show.map(({e, m}) => { const st = dayInfo(e, day).state; return `<li><button type="button" data-open="${esc(e.作品編號)}">${esc(e.中文名 || e.作品名稱)}</button><span>${m < 60 ? "同場館" : `約 ${walkMinOf(m)} 分，${Math.round(m / 10) * 10} 公尺`}${st === "closed" ? "，這天休館" : st === "stay" ? "，僅限住宿者" : ""}</span></li>`; }).join("") +
+    show.map(({e, m}) => { const di = dayInfo(e, day); return `<li><button type="button" data-open="${esc(e.作品編號)}">${esc(e.中文名 || e.作品名稱)}</button><span>${m < 60 ? "同場館" : `約 ${walkMinOf(m)} 分，${Math.round(m / 10) * 10} 公尺`}${di.state === "closed" || di.state === "stay" ? "，" + stateShort(di) : ""}</span></li>`; }).join("") +
     `</ul>${ns.length > show.length ? `<div class="muted">另有 ${ns.length - show.length} 件，放大地圖可看到</div>` : ""}</div>`;
 }
 /* 巴士：只用 transit.json 裡有官方時刻表出處的路段；休日型＝週六、週日、國定假日、8/13～16、12/29～1/3 */
@@ -1752,8 +2011,13 @@ if ($("locate")) $("locate").onclick = () => {
 };
 if ($("wwarn-f")) $("wwarn-f").innerHTML = winterWarnHtml();
 if ($("rwinter")) $("rwinter").innerHTML = winterWarnHtml();
-dayEl.addEventListener("change", () => { if (!dayEl.value) dayEl.value = tokyoToday(); render(); });
-$("today").onclick = () => { dayEl.value = tokyoToday(); render(); };
+function syncDayLabel(){
+  const lab = document.querySelector('label[for="day"]');
+  if (lab) lab.textContent = (dayEl.value === tokyoToday()) ? "今天開不開" : "這天開不開";
+}
+dayEl.addEventListener("change", () => { if (!dayEl.value) dayEl.value = tokyoToday(); syncDayLabel(); render(); });
+syncDayLabel();
+$("today").onclick = () => { dayEl.value = tokyoToday(); syncDayLabel(); render(); };
 $("total").textContent = DATA.length;
 const TABS = ["s", "l", "r", "p"];
 let detailCode = null, lastTab = "s";
@@ -1821,7 +2085,7 @@ function itemHtml(d, withRemove, extra){
   const st = d._day.state;
   return `<button class="fav ${isSaved(d.作品編號) ? "on" : ""}" data-fav="${esc(d.作品編號)}" aria-pressed="${isSaved(d.作品編號)}" aria-label="${isSaved(d.作品編號) ? "從我的清單移除" : "加入我的清單"}：${esc(d.中文名 || d.作品名稱)}">${isSaved(d.作品編號) ? "★" : "☆"}</button>` +
     `<span class="t"><code>${esc(d.作品編號)}</code>${esc(d.中文名 || d.作品名稱)}${d.marker ? "" : ` <span style="color:#8F5600">（無定點${d.定點說明 ? "，" + esc(d.定點說明) : ""}）</span>`}${d.中文名 && d.中文名 !== d.作品名稱 ? `<span class="tja" lang="ja">${esc(d.作品名稱)}</span>` : ""}${extra || ""}</span>` +
-    `<span class="st st-${st}"${d._day.reason === "winter" ? ` title="${WINTER_OPEN_TXT}"` : ""}>${d._day.reason === "winter" ? "冬季開放" : STATE_SHORT[st]}</span>` +
+    `<span class="st st-${st}"${d._day.reason === "winter" ? ` title="${WINTER_OPEN_TXT}"` : ""}>${stateShort(d._day)}</span>` +
     (!withRemove && d.marker ? (inRoute(d.作品編號) ? `<button class="rm addr" disabled>已加入</button>` : `<button class="rm addr" data-addroute="${esc(d.作品編號)}" aria-label="加入路線：${esc(d.中文名 || d.作品名稱)}">＋路線</button>`) : "") +
     (withRemove ? (d.marker ? `<button class="rm" data-addroute="${esc(d.作品編號)}" title="加入路線">＋路線</button>` : "") + `<button class="rm" data-rm="${esc(d.作品編號)}">移除</button>` : "");
 }
@@ -1970,8 +2234,13 @@ async function computeRoute(pts, mode){
   } catch(e){ return estimate(pts, mode); }
 }
 const routeLayer = L.layerGroup().addTo(map);
+function syncRouteOn(){
+  const el = $("map"); if (!el) return;
+  el.classList.toggle("route-on", validStops(route.stops).length > 0);
+}
 function drawRoute(){
   routeLayer.clearLayers();
+  syncRouteOn();
   const st = validStops(route.stops);
   if (!st.length) return;
   const pts = st.map(stopLL);
@@ -2029,7 +2298,7 @@ function stopStatus(s){
   const d = BY[s.c]; if (!d) return "";
   const di = dayInfo(d, curDay());
   const cls = di.state === "closed" ? "st st-closedr" : "st st-" + di.state;
-  return `<span class="${cls}">${di.state === "closed" ? "這天休館" : stateShort(di)}</span>` + (di.tags.length ? `<span class="st st-unknown">${esc(di.tags.join("，"))}</span>` : "");
+  return `<span class="${cls}">${stateShort(di)}</span>` + (di.tags.length ? `<span class="st st-unknown">${esc(di.tags.join("，"))}</span>` : "");
 }
 function renderRouteList(pending){
   const ul = $("rlist"); if (!ul) return;
@@ -2054,7 +2323,7 @@ function renderRouteList(pending){
     const ll = ok && okLL(stopLL(s)) ? stopLL(s) : null;
     const fanX = [["lunch", "午餐"], ["parking", "停車"], ["toilet", "廁所"], ["photo", "拍照"], ["warn", "注意"]].filter(([k]) => s[k]);
     const _di = s.c && BY[s.c] && !s.ret ? dayInfo(BY[s.c], curDay()) : null;
-    const stLabel = _di ? ({open:"開放", view:"定休日可觀看", stay:"僅限住宿者", closed:"休館", unknown:"未公布"})[_di.state] : "";
+    const stLabel = _di ? stateShort(_di) : "";
     li.innerHTML = `<span class="no">${ok ? ++vi : "?"}</span><span class="t">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${stLabel ? `<span class="rst rst-${_di.state}">${stLabel}</span>` : ""}${s.c && BY[s.c] && BY[s.c].中文名 && BY[s.c].中文名 !== BY[s.c].作品名稱 ? `<span class="tja" lang="ja">${esc(BY[s.c].作品名稱)}</span>` : ""}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}${s.c ? ` <code>${esc(s.c)}</code>` : ""}<br>${stopStatus(s)}` +
       (s.stay_min != null || s.tip ? `<span class="sfan">${s.stay_min != null ? `停留約 ${esc(s.stay_min)} 分` : ""}${s.stay_min != null && s.tip ? "，" : ""}${s.tip ? esc(s.tip) : ""}</span>` : "") +
       (fanX.length ? `<details class="sdet"><summary>排程細節</summary>${fanX.map(([k, t]) => `<div><b>${t}</b>：${esc(s[k])}</div>`).join("")}</details>` : "") +
@@ -2280,6 +2549,7 @@ function clearRoute(){
   syncWinterBanner();
   const rn = $("rname"); if (rn) rn.value = "";
   updateRoute(false);
+  syncRouteOn();
   if (typeof zoomUpdate === "function" && zoomUpdate) zoomUpdate();
   const m = $("rmsg"); if (m) m.textContent = "路線已清除";
 }
@@ -2350,7 +2620,7 @@ function cardHtml(p){
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
 /* 加好友網址還沒填（"#" 或空白）時不顯示按鈕，只留說明文字 */
 const LINE_OK = !!LINE_ADD_FRIEND_URL && LINE_ADD_FRIEND_URL !== "#";
-const unlockBox = id => `<div class="fanlock" id="fanlock-${esc(id)}" hidden><p>加入富搖小幫手（越後飯服務窗口）即可解鎖飯團路線</p>${LINE_OK ? `<a class="gbtn" href="${esc(LINE_ADD_FRIEND_URL)}" target="_blank" rel="noopener">用 LINE 加入好友</a>` : ""}</div>`;
+const unlockBox = id => "";
 const notesFor = id => FAN_ON ? FAN_NOTES.find(n => n.attach_to === id) : null;
 /* 公開路線的站點加上筆記欄位（只在解鎖時） */
 function withNotes(p){
@@ -2666,7 +2936,7 @@ var sheetState = "half", setSheet = null;
 if (SHEET){
   const panel = $("panel"), handle = $("sheet-handle"), root = document.documentElement;
   const peekH = () => { const tb = $("tabs"); return tb.offsetTop + tb.offsetHeight + 10 + (parseFloat(getComputedStyle(panel).paddingBottom) || 0); };
-  const snapH = s => { const H = window.innerHeight; return s === "peek" ? peekH() : s === "half" ? Math.round(H * 0.52) : H - 64; };
+  const snapH = s => { const H = window.innerHeight; return s === "peek" ? peekH() : s === "half" ? (H <= 680 ? Math.max(peekH(), Math.min(Math.round(H * 0.45), H - 300)) : Math.round(H * 0.52)) : H - 64; };
   const apply = h => { panel.style.height = h + "px"; root.style.setProperty("--sheet-h", h + "px"); };
   setSheet = function(s){
     sheetState = s;
@@ -2703,7 +2973,7 @@ fitAll();
 
 /* ===== URL hash options: #date=2026-11-04&list=T025,T120&tab=list&open=T025&preset=d1031 ===== */
 const H = new URLSearchParams(location.hash.slice(1));
-if (/^\d{4}-\d{2}-\d{2}$/.test(H.get("date") || "")) dayEl.value = H.get("date");
+{ const hd = H.get("date") || ""; if (/^\d{4}-\d{2}-\d{2}$/.test(hd) && hd >= dayEl.min && hd <= dayEl.max) dayEl.value = hd; }
 if (H.get("list")) importText(H.get("list"));
 /* 分享的路線：#r=T025~K005~@越後湯澤站@36.93567,138.80909&rd=2026-10-14&rm=walk&rn=名稱
    目前已有不同的路線時先問；同意後把目前路線另存到「已儲存的路線」再載入 */
@@ -2751,11 +3021,14 @@ const ONB_ICON = {
   qr:'<rect x="5" y="10" width="26" height="18" rx="2"/><path d="M2 32h32"/><rect x="30" y="18" width="15" height="24" rx="3"/><path d="M34 24h3v3h-3zM38 30h3v3h-3zM34 30h1M41 24v1"/>',
   star:'<path d="M24 9l4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3L24 32.6l-9.3 4.9 1.8-10.3L9 19.9l10.4-1.5z"/>'
 };
-let ONB_CARDS = () => [
-  {icon:"date", t:"選日期，看開放狀態", x:["在「今天開不開」選日期，地圖上的點會顯示那天開放、休館或僅限住宿者。", "看不懂點的樣式，按右上角「圖例」。"]},
+let ONB_CARDS = () => {
+  const dayWording = (dayEl.value === tokyoToday()) ? "今天開不開" : "這天開不開";
+  const legendHint = useSheet() ? "按右上角 ⋯，再點『圖例』。" : "按右上角「圖例」。";
+  return [
+  {icon:"date", t:"選日期，看開放狀態", x:[`在「${dayWording}」選日期，地圖上的點會顯示那天開放、休館或僅限住宿者。`, `看不懂點的樣式，${legendHint}`]},
   {icon:"tap", t:"點作品，看詳情與導航", x:["點地圖上的點或清單裡的作品名稱，就能看介紹和開放日。", "按「在 Google 地圖開啟」直接導航，按 ☆ 存進我的清單。"]},
   {icon:"route", t:"加入路線，分享出去", x:["按「＋路線」把作品排成一條路線，會算出每段車程或步行時間。", "到「路線」分頁按「複製分享連結」，傳給同行的朋友。"]}
-];
+]; };
 const onbSkip = !!(H.get("r") || H.get("it") || H.get("list") || H.get("open") || H.get("preset"));
 let onbI = 0, onbBack = null;
 function onbSeen(){ try { localStorage.setItem(ONB_KEY, "1"); } catch(e){} }
@@ -2820,7 +3093,7 @@ function onbClose(){
     b.innerHTML = '<span class="mh-q" aria-hidden="true">?</span><span class="mh-t">怎麼用</span>'; b.setAttribute("aria-label", "怎麼用");
     b.onclick = () => { if ($("legendpop") && !$("legendpop").hidden && lg) lg.click(); onbOpen(); };
     lg && lg.nextSibling ? tools.insertBefore(b, lg.nextSibling) : tools.appendChild(b); }
-  /* 等飯團擴充（附加在後面的程式）換好卡片內容再決定要不要顯示 */
+  /* 等專頁擴充（附加在後面的程式）換好卡片內容再決定要不要顯示 */
   setTimeout(() => { if (!onbSkip && !onbIsSeen()) onbOpen(); }, 0);
 })();
 
@@ -2843,7 +3116,7 @@ function onbClose(){
       menuPop.innerHTML = items.map(([k, t]) => `<button type="button" role="menuitem" data-mm="${k}">${t}</button>`).join("") + extra;
     };
     fill();
-    const setMenu = on => { menuPop.hidden = !on; menuBtn.setAttribute("aria-expanded", on); if (on){ fill(); menuPop.querySelector("button,a").focus(); } };
+    const setMenu = on => { menuPop.hidden = !on; menuBtn.setAttribute("aria-expanded", on); if (on){ const t=$("toast"); if (t){ t.classList.remove("on"); clearTimeout(t._t); } fill(); menuPop.querySelector("button,a").focus(); } };
     menuBtn.onclick = e => { e.stopPropagation(); setMenu(menuPop.hidden); };
     menuPop.addEventListener("click", e => {
       const b = e.target.closest("[data-mm]"); if (!b) { if (e.target.closest("a")) setMenu(false); return; }

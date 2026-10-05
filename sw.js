@@ -1,7 +1,7 @@
 /* 大地藝術祭 2026 作品地圖：離線快取
    網頁：先連網，連不上用快取；底圖與路線計算：先連網，成功就存一份，離線時用存過的。
    底圖（OpenStreetMap 與國土地理院）只存看過的圖磚（不預先下載），合計最多約 1500 張，超過就刪最舊的。 */
-const V = "v3";  // 每次改快取內容就加一，讓舊快取被清掉
+const V = "v4";  // 每次改快取內容就加一，讓舊快取被清掉
 const PAGE = "etmap-page-" + V, TILE = "etmap-tiles-" + V, API = "etmap-api-" + V;
 const MAX = {[TILE]: 1500, [API]: 150};
 self.addEventListener("install", e => {
