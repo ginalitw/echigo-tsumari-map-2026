@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>大地藝術祭 2026 作品地圖｜越後妻有</title>
-<meta name="build" content="2026-10-06 17:21">
+<meta name="build" content="2026-10-06 17:39">
 <meta name="description" content="越後妻有大地藝術祭 2026 常設與公開作品地圖：依日期查看開館與休館，收藏我的清單，排出開車、步行或巴士路線。">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
@@ -1051,6 +1051,12 @@ a{color:inherit}
 .qrm-cap{margin:12px 0 0;font-size:14px;color:var(--ink)}
 .qrm-err{margin:0;font-size:13px;color:var(--mute);text-align:left}
 .qrm-url{width:100%;box-sizing:border-box;padding:6px 8px;font-size:12px;border:1px solid var(--line);border-radius:8px}
+.qrm-link{display:flex;gap:6px;margin-top:10px}
+.qrm-link .qrm-url{flex:1;min-width:0}
+.qrm-ask{margin:0 0 12px;font-size:14px;line-height:1.6;text-align:left}
+.qrm-acts{display:flex;flex-direction:column;gap:6px}
+.qrm-acts button{min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:14px;cursor:pointer}
+.qrm-acts button.pri{background:#1d1d1b;border-color:#1d1d1b;color:#fff}
 .qrm-copy{min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:14px;cursor:pointer}
 .onb{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
 .onb[hidden]{display:none}
@@ -2443,14 +2449,21 @@ function loadQrLib(){
   return qrLibP;
 }
 function closeQr(){ const m = $("qrm"); if (!m) return; m.remove(); if (m._close) m._close(); }
+/* 傳到手機要送的內容：預設是目前路線；專頁版在 fan_trip.js 改成多日行程並在視窗裡加複製連結。回傳 null 表示沒有東西可送 */
+let qrPayload = u => route.stops.length ? {url:u, title:"傳到手機", cap:"用手機相機掃描，路線就會出現在手機上", copy:false} : null;
+/* 送出前的步驟（專頁版：目前路線不在行程裡時先問）；(body, show, close) => 自己決定何時呼叫 show() */
+let qrBefore = null;
+function copyText(u, okMsg){
+  const done = () => toast(okMsg || "已複製連結"), fb = () => { prompt("複製這個連結", u); };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(u).then(done, fb); else fb();
+}
 function openQr(){
-  if (!route.stops.length){ sayR("路線是空的"); return; }
   closeQr();
   const u = shareUrl(), opener = document.activeElement;
+  if (!qrPayload(u)){ sayR("路線是空的"); return; }
   const m = document.createElement("div"); m.id = "qrm"; m.className = "qrm";
   m.innerHTML = `<div class="qrm-box" role="dialog" aria-modal="true" aria-labelledby="qrm-t" aria-describedby="qrm-cap"><button type="button" class="qrm-x" aria-label="關閉">×</button>` +
-    `<div class="qrm-t" id="qrm-t">傳到手機</div><div class="qrm-code" aria-live="polite"><span class="muted">產生 QR 碼中…</span></div>` +
-    `<p class="qrm-cap" id="qrm-cap">用手機相機掃描，路線就會出現在手機上</p></div>`;
+    `<div class="qrm-t" id="qrm-t">傳到手機</div><div class="qrm-body"></div></div>`;
   m.addEventListener("click", e => { if (e.target === m || e.target.closest(".qrm-x")) closeQr(); });
   const key = e => {
     if (e.key === "Escape"){ e.preventDefault(); e.stopImmediatePropagation(); closeQr(); return; }
@@ -2462,19 +2475,31 @@ function openQr(){
   window.addEventListener("keydown", key, true);
   m._close = () => { window.removeEventListener("keydown", key, true); if (opener && opener.focus) opener.focus(); };
   document.body.appendChild(m); m.querySelector(".qrm-x").focus();
-  loadQrLib().then(Q => {
+  const body = m.querySelector(".qrm-body");
+  const show = () => {
     if (!m.isConnected) return;
-    const c = document.createElement("canvas");
-    new Q({element:c, value:u, size:240, level:"M", padding:12, background:"#ffffff", foreground:"#1d1d1b"});
-    c.setAttribute("role", "img"); c.setAttribute("aria-label", "路線分享連結的 QR 碼"); c.dataset.url = u;
-    const box = m.querySelector(".qrm-code"); box.innerHTML = ""; box.appendChild(c);
-  }, () => {
-    if (!m.isConnected) return;
-    const box = m.querySelector(".qrm-code"); m.querySelector(".qrm-cap").hidden = true;
-    box.innerHTML = `<p class="qrm-err">QR 碼載入失敗（可能離線或網路擋住），請改用複製連結傳到手機。</p><input class="qrm-url" readonly aria-label="分享連結"><button type="button" class="qrm-copy">複製分享連結</button>`;
-    const inp = box.querySelector(".qrm-url"); inp.value = u; inp.onfocus = () => inp.select();
-    box.querySelector(".qrm-copy").onclick = copyShare;
-  });
+    const pl = qrPayload(shareUrl()); if (!pl){ closeQr(); sayR("路線是空的"); return; }
+    m.querySelector(".qrm-t").textContent = pl.title;
+    body.innerHTML = `<div class="qrm-code" aria-live="polite"><span class="muted">產生 QR 碼中…</span></div><p class="qrm-cap" id="qrm-cap"></p>` +
+      (pl.copy ? `<div class="qrm-link"><input class="qrm-url" readonly aria-label="分享連結"><button type="button" class="qrm-copy">複製連結</button></div>` : "");
+    body.querySelector(".qrm-cap").textContent = pl.cap;
+    if (pl.copy){ const inp = body.querySelector(".qrm-link .qrm-url"); inp.value = pl.url; inp.onfocus = () => inp.select(); body.querySelector(".qrm-link .qrm-copy").onclick = () => copyText(pl.url, "已複製分享連結"); }
+    loadQrLib().then(Q => {
+      if (!m.isConnected) return;
+      const c = document.createElement("canvas");
+      new Q({element:c, value:pl.url, size:240, level:"M", padding:12, background:"#ffffff", foreground:"#1d1d1b"});
+      c.setAttribute("role", "img"); c.setAttribute("aria-label", pl.aria || "路線分享連結的 QR 碼"); c.dataset.url = pl.url;
+      const box = body.querySelector(".qrm-code"); box.innerHTML = ""; box.appendChild(c);
+    }, () => {
+      if (!m.isConnected) return;
+      const box = body.querySelector(".qrm-code"); body.querySelector(".qrm-cap").hidden = true;
+      if (pl.copy){ box.innerHTML = `<p class="qrm-err">QR 碼載入失敗（可能離線或網路擋住），請改用下面的複製連結傳到手機。</p>`; return; }
+      box.innerHTML = `<p class="qrm-err">QR 碼載入失敗（可能離線或網路擋住），請改用複製連結傳到手機。</p><input class="qrm-url" readonly aria-label="分享連結"><button type="button" class="qrm-copy">複製分享連結</button>`;
+      const inp = box.querySelector(".qrm-url"); inp.value = pl.url; inp.onfocus = () => inp.select();
+      box.querySelector(".qrm-copy").onclick = copyShare;
+    });
+  };
+  if (qrBefore) qrBefore(body, show, closeQr); else show();
 }
 function gmapsUrls(){
   const st = validStops(route.stops); if (st.length < 2) return [];
