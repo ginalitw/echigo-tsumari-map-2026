@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>大地藝術祭 2026 作品地圖｜越後妻有</title>
-<meta name="build" content="2026-10-06 17:09">
+<meta name="build" content="2026-10-06 17:15">
 <meta name="description" content="越後妻有大地藝術祭 2026 常設與公開作品地圖：依日期查看開館與休館，收藏我的清單，排出開車、步行或巴士路線。">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
@@ -3073,6 +3073,9 @@ if (H.get("r")){
   }
   history.replaceState(null, "", location.pathname + location.search);
 }
+/* 網站已經開著時再掃 QR／點分享連結，瀏覽器常常只換 # 後面、不重新載入，上面的開啟流程就不會跑（2026-10-06 掃行程 QR 只看到自己的資料）。
+   帶路線（r）或行程（it）參數時重新載入一次，照正常流程打開；本機資料不動 */
+window.addEventListener("hashchange", () => { const h = new URLSearchParams(location.hash.slice(1)); if (h.get("r") || h.get("it")) location.reload(); });
 if (/^\d{4}-\d{2}-\d{2}$/.test(H.get("rd") || "") && H.get("rd") >= dayEl.min && H.get("rd") <= dayEl.max) dayEl.value = H.get("rd");
 render();
 /* 進頁若已有路線（本機儲存／分享 #r=／之後載入的預設），對齊路線範圍，不要停在全區縮放 */
