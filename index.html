@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>大地藝術祭 2026 作品地圖｜越後妻有</title>
-<meta name="build" content="2026-10-06 09:25">
+<meta name="build" content="2026-10-06 16:33">
 <meta name="description" content="越後妻有大地藝術祭 2026 常設與公開作品地圖：依日期查看開館與休館，收藏我的清單，排出開車、步行或巴士路線。">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
@@ -1039,6 +1039,19 @@ a{color:inherit}
 /* 說明卡（第一次使用） */
 #mhelp{height:40px;padding:0 12px;border:none;border-radius:10px;background:rgba(255,255,255,.96);box-shadow:0 1px 2px rgba(0,0,0,.1),0 4px 14px rgba(0,0,0,.1);font:inherit;font-size:14px;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 #mhelp .mh-q{width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;font-size:12px;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+/* 傳到手機：寬 768px 以上（電腦、平板）才顯示；QR 視窗 */
+@media (max-width:767.98px){#rqr{display:none!important}}
+.qrm{position:fixed;inset:0;z-index:3100;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(29,29,27,.45)}
+.qrm-box{position:relative;width:100%;max-width:320px;box-sizing:border-box;padding:20px 24px 18px;background:#fff;border-radius:14px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.qrm-t{font-weight:700;font-size:16px;margin:0 0 12px}
+.qrm-x{position:absolute;top:6px;right:6px;width:40px;height:40px;border:0;border-radius:8px;background:none;font-size:24px;line-height:1;color:var(--mute);cursor:pointer}
+.qrm-x:hover,.qrm-x:focus-visible{background:var(--wash)}
+.qrm-code{min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.qrm-code canvas{display:block;width:240px;height:240px;image-rendering:pixelated}
+.qrm-cap{margin:12px 0 0;font-size:14px;color:var(--ink)}
+.qrm-err{margin:0;font-size:13px;color:var(--mute);text-align:left}
+.qrm-url{width:100%;box-sizing:border-box;padding:6px 8px;font-size:12px;border:1px solid var(--line);border-radius:8px}
+.qrm-copy{min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:14px;cursor:pointer}
 .onb{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
 .onb[hidden]{display:none}
 .onb-bg{position:absolute;inset:0;background:rgba(29,29,27,.42)}
@@ -1460,7 +1473,7 @@ a{color:inherit}
     <div id="rkml" class="kmlbox" hidden><button id="rkmlbtn" type="button" class="kbtn">匯出到 Google My Maps</button><div class="muted knote">匯入需用電腦：Google My Maps → 建立新地圖 → 匯入 → 選這個檔案。之後在手機 Google 地圖的『已儲存 › 地圖』就看得到這些圖釘。</div></div>
     <div class="btns redit-only" style="margin-top:6px"><button id="raddfav">加入清單全部作品</button><button id="rsel">路線作品加進清單</button></div>
     <div class="btns redit-only" style="margin-top:6px"><select id="rplace" class="b" aria-label="選擇車站"><option>十日町站</option><option>越後湯澤站</option><option>まつだい站</option><option>津南站</option></select><button id="raddplace">加入車站</button></div>
-    <div class="btns" style="margin-top:6px"><button id="rsave" class="redit-only">儲存路線</button><button id="rfit">看整條路線</button><button id="rshare" type="button">複製分享連結</button></div>
+    <div class="btns" style="margin-top:6px"><button id="rsave" class="redit-only">儲存路線</button><button id="rfit">看整條路線</button><button id="rshare" type="button">複製分享連結</button><button id="rqr" type="button" aria-haspopup="dialog">傳到手機</button></div>
     <div id="rmsg" class="okmsg"></div>
     <div class="box redit-only"><b>已儲存的路線</b><ul class="lst" id="rsaved"></ul></div>
     <div class="muted redit-only" style="margin-top:6px">可拖曳或用 ↑ ↓ 調整順序，或按「自動排順序」（起點不動）。路線時間由 OSRM 免費路線服務估算；開車或步行連不上時改用直線估算並註明。</div>
@@ -2408,6 +2421,65 @@ function copyShare(){
   const fallback = () => { prompt("複製這個連結", u); };
   if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(u).then(done, fallback); else fallback();
 }
+/* SHARESAVE-BEGIN 分享連結打開時自動存進「已儲存的路線」：交通方式＋站點相同就不重存（重開同一個連結不會重複） */
+const routeKey = r => (r.mode || "drive") + "|" + (r.stops || []).filter(s => stopLL(s)).map(tok).join("~");
+function saveShared(list, r){
+  const k = routeKey(r), hit = list.find(x => x && Array.isArray(x.stops) && routeKey(x) === k);
+  if (hit) return {item:hit, added:false};
+  const base = r.name || "分享的路線"; let name = base, n = 2;
+  while (list.some(x => x && x.name === name)) name = `${base}（${n++}）`;
+  const copy = JSON.parse(JSON.stringify({name, stops:r.stops, mode:r.mode || "drive", url:""})); copy.ts = new Date().toISOString();
+  list.push(copy); return {item:copy, added:true};
+}
+/* SHARESAVE-END */
+/* 傳到手機（寬螢幕才顯示）：把「複製分享連結」同一個網址做成 QR 碼；QR 程式庫第一次按才從 cdnjs 載入 */
+const QR_LIB = {src:"https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js", sri:"sha512-pUhApVQtLbnpLtJn6DuzDD5o2xtmLJnJ7oBoMsBnzOkVkpqofGLGPaBJ6ayD2zQe3lCgCibhJBi4cj5wAxwVKA=="};
+let qrLibP = null;
+function loadQrLib(){
+  if (window.QRious) return Promise.resolve(window.QRious);
+  if (!qrLibP) qrLibP = new Promise((ok, no) => {
+    const s = document.createElement("script"), t = setTimeout(() => no(new Error("timeout")), 10000);
+    s.src = QR_LIB.src; s.integrity = QR_LIB.sri; s.crossOrigin = "anonymous"; s.referrerPolicy = "no-referrer"; s.async = true;
+    s.onload = () => { clearTimeout(t); window.QRious ? ok(window.QRious) : no(new Error("QRious missing")); };
+    s.onerror = () => { clearTimeout(t); s.remove(); no(new Error("load failed")); };
+    document.head.appendChild(s);
+  }).catch(e => { qrLibP = null; throw e; });
+  return qrLibP;
+}
+function closeQr(){ const m = $("qrm"); if (!m) return; m.remove(); if (m._close) m._close(); }
+function openQr(){
+  if (!route.stops.length){ sayR("路線是空的"); return; }
+  closeQr();
+  const u = shareUrl(), opener = document.activeElement;
+  const m = document.createElement("div"); m.id = "qrm"; m.className = "qrm";
+  m.innerHTML = `<div class="qrm-box" role="dialog" aria-modal="true" aria-labelledby="qrm-t" aria-describedby="qrm-cap"><button type="button" class="qrm-x" aria-label="關閉">×</button>` +
+    `<div class="qrm-t" id="qrm-t">傳到手機</div><div class="qrm-code" aria-live="polite"><span class="muted">產生 QR 碼中…</span></div>` +
+    `<p class="qrm-cap" id="qrm-cap">用手機相機掃描，路線就會出現在手機上</p></div>`;
+  m.addEventListener("click", e => { if (e.target === m || e.target.closest(".qrm-x")) closeQr(); });
+  const key = e => {
+    if (e.key === "Escape"){ e.preventDefault(); e.stopImmediatePropagation(); closeQr(); return; }
+    if (e.key !== "Tab") return;
+    const f = [...m.querySelectorAll("button,input")]; if (!f.length) return;
+    const i = f.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0){ e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1){ e.preventDefault(); f[0].focus(); }
+  };
+  window.addEventListener("keydown", key, true);
+  m._close = () => { window.removeEventListener("keydown", key, true); if (opener && opener.focus) opener.focus(); };
+  document.body.appendChild(m); m.querySelector(".qrm-x").focus();
+  loadQrLib().then(Q => {
+    if (!m.isConnected) return;
+    const c = document.createElement("canvas");
+    new Q({element:c, value:u, size:240, level:"M", padding:12, background:"#ffffff", foreground:"#1d1d1b"});
+    c.setAttribute("role", "img"); c.setAttribute("aria-label", "路線分享連結的 QR 碼"); c.dataset.url = u;
+    const box = m.querySelector(".qrm-code"); box.innerHTML = ""; box.appendChild(c);
+  }, () => {
+    if (!m.isConnected) return;
+    const box = m.querySelector(".qrm-code"); m.querySelector(".qrm-cap").hidden = true;
+    box.innerHTML = `<p class="qrm-err">QR 碼載入失敗（可能離線或網路擋住），請改用複製連結傳到手機。</p><input class="qrm-url" readonly aria-label="分享連結"><button type="button" class="qrm-copy">複製分享連結</button>`;
+    const inp = box.querySelector(".qrm-url"); inp.value = u; inp.onfocus = () => inp.select();
+    box.querySelector(".qrm-copy").onclick = copyShare;
+  });
+}
 function gmapsUrls(){
   const st = validStops(route.stops); if (st.length < 2) return [];
   const pts = st.map(s => stopLL(s).map(x => (+x).toFixed(6)).join(","));
@@ -2564,6 +2636,7 @@ if ($("rkmlbtn")) $("rkmlbtn").onclick = exportRouteKml;
 if ($("lkmlbtn")) $("lkmlbtn").onclick = exportListKml;
 $("rfit").onclick = fitRoute;
 if ($("rshare")) $("rshare").onclick = copyShare;
+if ($("rqr")) $("rqr").onclick = openQr;
 $("rsave").onclick = () => {
   let name = ($("rname").value || "").trim();
   if (!name){ name = prompt("路線名稱，例如 10/31 明石之湯日", "") || ""; name = name.trim(); }
@@ -2993,14 +3066,14 @@ if (H.get("r")){
     if (stops.length >= 3 && sameStop(stops[0], stops[stops.length - 1])) Object.assign(stops[stops.length - 1], {ret:true, tnote:"回到起點"});
     const rm = H.get("rm"); sharedRoute = {name:H.get("rn") || "分享的路線", mode:["walk", "bus", "train"].includes(rm) ? rm : "drive", stops};
     const same = route.stops.length === stops.length && route.stops.every((s, i) => sameStop(s, stops[i]));
-    if (same){ sharedRoute = null; }
+    if (same){ saveShared(routes, sharedRoute); persist(); sharedRoute = null; }
     else if (route.stops.length && !confirm(`這個連結帶有一條路線「${sharedRoute.name}」（${stops.length} 站）。\n要用它取代目前的路線（${route.stops.length} 站）嗎？\n目前的路線會先存到「已儲存的路線」。`)){ sharedRoute = null; setTimeout(() => toast("沒有載入分享的路線，目前路線不變"), 300); }
     else if (route.stops.length){
       const nm = (route.name || "目前路線") + `（${new Date().toLocaleDateString("zh-TW")} 前）`;
       const copy = JSON.parse(JSON.stringify(route)); copy.name = nm; copy.ts = new Date().toISOString();
       const i = routes.findIndex(r => r.name === nm); i >= 0 ? (routes[i] = copy) : routes.push(copy);
     }
-    if (sharedRoute){ route = {name:sharedRoute.name, stops:sharedRoute.stops, mode:sharedRoute.mode, url:""}; persist(); }
+    if (sharedRoute){ route = {name:sharedRoute.name, stops:sharedRoute.stops, mode:sharedRoute.mode, url:""}; saveShared(routes, route); persist(); }
   }
   history.replaceState(null, "", location.pathname + location.search);
 }
@@ -3012,7 +3085,7 @@ updateRoute(bootRoute);
 const tabMap = {list:"l", route:"r", presets:"p", search:"s"};
 if (H.get("preset")) loadPreset(H.get("preset"));
 if (H.get("tab")) showTab(tabMap[H.get("tab")] || H.get("tab"));
-if (sharedRoute){ showTab("r"); if (!bootRoute) updateRoute(true); toast(`已載入分享的路線「${sharedRoute.name}」`); }
+if (sharedRoute){ showTab("r"); if (!bootRoute) updateRoute(true); toast(`已載入分享的路線「${sharedRoute.name}」，也存進「已儲存的路線」`); }
 if (H.get("open") && BY[H.get("open")]) zoomTo(BY[H.get("open")]);
 if (H.get("q")){ q.value = H.get("q"); render(); }
 if (/^\d+(\.\d+)?$/.test(H.get("z") || "")) map.setView(H.get("c") ? H.get("c").split(",").map(Number) : map.getCenter(), +H.get("z"), {animate:false});
