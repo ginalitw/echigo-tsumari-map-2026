@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>大地藝術祭 2026 作品地圖｜越後妻有</title>
-<meta name="build" content="2026-10-06 16:33">
+<meta name="build" content="2026-10-06 17:09">
 <meta name="description" content="越後妻有大地藝術祭 2026 常設與公開作品地圖：依日期查看開館與休館，收藏我的清單，排出開車、步行或巴士路線。">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
@@ -1146,9 +1146,6 @@ a{color:inherit}
   body:not(.redit-on) #rkml{display:none!important}
   body:not(.redit-on) #rlist .stop{cursor:pointer;user-select:none}
   body.redit-on #redit{background:#1d1d1b;color:#fff;border-color:#1d1d1b}
-  #rlist .stop .rst{display:inline-block;margin-left:6px;font-size:12px;color:var(--mute)}
-  #rlist .stop .rst.rst-closed{color:#b45309}
-  #rlist .stop .rst.rst-stay{color:#6b5b2a}
   .fanbar{display:none}  /* 專頁提示改到 ⋯ 選單，首屏不佔空間 */
 }
 @media (min-width:701px){
@@ -2341,9 +2338,8 @@ function renderRouteList(pending){
     li.className = "stop"; li.draggable = !useSheet() || document.body.classList.contains("redit-on"); li.dataset.i = i;
     const ll = ok && okLL(stopLL(s)) ? stopLL(s) : null;
     const fanX = [["lunch", "午餐"], ["parking", "停車"], ["toilet", "廁所"], ["photo", "拍照"], ["warn", "注意"]].filter(([k]) => s[k]);
-    const _di = s.c && BY[s.c] && !s.ret ? dayInfo(BY[s.c], curDay()) : null;
-    const stLabel = _di ? stateShort(_di) : "";
-    li.innerHTML = `<span class="no">${ok ? ++vi : "?"}</span><span class="t">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${stLabel ? `<span class="rst rst-${_di.state}">${stLabel}</span>` : ""}${s.c && BY[s.c] && BY[s.c].中文名 && BY[s.c].中文名 !== BY[s.c].作品名稱 ? `<span class="tja" lang="ja">${esc(BY[s.c].作品名稱)}</span>` : ""}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}${s.c ? ` <code>${esc(s.c)}</code>` : ""}<br>${stopStatus(s)}` +
+    /* 站名後面不再接狀態字：狀態只放在下一行的標籤（stopStatus），避免「光之館開放」黏在一起又重複 */
+    li.innerHTML = `<span class="no">${ok ? ++vi : "?"}</span><span class="t">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${s.c && BY[s.c] && BY[s.c].中文名 && BY[s.c].中文名 !== BY[s.c].作品名稱 ? `<span class="tja" lang="ja">${esc(BY[s.c].作品名稱)}</span>` : ""}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}${s.c ? ` <code>${esc(s.c)}</code>` : ""}<br>${stopStatus(s)}` +
       (s.stay_min != null || s.tip ? `<span class="sfan">${s.stay_min != null ? `停留約 ${esc(s.stay_min)} 分` : ""}${s.stay_min != null && s.tip ? "，" : ""}${s.tip ? esc(s.tip) : ""}</span>` : "") +
       (fanX.length ? `<details class="sdet"><summary>排程細節</summary>${fanX.map(([k, t]) => `<div><b>${t}</b>：${esc(s[k])}</div>`).join("")}</details>` : "") +
       (ll ? gmLink(ll[0], ll[1], "sgm") : "") + `</span>` +
