@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>大地藝術祭 2026 作品地圖｜越後妻有</title>
-<meta name="build" content="2026-10-06 18:36">
+<meta name="build" content="2026-10-06 19:12">
 <meta name="description" content="越後妻有大地藝術祭 2026 常設與公開作品地圖：依日期查看開館與休館，收藏我的清單，排出開車、步行或巴士路線。">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
@@ -3276,7 +3276,19 @@ function onbClose(){
 
 /* ===== 離線：service worker 快取網頁與看過的底圖；離線時顯示小提示 ===== */
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  /* 新版本：開著不關的分頁也要知道。回到這個分頁時（最多每 10 分鐘一次）檢查 sw.js；新版接手後顯示「重新載入」提示（不自動重新整理，免得打斷正在選照片或填寫的東西） */
+  const hadCtl = !!navigator.serviceWorker.controller; let swReg = null, swChk = Date.now();
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").then(r => { swReg = r; }).catch(() => {}));
+  const swCheck = () => { if (swReg && document.visibilityState === "visible" && Date.now() - swChk > 6e5){ swChk = Date.now(); swReg.update().catch(() => {}); } };
+  document.addEventListener("visibilitychange", swCheck); window.addEventListener("focus", swCheck); setInterval(swCheck, 36e5);
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadCtl || document.getElementById("swnew")) return;
+    const el = document.createElement("div"); el.id = "swnew"; el.setAttribute("role", "status");
+    el.style.cssText = "position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:3000;display:flex;gap:10px;align-items:center;background:#1d1d1b;color:#fff;padding:8px 8px 8px 14px;border-radius:12px;font-size:14px;box-shadow:0 2px 10px rgba(0,0,0,.25);max-width:calc(100vw - 24px)";
+    el.innerHTML = '<span>地圖已更新</span><button type="button" style="min-height:36px;padding:0 12px;border:0;border-radius:8px;background:#F2C200;color:#1d1d1b;font:inherit;font-weight:700;cursor:pointer">重新載入</button>';
+    el.querySelector("button").onclick = () => location.reload();
+    document.body.appendChild(el);
+  });
 }
 (function(){
   const el = document.createElement("div"); el.id = "offline"; el.setAttribute("role", "status"); el.hidden = true;
