@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>大地藝術祭 2026 作品地圖｜越後妻有</title>
-<meta name="build" content="2026-10-06 07:59">
+<meta name="build" content="2026-10-06 09:25">
 <meta name="description" content="越後妻有大地藝術祭 2026 常設與公開作品地圖：依日期查看開館與休館，收藏我的清單，排出開車、步行或巴士路線。">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
@@ -1669,7 +1669,7 @@ const isOffSeason = dateStr => dateStr < "2026-04-25" || dateStr > "2026-11-08";
 /* RULES-END */
 const SRC_URL = "https://www.echigo-tsumari.jp/assets/uploads/2026/10/" + encodeURIComponent("「2026年の越後妻有」作品公開カレンダー（英）.pdf");
 const SEASON = ["2026-04-25", "2026-11-08"];
-const STATE_TXT = {open:"這天開放", view:"定休日可觀看（當天是定休日，戶外部分仍可觀看，官方說明）", stay:"僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀", closed:"這天休館", unknown:"尚未公布開放資訊"};
+const STATE_TXT = {open:"這天開放", view:"定休日可觀看", stay:"僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀", closed:"這天休館", unknown:"尚未公布開放資訊"};
 const STATE_SHORT = {open:"開放", view:"定休日可觀看", stay:"僅限住宿者", closed:"休館", unknown:"未公布"};
 const WINTER_OPEN_TXT = "冬季開放，日期與時間以官方公告為準";
 const stateTxt = di => di.reason === "winter" ? WINTER_OPEN_TXT : di.reason === "season" ? "不在 2026 會期內（4/25～11/8）" : STATE_TXT[di.state];
@@ -2384,7 +2384,7 @@ function renderRouteCheck(){
     const di = dayInfo(BY[s.c], day); if (groups[di.state]) groups[di.state].push(`${k}. ${esc(stopName(s))}`);
     if (route.mode !== "drive") transitFor(BY[s.c]).forEach(t => near.add(t)); });
   if (!n){ box.hidden = true; box.innerHTML = ""; return; }
-  const L = [["closed", "休館", "warn"], ["stay", "僅限住宿者，非住宿者無法參觀", "warn"], ["unknown", "未公布開放資訊", "muted"], ["view", "定休日可觀看（戶外部分可看）", "muted"]];
+  const L = [["closed", "休館", "warn"], ["stay", "僅限住宿者，非住宿者無法參觀", "warn"], ["unknown", "未公布開放資訊", "muted"], ["view", "定休日可觀看", "muted"]];
   const rows = L.filter(([st]) => groups[st].length).map(([st, t, c]) => `<li><span class="${c}">${t}</span>：${groups[st].join("、")}</li>`);
   const bus = [...near].map(t => `<li><span class="warn">末班巴士</span>（${esc(busVer(t))}）：${esc(t.stop_zh)}站 ${transitLines(t, day).join("；")}。${esc(t.access)}。<a href="${esc(t.src[busDayType(day) === "holiday" ? 1 : 0].url)}" target="_blank" rel="noopener">官方時刻表</a></li>`);
   box.innerHTML = `<b>${day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）路線檢查</b>` +
