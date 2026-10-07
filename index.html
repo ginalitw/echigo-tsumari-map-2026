@@ -1083,6 +1083,14 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 .onb-dot{width:24px;height:44px;border:none;background:none;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 .onb-dot:before{content:"";width:8px;height:8px;border-radius:50%;background:#d0cdc5}
 .onb-dot.on:before{background:var(--ink);width:18px;border-radius:4px}
+.onb-qrfig{margin:2px 0 8px;text-align:center}
+.onb-qr{min-height:180px;display:flex;align-items:center;justify-content:center}
+.onb-qr canvas{display:block;width:180px;height:180px}
+.onb-qrfig figcaption{margin-top:6px;font-size:14px;line-height:1.4;color:var(--ink)}
+.onb-card p.onb-idline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:14.5px;line-height:1.55;margin:0 0 8px}
+.onb-copy{min-height:36px;padding:0 12px;border:1px solid var(--line,#d9d6ce);border-radius:8px;background:#fff;font:inherit;font-size:14px;color:var(--ink);cursor:pointer}
+.onb-card p.onb-note{font-size:12.5px;line-height:1.55;color:var(--mute);margin:0}
+.onb-qr-err{margin:0;font-size:13px;color:var(--mute);text-align:left}
 @keyframes onbIn{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.onb-card{animation:none}}
 /* ===== mobile: bottom sheet ===== */
@@ -1500,6 +1508,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 /* 大地藝術祭2026 作品地圖：共用程式（plain 與 illustrated 兩版共用） */
 const FAN_ENABLED = false;        // 第 4 階段才改 true
 const LINE_ADD_FRIEND_URL = "https://lin.ee/R12Vd62";  // Bot 加好友網址。說明卡與解鎖按鈕都直接用這個，不加參數。之後若改 LIFF 只改這裡。
+const LINE_BASIC_ID = "@800dbehr";  // 電腦版 LINE 的基本 ID。公開版說明卡寬螢幕版的搜尋 ID 與〔複製 ID〕都用這個。
 function isFan(){ return false; }
 function loadFanRoutes(){ return Promise.resolve([]); }
 const DEV = "";
@@ -3141,27 +3150,62 @@ let ONB_CARDS = () => {
     {icon:"star", t:"看順眼就收起來", x:["喜歡的作品按 ☆ 放進清單，再排成一條路線，開車、走路、搭巴士都幫你算時間。要排好幾天的話，用電腦或平板會順手很多。"]}
   ];
   if (hasPreviewYear()) cards.push({icon:"year", t:"2027 三年展，先偷看", x:["左上角可以切換年度。明年是三年一次的大祭，新作品預計 1 月公布，現在先放常設作品讓你暖身。"]});
-  cards.push({icon:"friend", t:"要不要一起當飯團？", x:["加入富搖小幫手，就能打開飯團專頁：到現場蓋章集點，還看得到阿飯的現場筆記。追過了，才帶你去。"], href:onbJoinHref(), primary:"加入富搖小幫手", secondary:"先逛逛"});
+  cards.push({icon:"friend", t:"要不要一起當飯團？", x:["加入富搖小幫手，就能打開飯團專頁：到現場蓋章集點，還看得到阿飯的現場筆記。追過了，才帶你去。"], href:onbJoinHref(), primary:"加入富搖小幫手", secondary:"先逛逛", deskLine:true});
   return cards;
 };
 const onbSkip = !!(H.get("r") || H.get("it") || H.get("list") || H.get("open") || H.get("preset"));
 let onbI = 0, onbBack = null;
 function onbSeen(){ try { localStorage.setItem(ONB_KEY, "1"); } catch(e){} }
 function onbIsSeen(){ try { return localStorage.getItem(ONB_KEY) === "1"; } catch(e){ return true; } }
+function onbDeskLine(c){
+  return !!(c && c.deskLine && !useSheet() && onbJoinHref() !== "#");
+}
+function copyLineId(btn){
+  const id = String(LINE_BASIC_ID || "");
+  const done = () => { btn.textContent = "已複製"; };
+  const fb = () => { prompt("複製這個 ID", id); done(); };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(id).then(done, fb); else fb();
+}
+function onbDeskLineHtml(){
+  return `<figure class="onb-qrfig"><div class="onb-qr" aria-live="polite"><span class="muted">產生 QR 碼中…</span></div><figcaption>用手機掃描</figcaption></figure>` +
+    `<p class="onb-idline">用電腦版 LINE：搜尋 ID ${esc(LINE_BASIC_ID)}<button type="button" class="onb-copy" data-onbcopy="1">複製 ID</button></p>` +
+    `<p class="onb-note">飯團專頁要在手機 LINE 裡打開，到現場蓋章最方便。</p>`;
+}
+function onbPaintFriendQr(card){
+  const url = onbJoinHref();
+  loadQrLib().then(Q => {
+    const box = card.querySelector(".onb-qr");
+    if (!box || !box.isConnected) return;
+    const c = document.createElement("canvas");
+    new Q({element:c, value:url, size:180, level:"M", padding:8, background:"#ffffff", foreground:"#1d1d1b"});
+    c.setAttribute("role", "img"); c.setAttribute("aria-label", "加入富搖小幫手的 QR 碼");
+    box.innerHTML = ""; box.appendChild(c);
+  }, () => {
+    const box = card.querySelector(".onb-qr");
+    if (!box || !box.isConnected) return;
+    box.innerHTML = `<p class="onb-qr-err">QR 碼載入失敗，請改用下面的 ID 加入。</p>`;
+  });
+}
 function onbRender(){
   const el = $("onb"), cs = ONB_CARDS(), c = cs[onbI], last = onbI === cs.length - 1;
-  el.querySelector(".onb-card").innerHTML = `<svg class="onb-ic" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${ONB_ICON[c.icon] || ""}</svg>` +
-    `<h2 id="onb-t" tabindex="-1">${esc(c.t)}</h2>${c.x.map(x => `<p>${esc(x)}</p>`).join("")}`;
+  const desk = last && onbDeskLine(c);
+  const card = el.querySelector(".onb-card");
+  card.innerHTML = `<svg class="onb-ic" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${ONB_ICON[c.icon] || ""}</svg>` +
+    `<h2 id="onb-t" tabindex="-1">${esc(c.t)}</h2>` + (desk ? onbDeskLineHtml() : c.x.map(x => `<p>${esc(x)}</p>`).join(""));
   el.querySelector(".onb-n").textContent = `第 ${onbI + 1} 張，共 ${cs.length} 張`;
   el.querySelector(".onb-dots").innerHTML = cs.map((_, i) => `<button type="button" class="onb-dot${i === onbI ? " on" : ""}" data-onbi="${i}" aria-label="第 ${i + 1} 張：${esc(cs[i].t)}"${i === onbI ? ' aria-current="step"' : ""}></button>`).join("");
   const pv = el.querySelector(".onb-prev");
   pv.disabled = onbI === 0;
   const acts = el.querySelector(".onb-acts");
-  acts.classList.toggle("has-join", !!(last && c.href));
-  acts.innerHTML = last && c.href
+  const join = !!(last && c.href && !desk);
+  acts.classList.toggle("has-join", join);
+  acts.innerHTML = desk
+    ? `<button type="button" class="onb-later" data-onbx="1">${esc(c.secondary || "先逛逛")}</button>`
+    : join
     ? `<button type="button" class="onb-later" data-onbx="1">${esc(c.secondary || "先逛逛")}</button><a class="onb-next" href="${esc(c.href)}"${/^https?:/i.test(c.href) ? ' target="_blank" rel="noopener"' : ""}>${esc(c.primary || "加入富搖小幫手")}</a>`
     : `<button type="button" class="onb-next">${esc(last ? (c.primary || "開始逛") : "下一張")}</button>`;
   el.querySelector(".onb-skip").hidden = false;
+  if (desk) onbPaintFriendQr(card);
 }
 function onbGo(i, focusTitle){ const n = ONB_CARDS().length; if (i < 0 || i >= n) return; onbI = i; onbRender(); if (focusTitle) $("onb-t").focus(); }
 function onbOpen(){
@@ -3181,7 +3225,8 @@ function onbClose(){
     `<div class="onb-card"></div><div class="onb-foot"><button type="button" class="onb-prev">上一張</button><div class="onb-dots"></div><div class="onb-acts"></div></div></div></div>`);
   const el = $("onb"), box = el.querySelector(".onb-box");
   el.addEventListener("click", e => {
-    if (e.target.closest("[data-onbx]")) onbClose();
+    if (e.target.closest("[data-onbcopy]")) copyLineId(e.target.closest("[data-onbcopy]"));
+    else if (e.target.closest("[data-onbx]")) onbClose();
     else if (e.target.closest(".onb-prev")) onbGo(onbI - 1, true);
     else if (e.target.closest("a.onb-next")){ onbSeen(); setTimeout(onbClose, 0); }
     else if (e.target.closest(".onb-next")){ if (onbI === ONB_CARDS().length - 1) onbClose(); else onbGo(onbI + 1, true); }
@@ -3216,6 +3261,7 @@ function onbClose(){
     lg && lg.nextSibling ? tools.insertBefore(b, lg.nextSibling) : tools.appendChild(b); }
   /* 等專頁擴充（附加在後面的程式）換好卡片內容再決定要不要顯示 */
   setTimeout(() => { if (!onbSkip && !onbIsSeen()) onbOpen(); }, 0);
+  MQ.addEventListener("change", () => { if (!el.hidden) onbRender(); });
 })();
 
 /* ===== 手機簡化：⋯選單、日期統計展開、路線兩層編輯、推薦路線收進「選建議」 ===== */
