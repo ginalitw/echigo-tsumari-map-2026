@@ -2747,7 +2747,7 @@ function renderPresets(){
     card.querySelector(".cbody").insertAdjacentHTML("beforeend", `<div class="cnotes${locked ? " locked" : ""}" data-notes="${esc(N.id)}"${locked ? ' role="button" tabindex="0"' : ""}>${locked ? LOCK_SVG + " " : ""}越後飯實踩筆記${locked ? "" : ` ${esc((N.walked || "").replace(/-/g, "/"))}`}</div>`);
     if (locked) card.insertAdjacentHTML("afterend", unlockBox(N.id));
   });
-  if (FAN_ON) box.insertAdjacentHTML("afterbegin", `<div class="cgroup"><div class="cgt">越後飯實踩路線</div><div class="cards">${FAN_ROUTES.length ? FAN_ROUTES.map(fanCardHtml).join("") : '<div class="muted">目前還沒有實踩路線</div>'}</div></div>`);
+  if (FAN_ON && FAN_ROUTES.length) box.insertAdjacentHTML("afterbegin", `<div class="cgroup"><div class="cgt">越後飯實踩路線</div><div class="cards">${FAN_ROUTES.map(fanCardHtml).join("")}</div></div>`);
 }
 function loadPreset(id){
   const p = PRESETS.find(x => x.id === id); if (!p) return;
