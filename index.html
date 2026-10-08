@@ -752,7 +752,6 @@ ul.lst code,.rlist code{font-size:11px;color:#777;margin-right:4px}
 .leaflet-popup-content{font-size:13px;line-height:1.55;min-width:210px}
 .pp-head{display:flex;align-items:center;gap:6px}
 .pp-code{display:inline-block;background:var(--accent);color:#222;font-weight:700;padding:0 6px;border-radius:4px;font-size:12px}
-.pp-head .fav{margin-left:auto;font-size:22px}
 .pp-name{font-size:15px;font-weight:700;margin:4px 0}
 .pp-row span{color:#888}
 .pp-note{color:#B26B00;font-size:12px;margin-top:4px}
@@ -762,7 +761,6 @@ ul.lst code,.rlist code{font-size:11px;color:#777;margin-right:4px}
 .pp-acts{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
 .pp-off{margin-top:6px;font-size:13px}
 .pp-off a{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
-.pp-add{border:1px solid #E0A800;background:#fff;border-radius:12px;padding:3px 10px;cursor:pointer;font-size:12.5px;font-family:inherit}
 .pp-src{font-size:11px;color:#888;display:inline-block;margin-top:4px}
 .cgroup{margin-bottom:10px}
 .cgt{font-weight:700;font-size:13px;margin:6px 0 4px}
@@ -801,7 +799,6 @@ ul.lst code,.rlist code{font-size:11px;color:#777;margin-right:4px}
 .fanlock{margin:-2px 0 4px;padding:10px 12px;border:1px solid #e7e5df;border-radius:10px;font-size:13px}
 .fanlock[hidden]{display:none}
 .fanlock p{margin:0 0 8px}
-.pp-gm{display:inline-flex;align-items:center;min-height:40px;padding:0 6px;text-decoration:none;color:#1a5fc8;box-sizing:border-box}
 .cnotes{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 8px;border-radius:8px;background:#efece4;color:#4a4436;font-size:12.5px}
 .cnotes.locked{cursor:pointer;min-height:32px}
 .cnotes .lock{vertical-align:-2px}
@@ -954,16 +951,19 @@ ul.lst li .addr{min-height:44px;border-radius:22px}
 .pp-row span,.pp-rule,.pp-src{color:var(--mute)}
 .pp-note{color:#8F5600}
 .pp-day.closed{background:#efefef;color:#555}.pp-day.unknown{background:#F3F0E6;color:#6B5B2A}
-.pp-add{min-height:36px;display:inline-flex;align-items:center;border-radius:18px;padding:0 14px;font-size:14px}
-.pp-add{border-color:#bdb9ae;color:var(--ink)}
-.pp-head .fav{width:44px;height:44px}
+.pp-acts{flex-wrap:nowrap;gap:8px;margin:8px 0 2px}
+.pp-btn{flex:1 1 0;min-width:0;min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:4px;margin:0;padding:0 6px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;font-size:14px;color:var(--ink);text-decoration:none;white-space:nowrap;box-sizing:border-box;cursor:pointer}
+.leaflet-container a.pp-btn{color:var(--ink)}
+.pp-btn:hover{background:var(--wash)}
+.pp-btn.on{border-color:var(--ink);font-weight:600}
+.pp-btn:disabled{color:var(--mute);background:#fff;cursor:default}
 /* detail pane in sheet */
 #pane-d .dnav{position:sticky;top:-14px;background:#fff;margin:-14px -20px 6px;padding:4px 8px;border-bottom:1px solid var(--line);z-index:1}
 .dback{min-height:44px;border:none;background:none;font:inherit;font-size:15px;color:var(--ink);padding:0 12px;cursor:pointer;border-radius:10px}
 #pane-d .pp-name{font-size:20px;line-height:1.35;margin:8px 0}
 #pane-d .dcard{font-size:15px;line-height:1.65}
 #pane-d .pp-acts{gap:8px;margin-top:12px}
-#pane-d .pp-add{min-height:44px;border-radius:22px;padding:0 18px;font-size:15px}
+#pane-d .pp-btn{min-height:44px;font-size:15px}
 #pane-d .pp-rule,#pane-d .pp-src{font-size:13px}
 /* breathing zoom */
 path.mk{transition:opacity .25s ease}
@@ -1270,6 +1270,16 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 @media (min-width:768px){
   .leaflet-popup.pp-area .leaflet-popup-content-wrapper{box-shadow:inset 0 5px 0 var(--ac,transparent),0 6px 24px rgba(0,0,0,.16)}
 }
+/* 電腦版右下角常駐〔目前行程・N 站〕；手機已有首屏按鈕，不顯示 */
+#dtrip{position:absolute;z-index:999;right:12px;bottom:28px;min-height:44px;padding:0 18px;border:none;border-radius:22px;background:var(--ink);color:#fff;font:inherit;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;box-shadow:0 1px 2px rgba(0,0,0,.12),0 4px 14px rgba(0,0,0,.18);cursor:pointer}
+#dtrip:hover{background:#3a3a37}
+#dtrip.bump{animation:dtripBump .5s ease-out}
+@keyframes dtripBump{0%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}60%{transform:translateY(0)}80%{transform:translateY(-2px)}}
+@media (max-width:767.98px){#dtrip{display:none}}
+/* 滑鼠停在作品點上的小提示 */
+.leaflet-tooltip.hv-tip{display:flex;align-items:center;gap:6px;padding:4px 8px;border:none;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.12),0 4px 12px rgba(0,0,0,.16);font-size:13px;line-height:1.4;color:var(--ink);white-space:nowrap}
+.hv-tip .hv-n{max-width:240px;overflow:hidden;text-overflow:ellipsis}
+.hv-tip .st{margin:0}
 </style>
 </head>
 <body>
@@ -1278,6 +1288,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 <div id="mtools"><button id="mlegend" type="button" aria-expanded="false" aria-controls="legendpop">圖例</button><button id="mall" type="button">看全區</button><button id="mmenu" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mmenupop" aria-label="更多" title="更多">⋯</button></div>
 <div id="mmenupop" role="menu" aria-label="地圖選單" hidden></div>
 <div id="legendpop" role="dialog" aria-label="圖例" hidden></div>
+<button id="dtrip" type="button" aria-controls="pane-r">目前行程・0 站</button>
 <div id="panel" role="region" aria-label="作品面板">
   <button id="sheet-handle" type="button" aria-label="展開面板" aria-expanded="false" aria-controls="sheet-body"></button>
   <h1>大地藝術祭 2026 作品地圖</h1>
@@ -2086,14 +2097,19 @@ const officialLink = d => `<div class="pp-off"><a href="${esc(d.官網連結)}" 
 function popupHtml(d){
   const di = d._day || {state:"unknown", tags:[]};
   const title = d.中文名 ? `${esc(d.中文名)}<div class="pp-ja" lang="ja">${esc(d.作品名稱)}</div>` : `<span lang="ja">${esc(d.作品名稱)}</span>`;
-  let h = `<div class="pp-head"><span class="pp-code">${esc(d.作品編號)}</span><span style="color:#888">${esc(d.地區)}${ILL ? "，" + KIND_TXT[kindOf(d)] : ""}</span>`;
-  h += `<button class="fav ${isSaved(d.作品編號) ? "on" : ""}" data-fav="${esc(d.作品編號)}" aria-pressed="${isSaved(d.作品編號)}" aria-label="${isSaved(d.作品編號) ? "從我的清單移除" : "加入我的清單"}" title="${isSaved(d.作品編號) ? "從我的清單移除" : "加入我的清單"}">${isSaved(d.作品編號) ? "★" : "☆"}</button></div>`;
+  const c = d.作品編號, sv = isSaved(c);
+  let h = `<div class="pp-head"><span class="pp-code">${esc(c)}</span><span style="color:#888">${esc(d.地區)}${ILL ? "，" + KIND_TXT[kindOf(d)] : ""}</span></div>`;
   h += `<div class="pp-name">${title}</div>`;
   h += photoHtml(d);
   h += `<div class="pp-row"><span>藝術家：</span>${esc(d.藝術家)}</div>`;
   h += `<div class="pp-row"><span>場館：</span>${esc(d.設置地點)}</div>`;
   if (d["官方場所（原文）"]) h += `<div class="pp-row"><span>場所：</span>${esc(d["官方場所（原文）"])}</div>`;
   h += `<div class="pp-day ${di.state}">${curDay().replace(/-/g, "/")}　${stateTxt(di)}${di.tags.length ? "，" + esc(di.tags.join("，")) : ""}</div>`;
+  /* 和手機浮動卡同一排：〔☆ 想去〕〔＋ 路線〕〔📍 地圖〕 */
+  h += `<div class="pp-acts"><button type="button" class="pp-btn${sv ? " on" : ""}" data-fav="${esc(c)}" aria-pressed="${sv}" aria-label="${sv ? "從我的清單移除" : "加入我的清單"}" title="${sv ? "從我的清單移除" : "加入我的清單"}"><span aria-hidden="true">${sv ? "★" : "☆"}</span>想去</button>` +
+    (!d.marker ? "" : inRoute(c) ? `<button type="button" class="pp-btn pp-route" disabled aria-label="已在路線"><span aria-hidden="true">✓</span>路線</button>`
+      : `<button type="button" class="pp-btn pp-route" data-addroute="${esc(c)}" aria-label="加入路線"><span aria-hidden="true">＋</span>路線</button>`) +
+    (d.ll ? `<a class="pp-btn" href="${esc(gmUrl(gmQuery(d)))}" target="_blank" rel="noopener" aria-label="在 Google 地圖開啟"><span aria-hidden="true">📍</span>地圖</a>` : "") + `</div>`;
   const rows = [["開放規則", d.開放規則], ["開放時間", d.開放時間 === "—" ? "" : d.開放時間], ["特殊條件", d.特殊條件], ["備註", d.備註]].filter(r => r[1]);
   if (rows.length) h += `<div class="pp-rule">${rows.map(([k, t]) => `<div><span>${k}：</span>${esc(t)}</div>`).join("")}</div>`;
   if (d.類型 === "戶外") h += `<div class="pp-note pp-etq">${ETIQUETTE}</div>`;
@@ -2101,10 +2117,6 @@ function popupHtml(d){
   else if (d._rule && d._rule.stay) h += `<div class="pp-note">僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀</div>`;
   if (d.座標來源 === "同場館推定") h += `<div class="pp-note">位置依同場館推定，現場請再確認</div>`;
   if (d.官網連結) h += officialLink(d);
-  h += `<div class="pp-acts">`;
-  if (d.marker) h += `<button class="pp-add" data-addroute="${esc(d.作品編號)}">＋加入路線</button>`;
-  if (d.ll) h += gmLink(gmQuery(d), "pp-add pp-gm");
-  h += `</div>`;
   h += transitHtml(d);
   h += nearbyHtml(d);
   if (d.資料來源) h += `<a class="pp-src" href="${SRC_URL}" target="_blank" rel="noopener" title="${esc(d.資料來源)}">開放資訊來源</a>`;
@@ -2183,13 +2195,39 @@ DATA.forEach(d => {
     d.marker = L.circleMarker(d.ll, {radius:7, color:"#fff", weight:2, fillColor:d.color, fillOpacity:.95, className:"mk mk-" + d.作品編號});
   }
 });
+/* 電腦版滑鼠停在點上 300ms 才出小提示：編號、名稱、這天狀態。觸控裝置（含觸控筆電點一下）不出 */
+const HOVER_MQ = window.matchMedia("(hover: hover) and (pointer: fine)");
+const HOVER_MS = 300;
+const hoverTip = L.tooltip({direction:"top", offset:[0, -8], className:"hv-tip", opacity:1});
+let hoverT = 0;
+function hoverTipHtml(d){
+  const di = d._day || dayInfo(d, curDay());
+  return `<span class="pp-code">${esc(d.作品編號)}</span><span class="hv-n">${esc(d.中文名 || d.作品名稱)}</span><span class="st st-${di.state}">${esc(stateShort(di))}</span>`;
+}
+function hoverOff(){ clearTimeout(hoverT); hoverT = 0; if (map.hasLayer(hoverTip)) map.closeTooltip(hoverTip); }
+function hoverOn(d, e){
+  const ev = e && e.originalEvent;
+  if (!HOVER_MQ.matches || useSheet() || (ev && ev.sourceCapabilities && ev.sourceCapabilities.firesTouchEvents)) return;
+  clearTimeout(hoverT);
+  hoverT = setTimeout(() => {
+    hoverT = 0;
+    if (!map.hasLayer(d.marker) || d.marker.isPopupOpen()) return;
+    map.openTooltip(hoverTip.setLatLng(d.marker.getLatLng()).setContent(hoverTipHtml(d)));
+  }, HOVER_MS);
+}
+map.on("popupopen movestart zoomstart", hoverOff);
 function bindMarkers(){
+  hoverOff();
   DATA.forEach(d => {
     if (!d.marker) return;
     d.marker.unbindPopup(); d.marker.unbindTooltip();
     if (d._click){ d.marker.off("click", d._click); d._click = null; }
+    if (d._hover){ d.marker.off("mouseover", d._hover).off("mouseout click", hoverOff); d._hover = null; }
     if (useSheet()){ d._click = () => zoomTo(d); d.marker.on("click", d._click); }
-    else d.marker.bindPopup(() => popupHtml(d), {maxWidth:280, className:"pp-area"}).bindTooltip(() => esc(d.中文名 || d.作品名稱), {direction:"top", offset:[0,-8]});
+    else {
+      d.marker.bindPopup(() => popupHtml(d), {maxWidth:280, className:"pp-area"});
+      d._hover = e => hoverOn(d, e); d.marker.on("mouseover", d._hover).on("mouseout click", hoverOff);
+    }
   });
 }
 bindMarkers();
@@ -2700,6 +2738,7 @@ function renderRouteList(pending){
   renderSavedRoutes();
   const rn = $("routen"); if (rn) rn.textContent = route.stops.length;
   const mn = $("mtripn"); if (mn) mn.textContent = route.stops.length || "";
+  const dt = $("dtrip"); if (dt) dt.textContent = `目前行程・${route.stops.length} 站`;
   const rh = $("rhead"); if (rh){ rh.hidden = !route.stops.length; $("rheadt").textContent = `目前路線 ${route.stops.length} 站`; }
 }
 /* 路線檢查：所選日期每一站的狀態，有問題的站列在路線最上方；非開車路線附上有官方出處的末班巴士 */
@@ -2887,8 +2926,11 @@ function renderSavedRoutes(){
 function addStop(s){
   /* 回到起點開著時，新站點加在回程那一站前面 */
   if (isLoop()) route.stops.splice(route.stops.length - 1, 0, s); else route.stops.push(s);
-  persist(); updateRoute(false);
+  persist(); updateRoute(false); bumpTrip();
 }
+/* 電腦版右下角〔目前行程・N 站〕：加一站時輕跳一下，點了打開路線分頁 */
+function bumpTrip(){ const b = $("dtrip"); if (!b) return; b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); }
+if ($("dtrip")){ $("dtrip").onclick = () => showTab("r"); $("dtrip").addEventListener("animationend", e => e.currentTarget.classList.remove("bump")); }
 const placeStop = n => ({p:n, lat:PLACES[n][0], lng:PLACES[n][1]});
 const sameStop = (a, b) => !!a && !!b && (a.c ? a.c === b.c : (!b.c && okLL(stopLL(a)) && okLL(stopLL(b)) && hav(stopLL(a), stopLL(b)) < 0.05));
 function isLoop(){ const st = route.stops; return st.length >= 3 && sameStop(st[0], st[st.length - 1]); }
@@ -3178,13 +3220,17 @@ function loadPreset(id){
   syncWinterBanner();
   if (CFG.onPreset) CFG.onPreset(p); else showTab("r");
 }
+/* 選推薦路線前的確認：days.js 換成「取代目前行程／另存一份再載入／取消」。網址 #preset= 不經過這裡 */
+let presetGate = (p, go) => go();
+function pickPreset(id){ const p = PRESETS.find(x => x.id === id); if (p) presetGate(p, () => loadPreset(id)); }
+function pickFanRoute(id){ const p = FAN_ROUTES.find(x => x.id === id); if (p && fanUnlocked()) presetGate(p, () => loadFanRoute(id)); else loadFanRoute(id); }
 document.addEventListener("click", e => {
   if (e.target.closest("a.clink") || e.target.closest(".fanlock")) return;
-  const fc = e.target.closest("[data-fan]"); if (fc){ loadFanRoute(fc.dataset.fan); return; }
+  const fc = e.target.closest("[data-fan]"); if (fc){ pickFanRoute(fc.dataset.fan); return; }
   const nl = e.target.closest(".cnotes.locked"); if (nl){ e.stopPropagation(); const m = $("fanlock-" + nl.dataset.notes); if (m) m.hidden = !m.hidden; return; }
-  const c = e.target.closest("[data-preset]"); if (c){ loadPreset(c.dataset.preset); return; }
+  const c = e.target.closest("[data-preset]"); if (c){ pickPreset(c.dataset.preset); return; }
 }, false);
-document.addEventListener("keydown", e => { if (e.key === "Enter"){ const nl = e.target.closest && e.target.closest(".cnotes.locked"); if (nl){ nl.click(); return; } const c = e.target.closest && e.target.closest("[data-preset]"); if (c) loadPreset(c.dataset.preset); } });
+document.addEventListener("keydown", e => { if (e.key === "Enter"){ const nl = e.target.closest && e.target.closest(".cnotes.locked"); if (nl){ nl.click(); return; } const c = e.target.closest && e.target.closest("[data-preset]"); if (c) pickPreset(c.dataset.preset); } });
 
 /* ===== click delegation ===== */
 document.addEventListener("click", e => {
@@ -3200,7 +3246,7 @@ document.addEventListener("click", e => {
   const a = e.target.closest("[data-addroute]");
   if (a){ e.preventDefault(); e.stopPropagation(); addStop({c:a.dataset.addroute});
     if (a.classList.contains("addr")){ a.textContent = "已加入"; a.disabled = true; a.removeAttribute("data-addroute"); toast(`已加入路線，共 ${route.stops.length} 站`); }
-    else if (a.classList.contains("wc-route")){ a.innerHTML = '<span aria-hidden="true">✓</span>路線'; a.setAttribute("aria-label", "已在路線"); a.disabled = true; a.removeAttribute("data-addroute"); toast(`已加入路線，共 ${route.stops.length} 站`); }
+    else if (a.classList.contains("wc-route") || a.classList.contains("pp-route")){ a.innerHTML = '<span aria-hidden="true">✓</span>路線'; a.setAttribute("aria-label", "已在路線"); a.disabled = true; a.removeAttribute("data-addroute"); toast(`已加入路線，共 ${route.stops.length} 站`); }
     else a.textContent = "已加入路線";
     return; }
   const b = e.target.closest("[data-up],[data-down],[data-del]");
@@ -3936,12 +3982,62 @@ function showDay(t, k, fit = true, setDate = true){
   const D = t.days[k]; if (setDate && D.date >= dayEl.min && D.date <= dayEl.max && dayEl.value !== D.date){ dayEl.value = D.date; dayEl.dispatchEvent(new Event("change", {bubbles:true})); }
   renderTripBox(); if (typeof renderTripView === "function") renderTripView();
 }
+/* 推薦路線選「取代」時，換掉正在看的那一天；只有 1 天的行程連名稱一起換 */
+let presetReplace = false;
+function replaceDay(r, fit){
+  const t = trip, k = editing;
+  t.days[k].stops = cpy(r.stops); t.mode = tripMode(r.mode);
+  if (t.days.length === 1){ const n = String(baseName(r.name) || defName()).slice(0, 40); let x = n, i = 2; while (trips.some(o => o !== t && o.name === x)) x = `${n}（${i++}）`; t.name = x; }
+  showDay(t, k, fit, false);
+}
 setRoute = (orig => (r, fit) => {
   if (tripLoading) return orig(r, fit);
   if (!r || !validStops(r.stops || []).length) return;
+  if (presetReplace && trip && trip.days[editing]){ replaceDay(r, fit); return; }
   const hit = findDay(r); if (hit){ showDay(hit[0], hit[1], fit, false); return; }
   const t = newTrip(r); showDay(t, 0, fit, false); toast(`已建立 1 天行程「${t.name}」`);
 })(setRoute);
+/* 選推薦路線：目前這天沒有站點就直接載入；已有站點先問，不再另外接一份 */
+presetGate = (p, go) => {
+  const run = rep => { presetReplace = rep; try { go(); } finally { presetReplace = false; } };
+  const D = trip && trip.days[editing], n = validStops(route.stops).length;
+  if (!D) return run(false);
+  if (!n) return run(true);
+  if (routeKey({stops:p.stops, mode:p.mode}) === routeKey(route)) return run(false);
+  askPreset(p, n, run);
+};
+function askPreset(p, n, run){
+  const old = document.getElementById("presetask"); if (old) old.remove();
+  const back = document.activeElement, multi = trip.days.length > 1;
+  const m = document.createElement("div"); m.id = "presetask"; m.className = "qrm";
+  m.innerHTML = `<div class="qrm-box" role="dialog" aria-modal="true" aria-labelledby="presetask-t" aria-describedby="presetask-q"><button type="button" class="qrm-x" aria-label="取消">×</button><div class="qrm-t" id="presetask-t"></div><p class="qrm-ask" id="presetask-q"></p><div class="qrm-acts"></div></div>`;
+  m.querySelector(".qrm-t").textContent = `載入「${p.name}」`;
+  m.querySelector(".qrm-ask").textContent = multi ? `正在看的「${trip.name}」第 ${editing + 1} 天已有 ${n} 站。取代只換這一天，其他天不變。` : `目前行程「${trip.name}」已有 ${n} 站。`;
+  const key = e => {
+    if (e.key === "Escape"){ e.preventDefault(); e.stopImmediatePropagation(); close(); return; }
+    if (e.key !== "Tab") return;
+    const f = [...m.querySelectorAll("button")], i = f.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0){ e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1){ e.preventDefault(); f[0].focus(); }
+  };
+  const close = () => { m.remove(); window.removeEventListener("keydown", key, true); if (back && back.focus && document.contains(back)) back.focus(); };
+  const acts = m.querySelector(".qrm-acts");
+  [[multi ? `取代第 ${editing + 1} 天` : "取代目前行程", "replace"], ["另存一份再載入", "new"], ["取消", ""]].forEach(([label, k]) => {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = label; if (k === "replace") b.className = "pri";
+    b.onclick = () => {
+      close(); if (!k) return;
+      const was = trip, count = trips.length;
+      run(k === "replace");
+      if (k === "replace") toast(`已用「${p.name}」取代${multi ? `第 ${editing + 1} 天` : "目前行程"}`);
+      else if (trip !== was) toast(trips.length > count ? `已另存成新行程「${trip.name}」，原本的「${was.name}」還在我的行程` : `「${trip.name}」已經存過，已切過去，原本的「${was.name}」不變`);
+    };
+    acts.appendChild(b);
+  });
+  m.querySelector(".qrm-x").onclick = close;
+  m.addEventListener("click", e => { if (e.target === m) close(); });
+  window.addEventListener("keydown", key, true);
+  document.body.appendChild(m);
+  acts.querySelector("button").focus();
+}
 function deleteTrip(t){
   const i = trips.indexOf(t); if (i < 0) return;
   trips.splice(i, 1);
