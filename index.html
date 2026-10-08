@@ -1479,12 +1479,36 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   .daterow .day-more{min-height:44px;min-width:44px;justify-content:center}
   #panel{background:var(--snow)}
 }
+/* 天氣：手機在日期膠囊，電腦在日期框下方一行小字；作品卡片與彈窗不放 */
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.day-wx,.dwx{font-variant-numeric:tabular-nums}
+.day-wx[hidden],.dwx[hidden],.wxrain[hidden]{display:none!important}
+.day-wx{display:none}
+.dwx{margin:var(--sp-2) var(--sp-6) 0;padding-left:calc(var(--sp-4) + 1px);font-size:var(--fs-s);line-height:20px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 下雨提醒：--view 底配 --snow 字 6.7:1 */
+.wxrain{min-height:44px;border:none;background:var(--view);color:var(--snow);font:inherit;font-size:var(--fs-s);font-weight:700;cursor:pointer}
+.wxrain:hover{background:var(--ink)}
+#drain{padding:0 var(--sp-4);box-shadow:var(--shadow-float)}
+@media (min-width:768px){#mtools.short .wr-l{display:none}}
+@media (max-width:767.98px){
+  .dwx,#drain{display:none!important}
+  #mtitle .day-wx{display:block;flex:none;margin-left:6px;padding:0;font-size:var(--fs-body);font-weight:700;line-height:1.3;color:var(--ink);pointer-events:none}
+  /* 日期膠囊放不下天氣：先讓季節膠囊只留季名，還放不下就收起季節膠囊 */
+  #mtitle.wx-tight #mseason{padding:0 var(--sp-2);font-size:0}
+  #mtitle.wx-tight #mseason:after{content:attr(data-short);font-size:var(--fs-s)}
+  #mtitle.wx-tight .day-wx{margin-left:4px;font-size:14px}
+  #mtitle.wx-hide #mseason,#mtitle #mseason[hidden]{display:none!important}
+  /* 下雨提醒放在日期膠囊正下方，膠囊裡放不下整句 */
+  #mrain{position:absolute;z-index:999;top:calc(72px + env(safe-area-inset-top));left:calc(12px + env(safe-area-inset-left));padding:0 var(--sp-4);border-radius:var(--r-pill);box-shadow:var(--shadow-float)}
+}
+@media (min-width:768px){#mrain{display:none!important}}
 </style>
 </head>
 <body>
 <div id="map" role="application" aria-label="作品地圖"></div>
 <header id="mtitle"><span class="brand">越後飯</span><span class="mt-name">大地藝術祭 2026</span><span class="mt-date" id="mdslot"></span><span class="season" id="mseason" hidden></span></header>
-<div id="mtools"><span class="season" id="dseason" hidden></span><button id="mlegend" type="button" aria-expanded="false" aria-controls="legendpop">圖例</button><button id="mall" type="button">看全區</button><button id="mmenu" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mmenupop" aria-label="更多" title="更多">⋯</button></div>
+<button type="button" class="season wxrain" id="mrain" aria-controls="pane-r" hidden><span class="wr-l">可能下雨・</span>看室內路線</button>
+<div id="mtools"><span class="season" id="dseason" hidden></span><button type="button" class="season wxrain" id="drain" aria-controls="pane-r" hidden><span class="wr-l">可能下雨・</span>看室內路線</button><button id="mlegend" type="button" aria-expanded="false" aria-controls="legendpop">圖例</button><button id="mall" type="button">看全區</button><button id="mmenu" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mmenupop" aria-label="更多" title="更多">⋯</button></div>
 <div id="mmenupop" role="menu" aria-label="地圖選單" hidden></div>
 <div id="legendpop" role="dialog" aria-label="圖例" hidden></div>
 <button id="dtrip" type="button" aria-controls="pane-r">目前行程・0 站</button>
@@ -1494,7 +1518,8 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   <h1>大地藝術祭 2026 作品地圖</h1>
   <div class="sub">越後妻有常設與公開作品 <b id="total"></b> 件</div>
   <div id="mdesc">選日期看作品那天能不能參觀，點地圖上的點看詳情</div>
-  <div class="daterow" id="daterow"><span class="dbox" id="dbox"><label for="day">今天開不開</label><span class="day-wrap"><span class="day-show" id="dayshow" aria-hidden="true"></span><input type="date" id="day" min="2026-04-25" max="2027-03-31"></span></span><span class="dcount" id="dcount" aria-hidden="true"></span><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
+  <div class="daterow" id="daterow"><span class="dbox" id="dbox"><label for="day">今天開不開</label><span class="day-wrap"><span class="day-show" id="dayshow" aria-hidden="true"></span><span class="day-wx" id="daywx" hidden></span><input type="date" id="day" min="2026-04-25" max="2027-03-31"></span></span><span class="dcount" id="dcount" aria-hidden="true"></span><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
+  <div class="dwx" id="dwx" hidden></div>
   <div id="daystat" aria-live="polite"></div>
   <div class="mbar" id="mbar"><button type="button" id="mfilter" aria-controls="sheet-body">篩選</button><button type="button" id="mtrip" aria-controls="sheet-body">我的行程<span class="n" id="mtripn"></span></button></div>
   <div class="tabs" id="tabs" role="tablist" aria-label="面板分頁"><button id="tab-s" class="on" role="tab" aria-selected="true" aria-controls="pane-s">搜尋</button><button id="tab-l" role="tab" aria-selected="false" aria-controls="pane-l">想去<span class="n" id="favn">0</span></button><button id="tab-r" role="tab" aria-selected="false" aria-controls="pane-r">行程<span class="n" id="routen">0</span></button><button id="tab-p" role="tab" aria-selected="false" aria-controls="pane-p">推薦路線</button></div>
@@ -1912,6 +1937,120 @@ function liffSaveAsk(trip){
   const m = trip.days.reduce((a, d) => a + d.stops.length, 0);
   return "把『" + trip.name + "』（" + n + " 天，" + m + " 站）存進我的行程？";
 }
+/* 天氣預報：気象庁 bosai 新潟縣預報（150000.json）。
+   天氣與降雨機率取「中越」（150020），氣溫取「長岡」（54501）。
+   短期預報只到後天；之後幾天週間預報只有「新潟県」（150000）與「新潟」（54232），中越、長岡沒有的欄位才拿它補。
+   週間預報附的往年平均不用。抓不到、格式不對、逾時都回傳 null，畫面就什麼都不顯示。 */
+const WX_URL = "https://www.jma.go.jp/bosai/forecast/data/forecast/150000.json";
+const WX_KEY = "etwx_v1";
+const WX_TTL = 3 * 3600e3;
+const WX_TIMEOUT = 5000;
+const WX_RAIN_POP = 50;
+const WX_STALE_MS = 13 * 3600e3;  // 気象庁每天 5、11、17 點發布，最長間隔是 17 點到隔天 5 點，超過 13 小時就是沒抓到新的
+const WX_AREA = "150020", WX_TEMP = "54501", WX_WEEK_AREA = "150000", WX_WEEK_TEMP = "54232";
+/* 天氣代碼對照：看百位數，也就是主要天氣（100 晴、101 晴時々曇、200 曇、202 曇一時雨、300 雨、400 雪…） */
+const WX_ICONS = [
+  {from: 100, to: 199, icon: "☀", name: "晴"},
+  {from: 200, to: 299, icon: "☁", name: "陰"},
+  {from: 300, to: 399, icon: "☂", name: "雨"},
+  {from: 400, to: 499, icon: "❄", name: "雪"}
+];
+function wxKind(code){
+  const s = String(code == null ? "" : code);
+  if (!/^\d{3}$/.test(s)) return null;
+  const n = +s;
+  return WX_ICONS.find(x => n >= x.from && n <= x.to) || null;
+}
+function wxIcon(code){ const k = wxKind(code); return k ? k.icon : ""; }
+
+function wxParse(raw){
+  if (!Array.isArray(raw) || !raw.length) return null;
+  const days = {};
+  const at = d => days[d] || (days[d] = {});
+  const dateOf = t => typeof t === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}/.test(t) ? t.slice(0, 10) : null;
+  const num = v => v === "" || v == null || !isFinite(+v) ? null : Math.round(+v);
+  const series = (block, i) => block && Array.isArray(block.timeSeries) && block.timeSeries[i] && Array.isArray(block.timeSeries[i].timeDefines) && Array.isArray(block.timeSeries[i].areas) ? block.timeSeries[i] : null;
+  const area = (ts, code) => ts ? ts.areas.find(a => a && a.area && a.area.code === code) || null : null;
+  const each = (ts, a, key, fn) => { const v = a && Array.isArray(a[key]) ? a[key] : null; if (v) ts.timeDefines.forEach((t, i) => { const d = dateOf(t); if (d) fn(d, v[i], t); }); };
+  const fill = (d, k, v) => { if (v != null && at(d)[k] == null) at(d)[k] = v; };
+  const [short, week] = raw;
+  let ts = series(short, 0);
+  each(ts, area(ts, WX_AREA), "weatherCodes", (d, c) => { if (wxKind(c)) fill(d, "code", String(c)); });
+  ts = series(short, 1);
+  each(ts, area(ts, WX_AREA), "pops", (d, p) => { p = num(p); if (p != null) at(d).pop = Math.max(at(d).pop == null ? 0 : at(d).pop, p); });
+  ts = series(short, 2);
+  const tmp = {};
+  each(ts, area(ts, WX_TEMP), "temps", (d, v, t) => { v = num(v); if (v == null) return; (tmp[d] || (tmp[d] = {}))[t.slice(11, 13) === "09" ? "max" : "min"] = v; });
+  /* 白天發布時當天的最低溫已過，気象庁會把最高溫放進 00 點那格，兩格相同就只留最高溫 */
+  Object.keys(tmp).forEach(d => { const o = tmp[d]; fill(d, "max", o.max); if (o.min != null && (o.max == null || o.min < o.max)) fill(d, "min", o.min); });
+  ts = series(week, 0);
+  const wa = area(ts, WX_WEEK_AREA);
+  each(ts, wa, "weatherCodes", (d, c) => { if (wxKind(c)) fill(d, "code", String(c)); });
+  each(ts, wa, "pops", (d, p) => fill(d, "pop", num(p)));
+  ts = series(week, 1);
+  const wt = area(ts, WX_WEEK_TEMP);
+  each(ts, wt, "tempsMax", (d, v) => fill(d, "max", num(v)));
+  each(ts, wt, "tempsMin", (d, v) => fill(d, "min", num(v)));
+  const out = {};
+  Object.keys(days).sort().forEach(d => {
+    const o = days[d]; if (!o.code) return;
+    out[d] = {code: o.code, pop: o.pop == null ? null : o.pop, max: o.max == null ? null : o.max, min: o.min == null || (o.max != null && o.min > o.max) ? null : o.min};
+  });
+  if (!Object.keys(out).length) return null;
+  const rep = short && typeof short.reportDatetime === "string" ? short.reportDatetime : "";
+  return {report: rep, days: out};
+}
+/* 所選日期不在預報範圍就回傳 null，不補往年平均 */
+function wxForDay(wx, day){
+  return wx && wx.days && typeof day === "string" && Object.prototype.hasOwnProperty.call(wx.days, day) ? wx.days[day] : null;
+}
+function wxRain(f){ return !!f && f.pop != null && f.pop >= WX_RAIN_POP; }
+/* 手機日期膠囊：「☁ 14°」 */
+function wxShort(f){
+  const k = f && wxKind(f.code); if (!k) return "";
+  return f.max != null ? `${k.icon} ${f.max}°` : k.icon;
+}
+/* 電腦側欄：「☁ 8–14°　降雨 60%」，舊資料加「（17 點更新）」 */
+function wxLine(f, stale, report, today){
+  const k = f && wxKind(f.code); if (!k) return "";
+  const t = f.max != null ? (f.min != null ? ` ${f.min}–${f.max}°` : ` ${f.max}°`) : "";
+  let s = k.icon + t + (f.pop != null ? `　降雨 ${f.pop}%` : "");
+  const m = stale && /^(\d{4})-(\d{2})-(\d{2})T(\d{2})/.exec(report || "");
+  if (m) s += `（${`${m[1]}-${m[2]}-${m[3]}` === today ? "" : `${+m[2]}/${+m[3]} `}${+m[4]} 點更新）`;
+  return s;
+}
+function wxSpeak(f){
+  const k = f && wxKind(f.code); if (!k) return "";
+  return `天氣${k.name}` + (f.max != null ? `，最高 ${f.max} 度` : "") + (f.min != null ? `，最低 ${f.min} 度` : "") + (f.pop != null ? `，降雨機率 ${f.pop}%` : "");
+}
+function wxLoad(store){
+  try {
+    const o = store && JSON.parse(store.getItem(WX_KEY));
+    return o && typeof o.t === "number" && o.wx && o.wx.days && typeof o.wx.days === "object" ? o : null;
+  } catch(e){ return null; }
+}
+function wxSave(store, wx, now){ try { if (store) store.setItem(WX_KEY, JSON.stringify({t: now, wx})); } catch(e){} }
+function wxOld(wx, now){ const t = Date.parse(wx && wx.report || ""); return isFinite(t) && now - t > WX_STALE_MS; }
+function wxFetch(fetchFn, timeout){
+  let timer = null;
+  const ctl = typeof AbortController === "function" ? new AbortController() : null;
+  const go = Promise.resolve().then(() => fetchFn(WX_URL, ctl ? {signal: ctl.signal} : undefined))
+    .then(r => r && r.ok ? r.json() : null).then(wxParse);
+  const stop = new Promise(res => { timer = setTimeout(() => { if (ctl) ctl.abort(); res(null); }, timeout == null ? WX_TIMEOUT : timeout); });
+  return Promise.race([go, stop]).catch(() => null).then(wx => { clearTimeout(timer); return wx || null; });
+}
+/* 3 小時內用存的；離線用最後一次的資料並標成舊資料；連線時抓不到就回傳 null */
+function wxGet(opt){
+  const now = opt.now, saved = wxLoad(opt.store);
+  if (saved && now - saved.t >= 0 && now - saved.t < WX_TTL) return Promise.resolve({wx: saved.wx, stale: wxOld(saved.wx, now)});
+  if (opt.online === false) return Promise.resolve(saved ? {wx: saved.wx, stale: true} : null);
+  return wxFetch(opt.fetch, opt.timeout).then(wx => {
+    if (!wx) return null;
+    const old = wxOld(wx, now);
+    if (!old) wxSave(opt.store, wx, now);  // 離線時 sw.js 給的舊回應不存，連線後才會重抓
+    return {wx, stale: old};
+  });
+}
 /* 大地藝術祭2026 作品地圖：共用程式（plain 與 illustrated 兩版共用） */
 const FAN_ENABLED = false;        // 第 4 階段才改 true
 const LINE_ADD_FRIEND_URL = "https://lin.ee/R12Vd62";  // Bot 加好友網址。說明卡與解鎖按鈕都直接用這個，不加參數。之後若改 LIFF 只改這裡。
@@ -2230,6 +2369,7 @@ if (!ILL){
   map.attributionControl.addAttribution('區域界線：國土數值情報 N03（2000年），信濃川與車站：&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 貢獻者');
 }
 map.attributionControl.setPrefix('<a href="https://echigo.fans/">越後飯 ECHIGO FAN</a> | <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+map.attributionControl.addAttribution('天氣：<a href="https://www.jma.go.jp/bosai/forecast/#area_type=offices&area_code=150000" target="_blank" rel="noopener">気象庁</a>');
 let boundary;
 if (ILL){
   // two offset sketchy strokes + area labels
@@ -2765,6 +2905,7 @@ function render(){
   areasEl.classList.toggle("all", allAreas);
   syncFilterN();
   renderSeason(day);
+  renderWx(day);
   const dsL = $("lp-daystat"); if (dsL) dsL.textContent = dayTxt;
   renderFav();
   renderRouteList();
@@ -2787,6 +2928,40 @@ function fitTools(){
   if (!useSheet() && t.getBoundingClientRect().left < p.getBoundingClientRect().right + 12) t.classList.add("short");
 }
 window.addEventListener("resize", fitTools);
+/* 天氣（weather.js）：所選日期在預報範圍內才顯示。降雨機率 ≥ 50% 時季節膠囊換成〔看室內路線〕 */
+let WX = null, WX_STALE = false;
+function renderWx(day){
+  const f = wxForDay(WX, day), show = !!wxKind(f && f.code), rain = show && wxRain(f);
+  const mw = $("daywx"), dw = $("dwx");
+  if (mw){ mw.hidden = !show; mw.innerHTML = show ? `<span aria-hidden="true">${esc(wxShort(f))}</span><span class="vh">${esc(wxSpeak(f))}</span>` : ""; }
+  if (dw){ dw.hidden = !show; dw.textContent = show ? wxLine(f, WX_STALE, WX.report, tokyoToday()) : ""; }
+  [["mseason", "mrain"], ["dseason", "drain"]].forEach(([s, r]) => {
+    const se = $(s), re = $(r); if (!se || !re) return;
+    re.hidden = !rain;
+    se.hidden = rain || !se.innerHTML;
+  });
+  const m = +day.slice(5, 7), s = SEASONS.find(x => x.months.includes(m)), ms = $("mseason");
+  if (ms && s) ms.dataset.short = s.name;
+  wxFit(); fitTools();
+}
+/* 手機日期膠囊放不下天氣時，季節膠囊先只留季名，還放不下就收起來 */
+function wxFit(){
+  const t = $("mtitle"), mw = $("daywx"), ms = $("mseason"), slot = $("mdslot"); if (!t) return;
+  t.classList.remove("wx-tight", "wx-hide");
+  if (!useSheet() || !mw || mw.hidden || !ms || ms.hidden || !slot) return;
+  const over = () => ms.scrollWidth > ms.clientWidth + 1 || slot.getBoundingClientRect().right > t.getBoundingClientRect().right - parseFloat(getComputedStyle(t).paddingRight) + 1;
+  if (!over()) return;
+  t.classList.add("wx-tight");
+  if (over()) t.classList.add("wx-hide");
+}
+window.addEventListener("resize", wxFit);
+MQ.addEventListener("change", () => renderWx(curDay()));
+["mrain", "drain"].forEach(id => { const b = $(id); if (b) b.addEventListener("click", () => pickPreset("t_rain")); });
+(function(){
+  let store = null; try { store = window.localStorage; } catch(e){}
+  wxGet({store, fetch: (u, o) => fetch(u, o), now: Date.now(), online: navigator.onLine})
+    .then(r => { if (!r) return; WX = r.wx; WX_STALE = r.stale; renderWx(curDay()); }, () => {});
+})();
 function renderFav(){
   $("favn").textContent = saved.length;
   const lk = $("lkml"); if (lk) lk.hidden = !saved.some(c => BY[c] && BY[c].ll);
@@ -4020,11 +4195,12 @@ function onbJoinHref(){
 function onbLegendLine(){
   return "點的樣式看不懂？右上角有「圖例」。";
 }
+const WX_HELP = "一週內的日期會附上気象庁的天氣預報，降雨機率五成以上時，可以直接點〔看室內路線〕。";
 let ONB_CARDS = () => {
   const n = DATA.length;
   const cards = [
     {icon:"hi", t:"嗨，我是阿飯", x:[`越後妻有的作品散在一大片山谷裡，每件開放的日子又不一樣，排行程最常卡在一個問題：「這件那天到底有沒有開？」所以我做了這張地圖，${n} 件作品都在這裡。`]},
-    {icon:"date", t:"先挑一天", x:["在下面選個日期，地圖上的點馬上告訴你那天誰開門、誰休息、誰只對住宿客開放。很多館週二、三在睡覺，先看一眼，別白跑一趟。", onbLegendLine()]},
+    {icon:"date", t:"先挑一天", x:["在下面選個日期，地圖上的點馬上告訴你那天誰開門、誰休息、誰只對住宿客開放。很多館週二、三在睡覺，先看一眼，別白跑一趟。", onbLegendLine(), WX_HELP]},
     {icon:"star", t:"看順眼就收起來", x:["喜歡的作品按 ☆ 放進清單，再排成一條路線，開車、走路、搭巴士都幫你算時間。要排好幾天的話，用電腦或平板會順手很多。"]}
   ];
   if (hasPreviewYear()) cards.push({icon:"year", t:"2027 三年展，先偷看", x:["左上角可以切換年度。明年是三年一次的大祭，新作品預計 1 月公布，現在先放常設作品讓你暖身。"]});
