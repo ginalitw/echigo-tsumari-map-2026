@@ -1196,7 +1196,8 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 .ftrips li.on .t{font-weight:600}
 .ftrips .fcur{font-size:12px;padding:0 6px}
 /* 手機首屏按鈕列與作品浮動卡；寬度 768 以上不顯示 */
-.mbar,.lg-more,#wcard{display:none}
+.mbar,.lg-more,#wcard,.day-show{display:none}
+.day-wrap{display:contents}
 @media (max-width:767.98px){
   .mbar{display:flex;gap:8px;margin:10px 12px 10px}
   .mbar button{flex:1 1 0;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:4px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
@@ -1242,6 +1243,30 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   .wc-det span{color:var(--mute)}
   .wc-det .pp-etq{color:#8F5600}
   .wc-more .pp-rule,.wc-more .pp-src{font-size:13px}
+  #wcard:before{content:"";flex:none;height:5px;background:var(--ac,transparent)}
+  .wc-area{flex:none;font-size:12px;line-height:20px;padding:0 8px;border-radius:10px;font-weight:600}
+  .wc-last{font-weight:400}
+  .wc-near li{align-items:center;flex-wrap:nowrap}
+  .wc-near li span{flex:none}
+  .wc-near li button{flex:0 1 auto;min-width:0;min-height:40px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wc-dot{flex:none;width:9px;height:9px;border-radius:50%;background:#8f8c84}
+  .wc-dot.on{background:#1E7B34}
+  .wc-dot.view{background:#fff;box-shadow:inset 0 0 0 2px #1E7B34}
+  .wc-nmore summary{display:inline-flex;align-items:center;min-height:40px;list-style:none;font-size:13px;color:var(--ink);cursor:pointer}
+  .wc-nmore summary::-webkit-details-marker{display:none}
+  .wc-nmore summary:after{content:"▾";margin-left:4px;color:var(--mute)}
+  .wc-nmore[open]>summary{display:none}
+  /* 所選日期休館：收合時卡片降低彩度，休館狀態與休館提示維持原色 */
+  #wcard.wc-closed[data-state="peek"]:before,#wcard.wc-closed[data-state="peek"] .wc-t,#wcard.wc-closed[data-state="peek"] .wc-area,#wcard.wc-closed[data-state="peek"] .wc-acts{filter:saturate(.2)}
+  #wcard.wc-closed[data-state="peek"] .wc-t{opacity:.75}
+  /* 首屏日期：照「2026/10/08（四）」顯示，不跟瀏覽器語系；原生日期欄位透明疊在上面，點了照樣開選擇器 */
+  .day-wrap{position:relative;flex:1 1 auto;min-width:0;display:flex;align-items:center;height:40px}
+  .day-show{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px;font-size:15px;font-variant-numeric:tabular-nums;color:var(--ink);pointer-events:none}
+  #day{position:absolute;inset:0;width:100%;height:100%;min-height:0;padding:0;opacity:0;-webkit-appearance:none;appearance:none;cursor:pointer}
+  .daterow .day-more{flex:none;padding:0 12px 0 6px}
+}
+@media (min-width:768px){
+  .leaflet-popup.pp-area .leaflet-popup-content-wrapper{box-shadow:inset 0 5px 0 var(--ac,transparent),0 6px 24px rgba(0,0,0,.16)}
 }
 </style>
 </head>
@@ -1256,7 +1281,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   <h1>大地藝術祭 2026 作品地圖</h1>
   <div class="sub">越後妻有常設與公開作品 <b id="total"></b> 件</div>
   <div id="mdesc">選日期看作品當天能不能參觀，點地圖上的點看詳情</div>
-  <div class="daterow" id="daterow"><label for="day">今天開不開</label><input type="date" id="day" min="2026-04-25" max="2027-03-31"><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
+  <div class="daterow" id="daterow"><label for="day">今天開不開</label><span class="day-wrap"><span class="day-show" id="dayshow" aria-hidden="true"></span><input type="date" id="day" min="2026-04-25" max="2027-03-31"></span><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
   <div id="daystat" aria-live="polite"></div>
   <div class="mbar" id="mbar"><button type="button" id="mfilter" aria-controls="sheet-body">篩選</button><button type="button" id="mtrip" aria-controls="sheet-body">我的行程<span class="n" id="mtripn"></span></button></div>
   <div class="tabs" id="tabs" role="tablist" aria-label="面板分頁"><button id="tab-s" class="on" role="tab" aria-selected="true" aria-controls="pane-s">搜尋</button><button id="tab-l" role="tab" aria-selected="false" aria-controls="pane-l"><span class="tl-long">我的</span>清單<span class="n" id="favn">0</span></button><button id="tab-r" role="tab" aria-selected="false" aria-controls="pane-r">路線<span class="n" id="routen">0</span></button><button id="tab-p" role="tab" aria-selected="false" aria-controls="pane-p">推薦路線</button></div>
@@ -1709,6 +1734,10 @@ const AREA_REPS = {
   "津南":[["M001", "龍現代美術館"], ["M028", "跨越國境・山"]],
 };
 const COLORS = {"十日町":"#E4572E","川西":"#2E86AB","中里":"#3BB273","松代":"#7768AE","松之山":"#D81E5B","津南":"#F18F01","廣域":"#8D6E63"};
+/* 地區小標籤：底色是地區色混 85% 白，字是地區色混 50% 黑，七區對比都在 6.7:1 以上 */
+const mixHex = (h, to, k) => "#" + [1, 3, 5].map(i => { const a = parseInt(h.slice(i, i + 2), 16), b = parseInt(to.slice(i, i + 2), 16); return Math.round(a + (b - a) * k).toString(16).padStart(2, "0"); }).join("");
+const areaTint = a => mixHex(COLORS[a] || "#888888", "#ffffff", .85);
+const areaInk = a => mixHex(COLORS[a] || "#888888", "#000000", .5);
 const ORDER = ["十日町","川西","中里","松代","松之山","津南","廣域"];
 const LS_KEY = "etmap2026_saved", LS_ROUTE = "etmap2026_route", LS_ROUTES = "etmap2026_routes";
 /* 起點清單。kind: station 車站、rental 租借處。租借處座標待補，先不放進 PLACES，選單也不出現。 */
@@ -1880,6 +1909,13 @@ function dayHours(d, dateStr){
   if (hit.length !== 1 || !hit[0].open) return null;
   const S = hit[0], e = S.ex.find(x => inMonths(m, x.months[0], x.months[1]));
   return `${(e && e.open) || S.open}–${(e && e.close) || S.close}`;
+}
+/* 開放時間寫「閉館前 N 分鐘停止入場」時，從這天的時段推最後入場；沒有時段或寫法不同就回傳 null */
+function lastEntry(d, hrs){
+  const m = /閉館前\s*(\d{1,3})\s*分鐘?停止入場/.exec(String(d.開放時間 || "")), c = hrs && /–(\d{1,2}):(\d{2})$/.exec(hrs);
+  if (!m || !c) return null;
+  const t = +c[1] * 60 + +c[2] - +m[1];
+  return t > 0 ? `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}` : null;
 }
 /* 備註裡寫到的日期（10/19 休館、11/1 起不開放、7/18–8/31 …）命中所選日期時，回傳那一段原文。4–12 月算 2026 年，1–3 月算 2027 年 */
 function noteHits(d, dateStr){
@@ -2079,6 +2115,17 @@ function nearbyHtml(d){
     show.map(({e, m}) => { const di = dayInfo(e, day); return `<li><button type="button" data-open="${esc(e.作品編號)}">${esc(e.中文名 || e.作品名稱)}</button><span>${m < 60 ? "同場館" : `約 ${walkMinOf(m)} 分，${Math.round(m / 10) * 10} 公尺`}${di.state === "closed" || di.state === "stay" ? "，" + stateShort(di) : ""}</span></li>`; }).join("") +
     `</ul>${ns.length > show.length ? `<div class="muted">另有 ${ns.length - show.length} 件，放大地圖可看到</div>` : ""}</div>`;
 }
+/* 手機浮動卡的附近作品：狀態點依所選日期（開放是綠點，定休日可觀看是綠色空心圓並寫「戶外可看」，其餘灰點），前 4 件直接列出，其餘收進「更多」 */
+const NEAR_SHOW = 4;
+function nearbyCardHtml(d){
+  const ns = nearbyOf(d); if (!ns.length) return "";
+  const show = ns.slice(0, 8), day = curDay();
+  const li = ({e, m}) => { const di = dayInfo(e, day), st = di.state === "view" ? "戶外可看" : stateShort(di);
+    return `<li><i class="wc-dot${di.state === "open" ? " on" : di.state === "view" ? " view" : ""}" role="img" aria-label="${esc(st)}"></i><button type="button" data-open="${esc(e.作品編號)}">${esc(e.中文名 || e.作品名稱)}</button><span>${m < 60 ? "同場館" : `步行 ${walkMinOf(m)} 分，${Math.round(m / 10) * 10} 公尺`}${di.state === "open" ? "" : "，" + esc(st)}</span></li>`; };
+  return `<div class="pp-near wc-near"><div class="pp-nh">附近還有什麼<span>直線 ${NEAR_M} 公尺內</span></div><ul>${show.slice(0, NEAR_SHOW).map(li).join("")}</ul>` +
+    (show.length > NEAR_SHOW ? `<details class="wc-nmore"><summary>更多</summary><ul>${show.slice(NEAR_SHOW).map(li).join("")}</ul></details>` : "") +
+    `${ns.length > show.length ? `<div class="muted">另有 ${ns.length - show.length} 件，放大地圖可看到</div>` : ""}</div>`;
+}
 /* 巴士：只用 transit.json 裡有官方時刻表出處的路段；休日型＝週六、週日、國定假日、8/13～16、12/29～1/3 */
 function busDayType(v){
   const d = new Date(v + "T00:00"), md = v.slice(5);
@@ -2127,10 +2174,11 @@ function bindMarkers(){
     d.marker.unbindPopup(); d.marker.unbindTooltip();
     if (d._click){ d.marker.off("click", d._click); d._click = null; }
     if (useSheet()){ d._click = () => zoomTo(d); d.marker.on("click", d._click); }
-    else d.marker.bindPopup(() => popupHtml(d), {maxWidth:280}).bindTooltip(() => esc(d.中文名 || d.作品名稱), {direction:"top", offset:[0,-8]});
+    else d.marker.bindPopup(() => popupHtml(d), {maxWidth:280, className:"pp-area"}).bindTooltip(() => esc(d.中文名 || d.作品名稱), {direction:"top", offset:[0,-8]});
   });
 }
 bindMarkers();
+map.on("popupopen", e => { const src = e.popup._source, el = e.popup.getElement(), d = src && DATA.find(x => x.marker === src); if (d && el) el.style.setProperty("--ac", d.color); });
 /* 參觀禮儀提醒（搜尋分頁，兩版都有） */
 if ($("stat")) $("stat").insertAdjacentHTML("afterend", `<div class="etq" id="etq">${ETIQUETTE}</div>`);
 /* 圖例：標記樣式對照（一般版） */
@@ -2248,6 +2296,8 @@ function syncDayLabel(){
   const lab = document.querySelector('label[for="day"]');
   if (lab) lab.textContent = (dayEl.value === tokyoToday()) ? "今天開不開" : "這天開不開";
 }
+/* 手機版日期欄位是透明的，點文字時要能叫出日期選擇器 */
+if ($("dayshow")) dayEl.addEventListener("click", () => { if (MQ.matches && dayEl.showPicker){ try { dayEl.showPicker(); } catch(e){} } });
 dayEl.addEventListener("change", () => { dayEl.value = clampDay(dayEl.value || tokyoToday()); syncDayLabel(); render(); });
 syncDayLabel();
 $("today").onclick = () => { dayEl.value = clampDay(tokyoToday()); syncDayLabel(); render(); };
@@ -2389,6 +2439,7 @@ function render(){
   const hol = HOLIDAYS.has(day) ? "（日本國定假日）" : "";
   const dayTxt = `${day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）${hol}${offS ? "，會期外" : ""}：開放 ${cnt.open}，定休日可觀看 ${cnt.view}，僅限住宿者 ${cnt.stay}，休館 ${cnt.closed}，未公布 ${cnt.unknown}${nwin ? `（含冬季開放 ${nwin}，以官方公告為準）` : ""}`;
   $("daystat").textContent = dayTxt;
+  if ($("dayshow")) $("dayshow").textContent = `${day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）`;
   const dsL = $("lp-daystat"); if (dsL) dsL.textContent = dayTxt;
   renderFav();
   renderRouteList();
@@ -3426,24 +3477,25 @@ function workCardHtml(d){
     (!d.marker ? "" : inRoute(c) ? `<button type="button" class="wc-btn wc-route" disabled aria-label="已在路線"><span aria-hidden="true">✓</span>路線</button>`
       : `<button type="button" class="wc-btn wc-route" data-addroute="${esc(c)}" aria-label="加入路線"><span aria-hidden="true">＋</span>路線</button>`) +
     (d.ll ? `<a class="wc-btn" href="${gmUrl(d.ll[0], d.ll[1])}" target="_blank" rel="noopener" aria-label="在 Google 地圖開啟"><span aria-hidden="true">📍</span>地圖</a>` : "");
-  const hrs = di.state === "open" ? dayHours(d, day) : null;
+  const hrs = di.state === "open" ? dayHours(d, day) : null, last = lastEntry(d, hrs);
   const who = [d.藝術家, d.設置地點].filter(Boolean).map(esc).join("｜");
   const ex = cardExtra(d);
   const rows = [["開放規則", d.開放規則], ["開放時間", d.開放時間 === "—" ? "" : d.開放時間], ["特殊條件", d.特殊條件], ["備註", d.備註], ["場所", d["官方場所（原文）"]]].filter(r => r[1]);
   const notes = (d._rule && d._rule.stayIn ? `<div class="pp-note">館內僅限住宿者，外觀可自由觀看</div>` : d._rule && d._rule.stay ? `<div class="pp-note">僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀</div>` : "") +
     (d.座標來源 === "同場館推定" ? `<div class="pp-note">位置依同場館推定，現場請再確認</div>` : "");
   return `<div class="wc-head"><div class="wc-t"><span class="pp-code">${esc(c)}</span>${title}</div>` +
-    `<div class="wc-day"><span class="st st-${di.state}">${esc(stateShort(di))}</span><span class="wc-date">${day.slice(5).replace("-", "/")}（${WD[new Date(day + "T00:00").getDay()]}）${esc(d.地區)}</span></div>` +
+    `<div class="wc-day"><span class="st st-${di.state}">${esc(stateShort(di))}</span><span class="wc-date">${day.slice(5).replace("-", "/")}（${WD[new Date(day + "T00:00").getDay()]}）</span><span class="wc-area" style="background:${areaTint(d.地區)};color:${areaInk(d.地區)}">${esc(d.地區)}</span></div>` +
     (alerts.length ? `<ul class="wc-alert">${alerts.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : "") +
     `<div class="wc-acts">${acts}</div></div>` +
     `<div class="wc-more">${d.中文名 ? `<div class="pp-ja" lang="ja">${esc(d.作品名稱)}</div>` : ""}${who ? `<div class="wc-who" lang="ja">${who}</div>` : ""}` +
-    (di.state === "open" ? `<div class="wc-hours">這天開放${hrs ? " " + esc(hrs) : ""}</div>` : "") + notes + ex.body + photoHtml(d) +
+    (di.state === "open" ? `<div class="wc-hours">這天開放${hrs ? " " + esc(hrs) : ""}${last ? `<span class="wc-last">｜最後入場 ${esc(last)}</span>` : ""}</div>` : "") + notes + ex.body + photoHtml(d) +
     `<details class="wc-det"><summary>詳細資訊</summary>${rows.map(([k, t]) => `<div><span>${k}：</span>${esc(t)}</div>`).join("")}${ex.detail}` +
     (d.類型 === "戶外" ? `<div class="pp-etq">${ETIQUETTE}</div>` : "") +
     (d.資料來源 ? `<a class="pp-src" href="${SRC_URL}" target="_blank" rel="noopener" title="${esc(d.資料來源)}">開放資訊來源</a>` : "") + `</details>` +
-    transitHtml(d) + nearbyHtml(d) + `</div>`;
+    transitHtml(d) + nearbyCardHtml(d) + `</div>`;
 }
 var wcard = null;
+const WC_STRIP = 5;  /* 卡片頂端地區色條高度，和 common.css 的 #wcard:before 一致 */
 if (SHEET){
   const root = document.documentElement, el = document.createElement("div");
   el.id = "wcard"; el.setAttribute("role", "dialog"); el.setAttribute("aria-label", "作品資訊"); el.hidden = true; el.dataset.state = "peek";
@@ -3453,7 +3505,7 @@ if (SHEET){
   let st = "peek", drag = null, pk = 0;
   const vh = () => window.innerHeight;
   const fullH = () => vh() - 64;
-  const peekH = () => { const hd = box.querySelector(".wc-head"), need = grip.offsetHeight + (hd ? hd.offsetHeight : 0) + (parseFloat(getComputedStyle(el).paddingBottom) || 0) + 8;
+  const peekH = () => { const hd = box.querySelector(".wc-head"), need = WC_STRIP + grip.offsetHeight + (hd ? hd.offsetHeight : 0) + (parseFloat(getComputedStyle(el).paddingBottom) || 0) + 8;
     return Math.min(fullH(), Math.max(Math.round(vh() * 0.25), Math.ceil(need))); };
   /* 地圖下緣的保留高度最多到收合高度，展開時署名列才不會跑到卡片上方 */
   const apply = h => { el.style.height = h + "px"; root.style.setProperty("--sheet-h", Math.round(Math.min(h, pk || h)) + "px"); };
@@ -3465,7 +3517,11 @@ if (SHEET){
     grip.setAttribute("aria-expanded", s === "full"); grip.setAttribute("aria-label", s === "full" ? "收合作品資訊" : "展開作品資訊");
   };
   const isOpen = () => !el.hidden;
-  const render = d => { box.innerHTML = workCardHtml(d); if (isOpen()){ pk = peekH(); if (st === "peek") apply(pk); } };
+  const render = d => {
+    box.innerHTML = workCardHtml(d);
+    el.style.setProperty("--ac", COLORS[d.地區] || "#888");
+    el.classList.toggle("wc-closed", (d._day || dayInfo(d, curDay())).state === "closed");
+    if (isOpen()){ pk = peekH(); if (st === "peek") apply(pk); } };
   const open = d => {
     render(d);
     if (!isOpen()){ if (sheetState !== "peek") setSheet("peek"); el.hidden = false; document.body.classList.add("wc-on"); }
