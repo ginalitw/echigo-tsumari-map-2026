@@ -712,12 +712,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;
   --r-s:10px;--r-m:14px;--r-l:20px;--r-pill:999px;
   --shadow-float:0 2px 10px rgba(58,55,51,.16);--shadow-panel:0 4px 24px rgba(58,55,51,.14);
-  --sheet-h:0px}
+  --sheet-h:0px;--side-w:420px}
+@media (min-width:768px) and (max-width:899.98px){:root{--side-w:360px}}
 html,body{margin:0;height:100%;font-family:var(--font);color:var(--ink);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 body{overflow:hidden;font-size:15px;line-height:1.5}
 #map{position:absolute;inset:0;background:var(--map)}
 .leaflet-container{font-family:var(--font)}
-#panel{position:absolute;z-index:1000;top:0;left:0;bottom:0;width:420px;display:flex;flex-direction:column;background:var(--snow);border-right:1px solid var(--line);box-sizing:border-box;overflow:hidden}
+#panel{position:absolute;z-index:1000;top:0;left:0;bottom:0;width:var(--side-w);display:flex;flex-direction:column;background:var(--snow);border-right:1px solid var(--line);box-sizing:border-box;overflow:hidden}
 #panel>*:not(.sheet-body){flex:none}
 .brandline{display:flex;align-items:baseline;gap:var(--sp-2);padding:var(--sp-5) var(--sp-6) 0}
 .brand{font-family:var(--font-brand);font-weight:700;letter-spacing:.04em}
@@ -897,6 +898,22 @@ ul.lst li.grp:hover{background:none}
 .pp-bus summary b{font-weight:700}
 .pp-bus>div{margin-top:2px}
 @media (min-width:768px){.leaflet-popup-content{max-height:min(480px, calc(100vh - 160px));overflow-y:auto;overscroll-behavior:contain}}
+@media (min-width:768px){
+  .leaflet-popup-content-wrapper{max-width:calc(100vw - var(--side-w) - 24px)}
+  .leaflet-popup-content{max-width:calc(100vw - var(--side-w) - 24px - 2 * var(--sp-5))}
+  #mtools.short .ss-x{display:none}
+}
+/* 電腦版〔篩選與排序〕折疊列 */
+.fsort[hidden],#fsortp[hidden]{display:none}
+.fsort{margin:0 0 var(--sp-2);border:1px solid var(--line);border-radius:var(--r-s);background:var(--paper)}
+#fsortb{display:flex;align-items:center;gap:var(--sp-2);width:100%;min-height:44px;padding:0 var(--sp-4);border:none;background:none;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;text-align:left;border-radius:var(--r-s)}
+#fsortb:after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid var(--ink-soft);border-bottom:2px solid var(--ink-soft);transform:translateY(-2px) rotate(45deg);transition:transform .15s}
+#fsortb[aria-expanded="true"]:after{transform:translateY(2px) rotate(-135deg)}
+#fsortb:focus-visible{outline:2px solid var(--link);outline-offset:-2px}
+#fsortn{min-width:20px;padding:0 6px;border-radius:10px;background:var(--gold-bg);color:var(--ink);font-size:12px;line-height:20px;font-weight:700;text-align:center;box-sizing:border-box;font-variant-numeric:tabular-nums}
+#fsortn[hidden]{display:none}
+#fsortp{padding:0 var(--sp-4) var(--sp-3)}
+#fsortp .lsort{margin-top:var(--sp-2)}
 
 /* 清單排序：熱門／編號（精簡切換） */
 .listbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;flex-wrap:wrap}
@@ -1490,6 +1507,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
     <label class="chk"><input type="checkbox" id="winteronly">冬季線：只顯示冬季也開放的作品</label>
     <div id="wwarn-f" hidden></div>
     <div class="wave" aria-hidden="true"></div>
+    <div class="fsort" id="fsort" hidden><button type="button" id="fsortb" aria-expanded="false" aria-controls="fsortp">篩選與排序<span class="n" id="fsortn" hidden></span></button><div id="fsortp" hidden></div></div>
     <div class="listbar"><div id="stat" aria-live="polite"></div>
     <div class="lsort" id="lsort" role="group" aria-label="清單排序">
       <button type="button" id="lsort-hot" class="on" aria-pressed="true">熱門</button>
@@ -2431,8 +2449,13 @@ function hoverOn(d, e){
   }, HOVER_MS);
 }
 map.on("popupopen movestart zoomstart", hoverOff);
+/* 彈窗自動平移的左上留白要算進側欄寬；同一個 L.point 讓視窗縮放後也能更新 */
+const PP_TL = L.point(0, 64);
+const syncPopupPad = () => { if (!useSheet()) PP_TL.x = insets().left; };
+window.addEventListener("resize", syncPopupPad);
 function bindMarkers(){
   hoverOff();
+  syncPopupPad();
   DATA.forEach(d => {
     if (!d.marker) return;
     d.marker.unbindPopup(); d.marker.unbindTooltip();
@@ -2440,7 +2463,7 @@ function bindMarkers(){
     if (d._hover){ d.marker.off("mouseover", d._hover).off("mouseout", hoverLeave).off("click", hoverOff); d._hover = null; }
     if (useSheet()){ d._click = () => zoomTo(d); d.marker.on("click", d._click); }
     else {
-      d.marker.bindPopup(() => popupHtml(d), {maxWidth:320, minWidth:288, className:"pp-area", autoPanPaddingTopLeft:L.point(insets().left, 64), autoPanPaddingBottomRight:L.point(20, 80)});
+      d.marker.bindPopup(() => popupHtml(d), {maxWidth:320, minWidth:288, className:"pp-area", autoPanPaddingTopLeft:PP_TL, autoPanPaddingBottomRight:L.point(20, 80)});
       d._hover = e => hoverOn(d, e); d.marker.on("mouseover", d._hover).on("mouseout", hoverLeave).on("click", hoverOff);
     }
   });
@@ -2578,6 +2601,23 @@ function placeDate(){
 }
 placeDate();
 MQ.addEventListener("change", placeDate);
+/* 電腦版搜尋分頁：按鈕、勾選、圖例與排序收進〔篩選與排序〕；手機放回原位 */
+const FS_MOVE = [document.querySelector("#pane-s > .btns"), $("todayonly") && $("todayonly").closest("label"), $("winteronly") && $("winteronly").closest("label"), $("wwarn-f"), $("legend"), $("etq"), $("lsort")]
+  .filter(Boolean).map(el => { const ph = document.createComment(""); el.before(ph); return [el, ph]; });
+function placeFilters(){
+  const fs = $("fsort"), box = $("fsortp"); if (!fs || !box) return;
+  fs.hidden = useSheet();
+  if (useSheet()) FS_MOVE.forEach(([el, ph]) => { if (el.previousSibling !== ph) ph.after(el); });
+  else FS_MOVE.forEach(([el]) => { if (el.parentNode !== box) box.appendChild(el); });
+}
+function syncFilterN(){
+  const n = $("fsortn"); if (!n) return;
+  const k = ["todayonly", "winteronly"].filter(id => $(id) && $(id).checked).length;
+  n.textContent = k || ""; n.hidden = !k;
+}
+if ($("fsortb")) $("fsortb").onclick = () => { const b = $("fsortb"), on = b.getAttribute("aria-expanded") !== "true"; b.setAttribute("aria-expanded", on); $("fsortp").hidden = !on; };
+placeFilters();
+MQ.addEventListener("change", placeFilters);
 $("today").onclick = () => { dayEl.value = clampDay(tokyoToday()); syncDayLabel(); render(); };
 $("total").textContent = DATA.length;
 const TABS = ["s", "l", "r", "p"];
@@ -2723,6 +2763,7 @@ function render(){
   if ($("dayshow")) $("dayshow").textContent = `${day.startsWith("2026-") ? `${+day.slice(5, 7)}/${+day.slice(8)}` : day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）`;
   if ($("dcount")) $("dcount").innerHTML = `<span class="dc-o"><b>${cnt.open}</b>開放</span><span class="dc-c"><b>${cnt.closed}</b>休館</span>`;
   areasEl.classList.toggle("all", allAreas);
+  syncFilterN();
   renderSeason(day);
   const dsL = $("lp-daystat"); if (dsL) dsL.textContent = dayTxt;
   renderFav();
@@ -2737,7 +2778,15 @@ function renderSeason(day){
   document.documentElement.style.setProperty("--season", `var(--season-${s.key})`);
   const [a, ...b] = (s.text || s.name).split("　");
   ["mseason", "dseason"].forEach(id => { const el = $(id); if (!el) return; el.hidden = false; el.innerHTML = esc(a) + (b.length ? `<span class="ss-x">　${esc(b.join("　"))}</span>` : ""); });
+  fitTools();
 }
+/* 右上工具列會蓋到側欄時，季節膠囊只留短字 */
+function fitTools(){
+  const t = $("mtools"), p = $("panel"); if (!t || !p) return;
+  t.classList.remove("short");
+  if (!useSheet() && t.getBoundingClientRect().left < p.getBoundingClientRect().right + 12) t.classList.add("short");
+}
+window.addEventListener("resize", fitTools);
 function renderFav(){
   $("favn").textContent = saved.length;
   const lk = $("lkml"); if (lk) lk.hidden = !saved.some(c => BY[c] && BY[c].ll);
@@ -3455,7 +3504,7 @@ function renderPresets(){
 }
 function loadPreset(id){
   const p = PRESETS.find(x => x.id === id); if (!p) return;
-  if (p.date){ dayEl.value = p.date; }
+  if (p.date){ dayEl.value = p.date; syncDayLabel(); }
   setRoute({name:p.name, stops:withNotes(p), mode:p.mode, url:p.url}, true);
   render();
   const N = notesFor(p.id), nOn = N && fanUnlocked();
@@ -3902,7 +3951,7 @@ fitAll();
 
 /* ===== URL hash options: #date=2026-11-04&list=T025,T120&tab=list&open=T025&preset=d1031 ===== */
 const H = new URLSearchParams(location.hash.slice(1));
-{ const hd = H.get("date") || ""; if (/^\d{4}-\d{2}-\d{2}$/.test(hd) && hd >= dayEl.min && hd <= dayEl.max) dayEl.value = hd; }
+{ const hd = H.get("date") || ""; if (/^\d{4}-\d{2}-\d{2}$/.test(hd) && hd >= dayEl.min && hd <= dayEl.max){ dayEl.value = hd; syncDayLabel(); } }
 if (H.get("list")) importText(H.get("list"));
 /* 分享的路線：#r=T025~K005~@越後湯澤站@36.93567,138.80909&rd=2026-10-14&rm=walk&rn=名稱
    目前已有不同的路線時先問；同意後把目前路線另存到「已儲存的路線」再載入 */
@@ -3927,7 +3976,7 @@ if (H.get("r")){
 /* 網站已經開著時再掃 QR／點分享連結，瀏覽器常常只換 # 後面、不重新載入，上面的開啟流程就不會跑（2026-10-06 掃行程 QR 只看到自己的資料）。
    帶路線（r）或行程（it）參數時重新載入一次，照正常流程打開；本機資料不動 */
 window.addEventListener("hashchange", () => { const h = new URLSearchParams(location.hash.slice(1)); if (h.get("r") || h.get("it")) location.reload(); });
-if (/^\d{4}-\d{2}-\d{2}$/.test(H.get("rd") || "") && H.get("rd") >= dayEl.min && H.get("rd") <= dayEl.max) dayEl.value = H.get("rd");
+if (/^\d{4}-\d{2}-\d{2}$/.test(H.get("rd") || "") && H.get("rd") >= dayEl.min && H.get("rd") <= dayEl.max){ dayEl.value = H.get("rd"); syncDayLabel(); }
 render();
 /* 進頁若已有路線（本機儲存／分享 #r=／之後載入的預設），對齊路線範圍，不要停在全區縮放 */
 const bootRoute = !!(sharedRoute || validStops(route.stops).length);
@@ -4087,7 +4136,7 @@ function onbClose(){
   if (tools){ const b = document.createElement("button"); b.id = "mhelp"; b.type = "button"; b.setAttribute("aria-haspopup", "dialog"); b.title = "怎麼用";
     b.innerHTML = '<span class="mh-q" aria-hidden="true">?</span><span class="mh-t">怎麼用</span>'; b.setAttribute("aria-label", "怎麼用");
     b.onclick = () => { if ($("legendpop") && !$("legendpop").hidden && lg) lg.click(); onbOpen(); };
-    lg && lg.nextSibling ? tools.insertBefore(b, lg.nextSibling) : tools.appendChild(b); }
+    lg && lg.nextSibling ? tools.insertBefore(b, lg.nextSibling) : tools.appendChild(b); fitTools(); }
   /* 等專頁擴充（附加在後面的程式）換好卡片內容再決定要不要顯示 */
   setTimeout(() => { if (!onbSkip && !onbIsSeen()) onbOpen(); }, 0);
   MQ.addEventListener("change", () => { if (!el.hidden) onbRender(); });
