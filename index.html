@@ -755,9 +755,16 @@ ul.lst code,.rlist code{font-size:11px;color:#777;margin-right:4px}
 .pp-name{font-size:15px;font-weight:700;margin:4px 0}
 .pp-row span{color:#888}
 .pp-note{color:#B26B00;font-size:12px;margin-top:4px}
-.pp-day{margin-top:6px;padding:4px 8px;border-radius:6px;font-weight:600}
+.pp-day{margin-top:6px;padding:4px 8px;border-radius:6px;font-weight:600;font-variant-numeric:tabular-nums}
+.pp-day .pp-last{display:block;font-weight:400}
 .pp-day.open{background:#E3F4E5;color:#1E7B34}.pp-day.closed{background:#eee;color:#666}.pp-day.unknown{background:#F3F0E6;color:#8A7A4A}
 .pp-rule{font-size:12px;line-height:1.5;color:#888;margin-top:4px}
+.pp-det{margin-top:4px;font-size:12.5px}
+.pp-det summary{display:inline-flex;align-items:center;min-height:28px;list-style:none;cursor:pointer;color:var(--ink)}
+.pp-det summary::-webkit-details-marker{display:none}
+.pp-det summary:after{content:"▾";margin-left:4px;color:var(--mute);transition:transform .2s}
+.pp-det[open] summary:after{transform:rotate(180deg)}
+.pp-det .pp-rule{margin-top:0}
 .pp-acts{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
 .pp-off{margin-top:6px;font-size:13px}
 .pp-off a{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
@@ -1126,9 +1133,13 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   #mtitle a{font-size:13px;font-weight:400;color:var(--mute);text-decoration:none;padding:0 10px;height:44px;display:flex;align-items:center;border-left:1px solid var(--line);margin-left:6px}
   #mall{right:calc(12px + env(safe-area-inset-right));border:none;font:inherit;font-size:14px;color:var(--ink);padding:0 14px;cursor:pointer}
   #toast{top:calc(68px + env(safe-area-inset-top))}
+  /* 面板或作品卡全開時，提示改疊在上方露出的地圖條，不蓋住日期與分頁 */
+  body:has(#panel[data-state="full"]) #toast,body.wc-on:has(#wcard[data-state="full"]) #toast{top:calc(10px + env(safe-area-inset-top))}
 
   /* ===== 手機簡化：首屏地圖＋精簡日期、⋯選單、三個分頁、路線兩層編輯 ===== */
-  #mdesc{display:none}
+  /* 首屏一行提示：第一次點地圖或換日期後收掉 */
+  #mdesc{margin:0 12px 6px;font-size:12.5px;line-height:1.4;white-space:normal}
+  body.mdesc-off #mdesc{display:none}
   #daystat{display:none;margin:4px 16px 6px;font-size:12.5px;line-height:1.45;color:var(--mute)}
   body.daystat-open #daystat{display:block}
   .daterow{margin:0 12px;gap:6px}
@@ -1138,10 +1149,11 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   .daterow{cursor:pointer}
   .daterow .day-more{display:inline-flex;align-items:center;margin-left:auto;font-size:12px;color:var(--mute);border:none;background:none;padding:0 4px;min-height:40px;cursor:pointer}
   /* 標題精簡，右上改 ⋯ 選單 */
-  #mtitle{max-width:calc(100vw - 72px);overflow:hidden;text-overflow:ellipsis;padding-right:12px}
+  #mtitle{max-width:calc(100vw - 144px);overflow:hidden;text-overflow:ellipsis;padding-right:12px}
   #mtitle a{display:none}  /* 公開地圖連結改到 ⋯ 選單 */
-  #mtools{gap:0}
-  #mlegend,#mhelp,#mall{display:none!important}
+  #mtools{gap:6px}
+  #mlegend{border-radius:12px}
+  #mhelp,#mall{display:none!important}
   #mmenu{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:none;border-radius:12px;background:rgba(255,255,255,.96);box-shadow:0 1px 2px rgba(0,0,0,.1),0 4px 14px rgba(0,0,0,.1);font:inherit;font-size:22px;line-height:1;color:var(--ink);cursor:pointer;padding:0}
   #mmenu[aria-expanded="true"]{box-shadow:0 0 0 2px var(--ink)}
   #mmenupop{position:absolute;z-index:2100;top:calc(60px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));min-width:180px;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.1),0 8px 28px rgba(0,0,0,.16);padding:6px;display:flex;flex-direction:column;gap:2px}
@@ -1233,7 +1245,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   #wcard[data-state="peek"] .wc-more{visibility:hidden}
   .wc-more .pp-ja{margin:0}
   .wc-who{font-size:13px;color:var(--mute);margin:2px 0 0}
-  .wc-hours{margin:10px 0 4px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+  .wc-hours{margin:-4px 0 10px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
   .wc-det{margin-top:8px;border-top:1px solid var(--line);font-size:13px;line-height:1.6;color:#3d3d3d}
   .wc-det summary{display:flex;align-items:center;min-height:44px;list-style:none;font-size:14px;color:var(--ink);cursor:pointer}
   .wc-det summary::-webkit-details-marker{display:none}
@@ -1268,6 +1280,9 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   .daterow .day-more{flex:none;padding:0 12px 0 6px}
 }
 @media (min-width:768px){
+  .day-wrap{position:relative;flex:1 1 auto;min-width:0;display:flex;align-items:center;height:44px}
+  .day-show{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 6px;font-size:16px;font-variant-numeric:tabular-nums;color:var(--ink);pointer-events:none}
+  #day{position:absolute;inset:0;width:100%;height:100%;padding:0;opacity:0;cursor:pointer}
   .leaflet-popup.pp-area .leaflet-popup-content-wrapper{box-shadow:inset 0 5px 0 var(--ac,transparent),0 6px 24px rgba(0,0,0,.16)}
 }
 /* 電腦版右下角常駐〔目前行程・N 站〕；手機已有首屏按鈕，不顯示 */
@@ -1280,6 +1295,29 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 .leaflet-tooltip.hv-tip{display:flex;align-items:center;gap:6px;padding:4px 8px;border:none;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.12),0 4px 12px rgba(0,0,0,.16);font-size:13px;line-height:1.4;color:var(--ink);white-space:nowrap}
 .hv-tip .hv-n{max-width:240px;overflow:hidden;text-overflow:ellipsis}
 .hv-tip .st{margin:0}
+.leaflet-tooltip.hv-tip{pointer-events:auto}
+.hv-add{min-height:28px;padding:0 8px;border:1px solid var(--line);border-radius:6px;background:#fff;font:inherit;font-size:12.5px;color:var(--ink);cursor:pointer}
+.hv-add:hover{background:var(--wash)}
+.hv-add:disabled{color:var(--mute);cursor:default;background:#fff}
+#pbackb{min-height:32px;min-width:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;font:inherit;font-size:13px;color:var(--ink);cursor:pointer}
+/* 觸控裝置（含用電腦版面的 iPad）：常用按鈕至少 44px；滑鼠電腦維持原本的行程日列 */
+@media (pointer:coarse),(max-width:767.98px){
+  .ftdays .b{min-width:44px;padding:0 6px;border:1px solid var(--line);border-radius:8px;background:#fff;font:inherit;font-size:13px;color:var(--ink);cursor:pointer}
+  ol.ftdays li{gap:4px}
+  .ftdays .ftd{width:auto}
+  .ftdays .ftn{white-space:nowrap}
+  .ftdays .fted{padding:0 4px}
+  #pbackb,.ftdays .b,ol.ftdays input,.fdays .b,.rm,#redit,#rquick .b,.rstart button{min-height:44px}
+  .lsort button{min-height:44px;padding:0 14px}
+  .pp-near li button{min-height:44px;padding:0}
+  #mlegend,#mhelp{height:44px}
+  .sgm{display:inline-flex;align-items:center;min-height:44px;padding:0}
+  .fthead input{min-height:44px}
+  .pp-off a,a.pp-src{display:inline-flex;align-items:center;min-height:44px}
+  .pp-det summary{min-height:44px}
+  .rlist .ud button{width:44px}
+  .leaflet-control-zoom a{width:44px!important;height:44px!important;line-height:44px!important}
+}
 </style>
 </head>
 <body>
@@ -1293,7 +1331,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   <button id="sheet-handle" type="button" aria-label="展開面板" aria-expanded="false" aria-controls="sheet-body"></button>
   <h1>大地藝術祭 2026 作品地圖</h1>
   <div class="sub">越後妻有常設與公開作品 <b id="total"></b> 件</div>
-  <div id="mdesc">選日期看作品當天能不能參觀，點地圖上的點看詳情</div>
+  <div id="mdesc">選日期看作品那天能不能參觀，點地圖上的點看詳情</div>
   <div class="daterow" id="daterow"><label for="day">今天開不開</label><span class="day-wrap"><span class="day-show" id="dayshow" aria-hidden="true"></span><input type="date" id="day" min="2026-04-25" max="2027-03-31"></span><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
   <div id="daystat" aria-live="polite"></div>
   <div class="mbar" id="mbar"><button type="button" id="mfilter" aria-controls="sheet-body">篩選</button><button type="button" id="mtrip" aria-controls="sheet-body">我的行程<span class="n" id="mtripn"></span></button></div>
@@ -1303,7 +1341,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
     <input id="q" type="search" enterkeyhint="search" autocomplete="off" aria-label="搜尋作品" placeholder="搜尋作品名稱、編號、藝術家或場館">
     <div class="areas" id="areas"></div>
     <div class="btns"><button id="all">全選</button><button id="none">全不選</button><button id="bd">區域界線</button><button id="locate" type="button" aria-pressed="false">定位</button></div>
-    <label class="chk"><input type="checkbox" id="todayonly">只看這天可參觀（含定休日可觀看）</label>
+    <label class="chk"><input type="checkbox" id="todayonly">只看這天可參觀（休館但戶外可看的也算）</label>
     <label class="chk"><input type="checkbox" id="winteronly">冬季線：只顯示冬季也開放的作品</label>
     <div id="wwarn-f" hidden></div>
     <div class="listbar"><div id="stat" aria-live="polite"></div>
@@ -1959,8 +1997,8 @@ function noteHits(d, dateStr){
 }
 const SRC_URL = "https://www.echigo-tsumari.jp/assets/uploads/2026/10/" + encodeURIComponent("「2026年の越後妻有」作品公開カレンダー（英）.pdf");
 const SEASON = ["2026-04-25", "2026-11-08"];
-const STATE_TXT = {open:"這天開放", view:"定休日可觀看", stay:"僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀", closed:"這天休館", unknown:"尚未公布開放資訊"};
-const STATE_SHORT = {open:"開放", view:"定休日可觀看", stay:"僅限住宿者", closed:"休館", unknown:"未公布"};
+const STATE_TXT = {open:"這天開放", view:"休館但戶外可看", stay:"僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀", closed:"這天休館", unknown:"尚未公布開放資訊"};
+const STATE_SHORT = {open:"開放", view:"休館但戶外可看", stay:"僅限住宿者", closed:"休館", unknown:"未公布"};
 const WINTER_OPEN_TXT = "冬季開放，日期與時間以官方公告為準";
 const stateTxt = di => di.reason === "winter" ? WINTER_OPEN_TXT : di.reason === "season" ? "不在 2026 會期內（4/25～11/8）" : STATE_TXT[di.state];
 const stateShort = di => di.reason === "winter" ? "冬季開放" : di.reason === "season" ? "會期外" : STATE_SHORT[di.state];
@@ -2104,14 +2142,19 @@ function popupHtml(d){
   h += `<div class="pp-row"><span>藝術家：</span>${esc(d.藝術家)}</div>`;
   h += `<div class="pp-row"><span>場館：</span>${esc(d.設置地點)}</div>`;
   if (d["官方場所（原文）"]) h += `<div class="pp-row"><span>場所：</span>${esc(d["官方場所（原文）"])}</div>`;
-  h += `<div class="pp-day ${di.state}">${curDay().replace(/-/g, "/")}　${stateTxt(di)}${di.tags.length ? "，" + esc(di.tags.join("，")) : ""}</div>`;
+  const hrs = di.state === "open" ? dayHours(d, curDay()) : null, last = lastEntry(d, hrs);
+  h += `<div class="pp-day ${di.state}">${curDay().replace(/-/g, "/")}　${stateTxt(di)}${hrs ? ` ${esc(hrs)}` : ""}${last ? `<span class="pp-last">最後入場 ${esc(last)}</span>` : ""}${di.tags.length ? "，" + esc(di.tags.join("，")) : ""}</div>`;
   /* 和手機浮動卡同一排：〔☆ 想去〕〔＋ 路線〕〔📍 地圖〕 */
   h += `<div class="pp-acts"><button type="button" class="pp-btn${sv ? " on" : ""}" data-fav="${esc(c)}" aria-pressed="${sv}" aria-label="${sv ? "從我的清單移除" : "加入我的清單"}" title="${sv ? "從我的清單移除" : "加入我的清單"}"><span aria-hidden="true">${sv ? "★" : "☆"}</span>想去</button>` +
     (!d.marker ? "" : inRoute(c) ? `<button type="button" class="pp-btn pp-route" disabled aria-label="已在路線"><span aria-hidden="true">✓</span>路線</button>`
       : `<button type="button" class="pp-btn pp-route" data-addroute="${esc(c)}" aria-label="加入路線"><span aria-hidden="true">＋</span>路線</button>`) +
     (d.ll ? `<a class="pp-btn" href="${esc(gmUrl(gmQuery(d)))}" target="_blank" rel="noopener" aria-label="在 Google 地圖開啟"><span aria-hidden="true">📍</span>地圖</a>` : "") + `</div>`;
-  const rows = [["開放規則", d.開放規則], ["開放時間", d.開放時間 === "—" ? "" : d.開放時間], ["特殊條件", d.特殊條件], ["備註", d.備註]].filter(r => r[1]);
-  if (rows.length) h += `<div class="pp-rule">${rows.map(([k, t]) => `<div><span>${k}：</span>${esc(t)}</div>`).join("")}</div>`;
+  const rowHtml = rs => rs.map(([k, t]) => `<div><span>${k}：</span>${esc(t)}</div>`).join("");
+  const rule = [["開放規則", d.開放規則], ["開放時間", d.開放時間 === "—" ? "" : d.開放時間]].filter(r => r[1]);
+  const rows = (hrs ? [] : rule).concat([["特殊條件", d.特殊條件], ["備註", d.備註]].filter(r => r[1]));
+  if (rows.length) h += `<div class="pp-rule">${rowHtml(rows)}</div>`;
+  /* 綠色狀態條已寫出這天的時段，整季規則收進詳細資訊，和手機卡片一樣 */
+  if (hrs && rule.length) h += `<details class="pp-det"><summary>詳細資訊</summary><div class="pp-rule">${rowHtml(rule)}</div></details>`;
   if (d.類型 === "戶外") h += `<div class="pp-note pp-etq">${ETIQUETTE}</div>`;
   if (d._rule && d._rule.stayIn) h += `<div class="pp-note">館內僅限住宿者，外觀可自由觀看</div>`;
   else if (d._rule && d._rule.stay) h += `<div class="pp-note">僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀</div>`;
@@ -2202,17 +2245,29 @@ const hoverTip = L.tooltip({direction:"top", offset:[0, -8], className:"hv-tip",
 let hoverT = 0;
 function hoverTipHtml(d){
   const di = d._day || dayInfo(d, curDay());
-  return `<span class="pp-code">${esc(d.作品編號)}</span><span class="hv-n">${esc(d.中文名 || d.作品名稱)}</span><span class="st st-${di.state}">${esc(stateShort(di))}</span>`;
+  const c = d.作品編號, add = inRoute(c) ? `<button type="button" class="hv-add" disabled>✓ 路線</button>` : `<button type="button" class="hv-add" data-addroute="${esc(c)}" aria-label="加入路線">＋路線</button>`;
+  return `<span class="pp-code">${esc(c)}</span><span class="hv-n">${esc(d.中文名 || d.作品名稱)}</span><span class="st st-${di.state}">${esc(stateShort(di))}</span>${add}`;
 }
-function hoverOff(){ clearTimeout(hoverT); hoverT = 0; if (map.hasLayer(hoverTip)) map.closeTooltip(hoverTip); }
+/* 滑鼠離開點後留一下，讓人移進提示按〔＋路線〕 */
+const HOVER_LEAVE_MS = 250;
+let hoverL = 0;
+function hoverOff(){ clearTimeout(hoverT); clearTimeout(hoverL); hoverT = hoverL = 0; if (map.hasLayer(hoverTip)) map.closeTooltip(hoverTip); }
+function hoverLeave(){ clearTimeout(hoverT); hoverT = 0; clearTimeout(hoverL); hoverL = setTimeout(hoverOff, HOVER_LEAVE_MS); }
+function hoverBindTip(){
+  const el = hoverTip.getElement(); if (!el || el._hv) return; el._hv = 1;
+  L.DomEvent.disableClickPropagation(el); L.DomEvent.disableScrollPropagation(el);
+  el.addEventListener("mouseenter", () => { clearTimeout(hoverL); hoverL = 0; });
+  el.addEventListener("mouseleave", hoverLeave);
+}
 function hoverOn(d, e){
   const ev = e && e.originalEvent;
   if (!HOVER_MQ.matches || useSheet() || (ev && ev.sourceCapabilities && ev.sourceCapabilities.firesTouchEvents)) return;
-  clearTimeout(hoverT);
+  clearTimeout(hoverT); clearTimeout(hoverL); hoverL = 0;
   hoverT = setTimeout(() => {
     hoverT = 0;
     if (!map.hasLayer(d.marker) || d.marker.isPopupOpen()) return;
     map.openTooltip(hoverTip.setLatLng(d.marker.getLatLng()).setContent(hoverTipHtml(d)));
+    hoverBindTip();
   }, HOVER_MS);
 }
 map.on("popupopen movestart zoomstart", hoverOff);
@@ -2222,11 +2277,11 @@ function bindMarkers(){
     if (!d.marker) return;
     d.marker.unbindPopup(); d.marker.unbindTooltip();
     if (d._click){ d.marker.off("click", d._click); d._click = null; }
-    if (d._hover){ d.marker.off("mouseover", d._hover).off("mouseout click", hoverOff); d._hover = null; }
+    if (d._hover){ d.marker.off("mouseover", d._hover).off("mouseout", hoverLeave).off("click", hoverOff); d._hover = null; }
     if (useSheet()){ d._click = () => zoomTo(d); d.marker.on("click", d._click); }
     else {
       d.marker.bindPopup(() => popupHtml(d), {maxWidth:280, className:"pp-area"});
-      d._hover = e => hoverOn(d, e); d.marker.on("mouseover", d._hover).on("mouseout click", hoverOff);
+      d._hover = e => hoverOn(d, e); d.marker.on("mouseover", d._hover).on("mouseout", hoverLeave).on("click", hoverOff);
     }
   });
 }
@@ -2239,7 +2294,7 @@ if ($("stat")) $("stat").insertAdjacentHTML("afterend", `<div class="etq" id="et
 const LG_C = "#555";
 const legendSw = st => { const c = LG_C, s = {open:`r="6.5" fill="${c}" stroke="#fff" stroke-width="2"`, view:`r="6.5" fill="${c}" fill-opacity=".22" stroke="${c}" stroke-width="3"`, stay:`r="6.5" fill="#fff" stroke="${c}" stroke-width="2.5" stroke-dasharray="2.5 2.5"`, closed:`r="6.5" fill="#9E9E9E" fill-opacity=".35" stroke="#9E9E9E" stroke-opacity=".5" stroke-width="1"`, unknown:`r="4.5" fill="${c}" fill-opacity=".45" stroke="#fff" stroke-width="1.5"`}[st];
   return `<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" ${s}/></svg>`; };
-const LEGEND_ITEMS = [["open", "開放", "實心"], ["view", "定休日可觀看", "空心粗框：當天是定休日，戶外部分仍可觀看（官方說明）"], ["stay", "僅限住宿者", "白底虛線框：只開放入住旅客，非住宿者無法參觀"], ["closed", "休館", "灰色淡化"], ["unknown", "未公布", "淡色小點：尚未公布開放資訊；會期外的冬季開放作品也是這個樣式"]];
+const LEGEND_ITEMS = [["open", "開放", "實心"], ["view", "休館但戶外可看", "空心粗框：當天是定休日，戶外部分仍可觀看（官方說明）"], ["stay", "僅限住宿者", "白底虛線框：只開放入住旅客，非住宿者無法參觀"], ["closed", "休館", "灰色淡化"], ["unknown", "未公布", "淡色小點：尚未公布開放資訊；會期外的冬季開放作品也是這個樣式"]];
 if (!ILL && $("stat")){
   $("stat").insertAdjacentHTML("afterend", `<div id="legend" class="legend" aria-label="地圖標記說明">${LEGEND_ITEMS.slice(0, 4).map(([k, t]) => `<span class="lg lg-${k}">${legendSw(k)}${t}</span>`).join("")}<span class="lg lg-note">顏色代表地區</span><button type="button" class="lg-more" id="lgmore" aria-controls="legendpop">完整圖例</button></div>`);
   $("lgmore").onclick = () => { const lg = $("mlegend"); if (lg) lg.click(); };
@@ -2350,7 +2405,7 @@ function syncDayLabel(){
   if (lab) lab.textContent = (dayEl.value === tokyoToday()) ? "今天開不開" : "這天開不開";
 }
 /* 手機版日期欄位是透明的，點文字時要能叫出日期選擇器 */
-if ($("dayshow")) dayEl.addEventListener("click", () => { if (MQ.matches && dayEl.showPicker){ try { dayEl.showPicker(); } catch(e){} } });
+if ($("dayshow")) dayEl.addEventListener("click", () => { if (dayEl.showPicker){ try { dayEl.showPicker(); } catch(e){} } });
 dayEl.addEventListener("change", () => { dayEl.value = clampDay(dayEl.value || tokyoToday()); syncDayLabel(); render(); });
 syncDayLabel();
 $("today").onclick = () => { dayEl.value = clampDay(tokyoToday()); syncDayLabel(); render(); };
@@ -2484,13 +2539,13 @@ function render(){
     li.onclick = e => { if (!e.target.closest("button")) zoomTo(d); };
     list.appendChild(li);
   });
-  const fnote = hiddenByFilter ? `另有 ${hiddenByFilter} 件符合，但被${[todayOnly ? "「只看今天可參觀」" : "", winterOnly ? "「冬季線」" : "", onlyFav.checked ? "「地圖只顯示清單作品」" : ""].filter(Boolean).join("、")}篩掉。` : "";
+  const fnote = hiddenByFilter ? `另有 ${hiddenByFilter} 件符合，但被${[todayOnly ? "「只看這天可參觀」" : "", winterOnly ? "「冬季線」" : "", onlyFav.checked ? "「地圖只顯示清單作品」" : ""].filter(Boolean).join("、")}篩掉。` : "";
   if (t && !shown) list.innerHTML = `<li class="empty">找不到「${esc(q.value.trim())}」，可試日文寫法或作品編號（例如 T025）。${fnote}</li>`;
   const offS = isOffSeason(day);
   $("stat").textContent = (t ? `找到 ${shown} 件` : `顯示 ${shown} 件`) + (nopt ? `，其中 ${nopt} 件無定點` : "") + (t && shown && fnote ? `。${fnote}` : "") +
     (todayOnly && offS ? "。會期外的冬季開放作品日期未公布，未列入" : "");
   const hol = HOLIDAYS.has(day) ? "（日本國定假日）" : "";
-  const dayTxt = `${day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）${hol}${offS ? "，會期外" : ""}：開放 ${cnt.open}，定休日可觀看 ${cnt.view}，僅限住宿者 ${cnt.stay}，休館 ${cnt.closed}，未公布 ${cnt.unknown}${nwin ? `（含冬季開放 ${nwin}，以官方公告為準）` : ""}`;
+  const dayTxt = `${day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）${hol}${offS ? "，會期外" : ""}：開放 ${cnt.open}，休館但戶外可看 ${cnt.view}，僅限住宿者 ${cnt.stay}，休館 ${cnt.closed}，未公布 ${cnt.unknown}${nwin ? `（含冬季開放 ${nwin}，以官方公告為準）` : ""}`;
   $("daystat").textContent = dayTxt;
   if ($("dayshow")) $("dayshow").textContent = `${day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）`;
   const dsL = $("lp-daystat"); if (dsL) dsL.textContent = dayTxt;
@@ -2666,6 +2721,12 @@ function stopStatus(s){
   const cls = di.state === "closed" ? "st st-closedr" : "st st-" + di.state;
   return `<span class="${cls}">${stateShort(di)}</span>` + (di.tags.length ? `<span class="st st-unknown">${esc(di.tags.join("，"))}</span>` : "");
 }
+function routeTotalTxt(){
+  if (TT(route.mode) || validStops(route.stops).length < 2 || !routeInfo || routeInfo.src === "none") return "";
+  const k = routeClock(routeInfo.legs, route.stops);
+  /* 停留時間還沒建資料：只寫移動時間；有站填了停留才叫總時間 */
+  return k.stay ? `，總時間約 ${fmtMin(k.total)}` : `，${route.mode === "walk" ? "步行" : "車程"}約 ${fmtMin(k.travel)}`;
+}
 function renderRouteList(pending){
   const ul = $("rlist"); if (!ul) return;
   $("rname").value = route.name || "";
@@ -2705,14 +2766,14 @@ function renderRouteList(pending){
   if (TT(route.mode)){
     const tt = st.filter(s => s.time);
     sum.innerHTML = `<b>${TTL(route.mode)}時刻，共 ${n} 站${tt.length ? `，${esc(tt[0].time)} 出發，最後一站 ${esc(tt[tt.length - 1].time)}` : ""}</b><br><span class="muted">時間依官方行程表，路況可能前後變動；地圖上的線只是示意。</span>` +
-      (closed ? `<br><span class="warn">有 ${closed} 站在 ${curDay().replace(/-/g, "/")} 休館</span>` : "") + (unk ? `<br><span class="muted">${unk} 站尚未公布開放資訊</span>` : "") + (nstay ? `<br><span class="warn">${nstay} 站僅限住宿者</span>` : "") + (nview ? `<br><span class="muted">${nview} 站定休日可觀看</span>` : "") + (nwin ? `<br><span class="muted">${nwin} 站冬季開放，日期與時間以官方公告為準</span>` : "") +
+      (closed ? `<br><span class="warn">有 ${closed} 站在 ${curDay().replace(/-/g, "/")} 休館</span>` : "") + (unk ? `<br><span class="muted">${unk} 站尚未公布開放資訊</span>` : "") + (nstay ? `<br><span class="warn">${nstay} 站僅限住宿者</span>` : "") + (nview ? `<br><span class="muted">${nview} 站休館但戶外可看</span>` : "") + (nwin ? `<br><span class="muted">${nwin} 站冬季開放，日期與時間以官方公告為準</span>` : "") +
       (route.url ? `<br><a href="${esc(route.url)}" target="_blank" rel="noopener">官方行程頁</a>` : "");
   }
   else if (n < 2) sum.innerHTML = n ? "再加一站就能算時間" : "";
   else if (!routeInfo) sum.innerHTML = "計算路線中";
   else if (routeInfo.src === "none"){
     sum.innerHTML = `<b>共 ${n} 站，步行</b><br><span class="muted">步行路線服務暫時連不上，先不顯示時間。</span>` +
-      (closed ? `<br><span class="warn">有 ${closed} 站在 ${curDay().replace(/-/g, "/")} 休館</span>` : "") + (unk ? `<br><span class="muted">${unk} 站尚未公布開放資訊</span>` : "") + (nstay ? `<br><span class="warn">${nstay} 站僅限住宿者</span>` : "") + (nview ? `<br><span class="muted">${nview} 站定休日可觀看</span>` : "") + (nwin ? `<br><span class="muted">${nwin} 站冬季開放，日期與時間以官方公告為準</span>` : "");
+      (closed ? `<br><span class="warn">有 ${closed} 站在 ${curDay().replace(/-/g, "/")} 休館</span>` : "") + (unk ? `<br><span class="muted">${unk} 站尚未公布開放資訊</span>` : "") + (nstay ? `<br><span class="warn">${nstay} 站僅限住宿者</span>` : "") + (nview ? `<br><span class="muted">${nview} 站休館但戶外可看</span>` : "") + (nwin ? `<br><span class="muted">${nwin} 站冬季開放，日期與時間以官方公告為準</span>` : "");
   }
   else {
     const K = routeInfo.legs.reduce((a, l) => a + l.km, 0);
@@ -2722,7 +2783,7 @@ function renderRouteList(pending){
     const warn = batteryWarn(route.mode, K);
     sum.innerHTML = `<b>共 ${n} 站，${how}約 ${fmtMin(clock.travel)}${clock.stay ? `，停留約 ${fmtMin(clock.stay)}` : ""}，總時間約 ${fmtMin(clock.total)}，${fmtKm(K)}</b><br><span class="muted">${src}。總時間是移動時間加上各站停留。</span>` +
       (warn ? `<br><span class="warn">${esc(warn)}</span>` : "") +
-      (closed ? `<br><span class="warn">有 ${closed} 站在 ${curDay().replace(/-/g, "/")} 休館</span>` : "") + (unk ? `<br><span class="muted">${unk} 站尚未公布開放資訊</span>` : "") + (nstay ? `<br><span class="warn">${nstay} 站僅限住宿者</span>` : "") + (nview ? `<br><span class="muted">${nview} 站定休日可觀看</span>` : "") + (nwin ? `<br><span class="muted">${nwin} 站冬季開放，日期與時間以官方公告為準</span>` : "") +
+      (closed ? `<br><span class="warn">有 ${closed} 站在 ${curDay().replace(/-/g, "/")} 休館</span>` : "") + (unk ? `<br><span class="muted">${unk} 站尚未公布開放資訊</span>` : "") + (nstay ? `<br><span class="warn">${nstay} 站僅限住宿者</span>` : "") + (nview ? `<br><span class="muted">${nview} 站休館但戶外可看</span>` : "") + (nwin ? `<br><span class="muted">${nwin} 站冬季開放，日期與時間以官方公告為準</span>` : "") +
       (route.url ? `<br><a href="${esc(route.url)}" target="_blank" rel="noopener">官方行程頁</a>` : "");
   }
   const mini = $("rmini");
@@ -2739,7 +2800,7 @@ function renderRouteList(pending){
   const rn = $("routen"); if (rn) rn.textContent = route.stops.length;
   const mn = $("mtripn"); if (mn) mn.textContent = route.stops.length || "";
   const dt = $("dtrip"); if (dt) dt.textContent = `目前行程・${route.stops.length} 站`;
-  const rh = $("rhead"); if (rh){ rh.hidden = !route.stops.length; $("rheadt").textContent = `目前路線 ${route.stops.length} 站`; }
+  const rh = $("rhead"); if (rh){ rh.hidden = !route.stops.length; $("rheadt").textContent = `目前路線 ${route.stops.length} 站${routeTotalTxt()}`; }
 }
 /* 路線檢查：所選日期每一站的狀態，有問題的站列在路線最上方；非開車路線附上有官方出處的末班巴士 */
 function renderRouteCheck(){
@@ -2750,7 +2811,7 @@ function renderRouteCheck(){
     const di = dayInfo(BY[s.c], day); if (groups[di.state]) groups[di.state].push(`${k}. ${esc(stopName(s))}`);
     if (route.mode !== "drive") transitFor(BY[s.c]).forEach(t => near.add(t)); });
   if (!n){ box.hidden = true; box.innerHTML = ""; return; }
-  const L = [["closed", "休館", "warn"], ["stay", "僅限住宿者，非住宿者無法參觀", "warn"], ["unknown", "未公布開放資訊", "muted"], ["view", "定休日可觀看", "muted"]];
+  const L = [["closed", "休館", "warn"], ["stay", "僅限住宿者，非住宿者無法參觀", "warn"], ["unknown", "未公布開放資訊", "muted"], ["view", "休館但戶外可看", "muted"]];
   const rows = L.filter(([st]) => groups[st].length).map(([st, t, c]) => `<li><span class="${c}">${t}</span>：${groups[st].join("、")}</li>`);
   const bus = [...near].map(t => `<li><span class="warn">末班巴士</span>（${esc(busVer(t))}）：${esc(t.stop_zh)}站 ${transitLines(t, day).join("；")}。${esc(t.access)}。<a href="${esc(t.src[busDayType(day) === "holiday" ? 1 : 0].url)}" target="_blank" rel="noopener">官方時刻表</a></li>`);
   box.innerHTML = `<b>${day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）路線檢查</b>` +
@@ -3135,7 +3196,7 @@ function presetFlags(p){
   return {closed, unk, miss, day, view, stay, win};
 }
 /* 卡片上的當天狀態摘要（三種卡片共用，用語與摘要列一致） */
-const flagTxt = f => [f.closed ? `<span class="warn">${f.closed} 站休館</span>` : "", f.stay ? `<span class="warn">${f.stay} 站僅限住宿者</span>` : "", f.view ? `${f.view} 站定休日可觀看` : "",
+const flagTxt = f => [f.closed ? `<span class="warn">${f.closed} 站休館</span>` : "", f.stay ? `<span class="warn">${f.stay} 站僅限住宿者</span>` : "", f.view ? `${f.view} 站休館但戶外可看` : "",
   f.win ? `${f.win} 站冬季開放（以官方公告為準）` : "", f.unk ? `${f.unk} 站未公布` : "", !f.unk && !f.win ? "皆有開放資訊" : ""].filter(Boolean).join("，");
 function winterCardHtml(p){
   const n = p.stops.filter(s => s.c || s.note).length;
@@ -3246,6 +3307,7 @@ document.addEventListener("click", e => {
   const a = e.target.closest("[data-addroute]");
   if (a){ e.preventDefault(); e.stopPropagation(); addStop({c:a.dataset.addroute});
     if (a.classList.contains("addr")){ a.textContent = "已加入"; a.disabled = true; a.removeAttribute("data-addroute"); toast(`已加入路線，共 ${route.stops.length} 站`); }
+    else if (a.classList.contains("hv-add")){ hoverOff(); toast(`已加入路線，共 ${route.stops.length} 站`); }
     else if (a.classList.contains("wc-route") || a.classList.contains("pp-route")){ a.innerHTML = '<span aria-hidden="true">✓</span>路線'; a.setAttribute("aria-label", "已在路線"); a.disabled = true; a.removeAttribute("data-addroute"); toast(`已加入路線，共 ${route.stops.length} 站`); }
     else a.textContent = "已加入路線";
     return; }
@@ -3550,10 +3612,10 @@ function workCardHtml(d){
     (d.座標來源 === "同場館推定" ? `<div class="pp-note">位置依同場館推定，現場請再確認</div>` : "");
   return `<div class="wc-head"><div class="wc-t"><span class="pp-code">${esc(c)}</span>${title}</div>` +
     `<div class="wc-day"><span class="st st-${di.state}">${esc(stateShort(di))}</span><span class="wc-date">${day.slice(5).replace("-", "/")}（${WD[new Date(day + "T00:00").getDay()]}）</span><span class="wc-area" style="background:${areaTint(d.地區)};color:${areaInk(d.地區)}">${esc(d.地區)}</span></div>` +
+    (di.state === "open" && hrs ? `<div class="wc-hours">這天開放 ${esc(hrs)}${last ? `<span class="wc-last">｜最後入場 ${esc(last)}</span>` : ""}</div>` : "") +
     (alerts.length ? `<ul class="wc-alert">${alerts.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : "") +
     `<div class="wc-acts">${acts}</div></div>` +
-    `<div class="wc-more">${d.中文名 ? `<div class="pp-ja" lang="ja">${esc(d.作品名稱)}</div>` : ""}${who ? `<div class="wc-who" lang="ja">${who}</div>` : ""}` +
-    (di.state === "open" ? `<div class="wc-hours">這天開放${hrs ? " " + esc(hrs) : ""}${last ? `<span class="wc-last">｜最後入場 ${esc(last)}</span>` : ""}</div>` : "") + notes + ex.body + photoHtml(d) +
+    `<div class="wc-more">${d.中文名 ? `<div class="pp-ja" lang="ja">${esc(d.作品名稱)}</div>` : ""}${who ? `<div class="wc-who" lang="ja">${who}</div>` : ""}` + notes + ex.body + photoHtml(d) +
     `<details class="wc-det"><summary>詳細資訊</summary>${rows.map(([k, t]) => `<div><span>${k}：</span>${esc(t)}</div>`).join("")}${ex.detail}` +
     (d.類型 === "戶外" ? `<div class="pp-etq">${ETIQUETTE}</div>` : "") +
     (d.資料來源 ? `<a class="pp-src" href="${SRC_URL}" target="_blank" rel="noopener" title="${esc(d.資料來源)}">開放資訊來源</a>` : "") +
@@ -3714,7 +3776,7 @@ function onbJoinHref(){
   return raw && raw !== "#" ? raw : "#";
 }
 function onbLegendLine(){
-  return useSheet() ? "點的樣式看不懂？右上角「⋯」裡有圖例。" : "點的樣式看不懂？右上角有「圖例」。";
+  return "點的樣式看不懂？右上角有「圖例」。";
 }
 let ONB_CARDS = () => {
   const n = DATA.length;
@@ -3847,7 +3909,6 @@ function onbClose(){
     const fill = () => {
       const fanLink = ($("mtitle") && $("mtitle").querySelector("a")) ? $("mtitle").querySelector("a") : null;
       const items = [
-        ["legend", "圖例"],
         ["help", "怎麼用"],
         ["all", "看全區"]
       ];
@@ -3857,19 +3918,27 @@ function onbClose(){
       menuPop.innerHTML = items.map(([k, t]) => `<button type="button" role="menuitem" data-mm="${k}">${t}</button>`).join("") + extra;
     };
     fill();
-    const setMenu = on => { menuPop.hidden = !on; menuBtn.setAttribute("aria-expanded", on); if (on){ const t=$("toast"); if (t){ t.classList.remove("on"); clearTimeout(t._t); } fill(); menuPop.querySelector("button,a").focus(); } };
+    const setMenu = on => { menuPop.hidden = !on; menuBtn.setAttribute("aria-expanded", on); if (on){ const t=$("toast"); if (t){ t.classList.remove("on"); clearTimeout(t._t); } const lp = $("legendpop"); if (lp && !lp.hidden && $("mlegend")) $("mlegend").click(); fill(); menuPop.querySelector("button,a").focus(); } };
     menuBtn.onclick = e => { e.stopPropagation(); setMenu(menuPop.hidden); };
     menuPop.addEventListener("click", e => {
       const b = e.target.closest("[data-mm]"); if (!b) { if (e.target.closest("a")) setMenu(false); return; }
       const k = b.dataset.mm; setMenu(false);
-      if (k === "legend"){ const lg = $("mlegend"); if (lg) lg.click(); }
-      else if (k === "help"){ const h = $("mhelp"); if (h) h.click(); else if (typeof onbOpen === "function") onbOpen(); }
+      if (k === "help"){ const h = $("mhelp"); if (h) h.click(); else if (typeof onbOpen === "function") onbOpen(); }
       else if (k === "all"){ if (typeof fitAll === "function") fitAll(true); }
     });
     document.addEventListener("click", e => { if (!menuPop.hidden && !e.target.closest("#mmenu,#mmenupop")) setMenu(false); });
     document.addEventListener("keydown", e => { if (e.key === "Escape" && !menuPop.hidden){ setMenu(false); menuBtn.focus(); } });
     map.on("click movestart", () => { if (!menuPop.hidden) setMenu(false); });
   }
+  /* 首屏提示：第一次點地圖或換日期後收掉，收合面板跟著變矮 */
+  const hintOff = () => {
+    if (document.body.classList.contains("mdesc-off")) return;
+    document.body.classList.add("mdesc-off");
+    if (mob() && setSheet) setSheet(sheetState);
+  };
+  map.once("click", hintOff);
+  dayEl.addEventListener("change", hintOff, {once:true});
+  $("today").addEventListener("click", hintOff, {once:true});
   /* 日期列：點「統計」或日期旁展開當日件數（完整統計也在圖例裡） */
   const more = $("daymore"), row = $("daterow");
   const setDayStat = on => {
@@ -4096,7 +4165,7 @@ function decodeTrip(it, name){
   return days.length ? cleanTrip({name:name || "分享的行程", mode:CH_MODE[parts[1]] || "drive", days}) : null;
 }
 renderRouteList = (orig => pending => { orig(pending);
-  const rt = $("rheadt"); if (rt && trip && editing != null) rt.textContent = `第 ${editing + 1} 天 ${route.stops.length} 站`;
+  const rt = $("rheadt"); if (rt && trip && editing != null) rt.textContent = `第 ${editing + 1} 天 ${route.stops.length} 站${routeTotalTxt()}`;
 })(renderRouteList);
 function renderDayHead(){
   const box = $("fanday"); if (!box) return;
