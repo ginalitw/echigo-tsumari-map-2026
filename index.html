@@ -760,7 +760,8 @@ ul.lst code,.rlist code{font-size:11px;color:#777;margin-right:4px}
 .pp-day.open{background:#E3F4E5;color:#1E7B34}.pp-day.closed{background:#eee;color:#666}.pp-day.unknown{background:#F3F0E6;color:#8A7A4A}
 .pp-rule{font-size:12px;line-height:1.5;color:#888;margin-top:4px}
 .pp-acts{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
-.pp-link{display:inline-block;color:#222;background:var(--accent);padding:3px 10px;border-radius:12px;text-decoration:none;font-weight:600}
+.pp-off{margin-top:6px;font-size:13px}
+.pp-off a{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
 .pp-add{border:1px solid #E0A800;background:#fff;border-radius:12px;padding:3px 10px;cursor:pointer;font-size:12.5px;font-family:inherit}
 .pp-src{font-size:11px;color:#888;display:inline-block;margin-top:4px}
 .cgroup{margin-bottom:10px}
@@ -953,7 +954,7 @@ ul.lst li .addr{min-height:44px;border-radius:22px}
 .pp-row span,.pp-rule,.pp-src{color:var(--mute)}
 .pp-note{color:#8F5600}
 .pp-day.closed{background:#efefef;color:#555}.pp-day.unknown{background:#F3F0E6;color:#6B5B2A}
-.pp-link,.pp-add{min-height:36px;display:inline-flex;align-items:center;border-radius:18px;padding:0 14px;font-size:14px}
+.pp-add{min-height:36px;display:inline-flex;align-items:center;border-radius:18px;padding:0 14px;font-size:14px}
 .pp-add{border-color:#bdb9ae;color:var(--ink)}
 .pp-head .fav{width:44px;height:44px}
 /* detail pane in sheet */
@@ -962,7 +963,7 @@ ul.lst li .addr{min-height:44px;border-radius:22px}
 #pane-d .pp-name{font-size:20px;line-height:1.35;margin:8px 0}
 #pane-d .dcard{font-size:15px;line-height:1.65}
 #pane-d .pp-acts{gap:8px;margin-top:12px}
-#pane-d .pp-link,#pane-d .pp-add{min-height:44px;border-radius:22px;padding:0 18px;font-size:15px}
+#pane-d .pp-add{min-height:44px;border-radius:22px;padding:0 18px;font-size:15px}
 #pane-d .pp-rule,#pane-d .pp-src{font-size:13px}
 /* breathing zoom */
 path.mk{transition:opacity .25s ease}
@@ -1219,7 +1220,6 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   .wc-name{flex:1;min-width:0;display:flex;align-items:baseline;gap:3px;font-size:17px;font-weight:700;line-height:1.35;color:inherit;text-decoration:none}
   .wc-nt{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #wcard[data-state="full"] .wc-nt{white-space:normal}
-  .wc-ext{flex:none;font-size:12px;font-weight:400;color:var(--mute)}
   .wc-day{display:flex;align-items:center;gap:8px;margin:2px 0 10px;font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums}
   .wc-day .st{margin:0;font-size:13px;line-height:24px;padding:0 10px;border-radius:12px;font-weight:600}
   .wc-alert{list-style:none;margin:-2px 0 10px;padding:6px 10px;border:1px solid #EBDDB5;border-radius:8px;background:#FBF4E2;color:#5a4410;font-size:13px;line-height:1.5}
@@ -1242,6 +1242,8 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   .wc-det>div{margin:0 0 4px}
   .wc-det span{color:var(--mute)}
   .wc-det .pp-etq{color:#8F5600}
+  .wc-det .pp-off{margin:0}
+  .wc-det .pp-off a{display:inline-flex;align-items:center;min-height:44px;font-size:14px}
   .wc-more .pp-rule,.wc-more .pp-src{font-size:13px}
   #wcard:before{content:"";flex:none;height:5px;background:var(--ac,transparent)}
   .wc-area{flex:none;font-size:12px;line-height:20px;padding:0 8px;border-radius:10px;font-weight:600}
@@ -1886,6 +1888,21 @@ function isWinterDay(dateStr){ const [, m, d] = dateStr.split("-").map(Number); 
 const isWinterWork = d => d.冬季線 === "是" || d.冬季 === "冬季開放";
 const isOffSeason = dateStr => dateStr < "2026-04-25" || dateStr > "2026-11-08";
 /* RULES-END */
+/* 開 Google 地圖：類型不是戶外或只能看外觀，且設置地點在 data/gmaps_venues.json 裡，就用表內的地標名稱；其餘一律用座標。官方場所原文多是門牌地址，不拿來搜尋。匯出 My Maps 不走這裡 */
+const llq = (lat, lng) => `${(+lat).toFixed(6)},${(+lng).toFixed(6)}`;
+const GM_VENUES = {"越後妻有里山現代美術館 MonET": "越後妻有里山現代美術館 MonET", "越後妻成里山現代美術館 MonET": "越後妻有里山現代美術館 MonET", "明石の湯エントランス": "明石の湯 十日町", "市街地/產業發信館": "十日町市産業文化発信館 いこて", "越後妻有文化ホール 段十ろう": "越後妻有文化ホール 段十ろう", "うぶすなの家": "うぶすなの家", "絵本と木の実の美術館": "鉢&田島征三 絵本と木の実の美術館", "ナカゴ": "光の館", "ナカゴ/キャンプ場導線": "節黒城跡キャンプ場", "清津倉庫美術館": "清津倉庫美術館 SoKo", "清津峡トンネル": "清津峡渓谷トンネル", "まつだい「農舞台」": "まつだい農舞台", "まつだい郷土資料館": "まつだい郷土資料館", "松代城": "松代城 十日町", "奴奈川キャンパス": "奴奈川キャンパス", "脱皮する家": "脱皮する家", "越後松之山 「森の学校」キョロロ": "森の学校 キョロロ", "最後の教室": "最後の教室 十日町", "湯本": "夢の家 松之山", "オーストラリア・ハウス": "オーストラリア・ハウス", "三省ハウス": "三省ハウス", "上郷クローブ座": "上郷クローブ座", "香港ハウス": "香港ハウス 津南", "かたくりの宿": "かたくりの宿", "アケヤマ －秋山郷立大赤沢小学校－": "アケヤマ 秋山郷立大赤沢小学校"};
+const GM_OUTSIDE = new Set(["戶外", "只能看外觀"]);
+function gmPlace(d){
+  if (GM_OUTSIDE.has(d.類型)) return "";
+  return Object.prototype.hasOwnProperty.call(GM_VENUES, d.設置地點) ? GM_VENUES[d.設置地點] : "";
+}
+function gmQuery(d){
+  const p = gmPlace(d); if (p) return p;
+  const ll = d.ll || [d.緯度, d.經度];
+  return ll[0] === "" || ll[0] == null || ll[1] === "" || ll[1] == null ? "" : llq(ll[0], ll[1]);
+}
+const gmUrl = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+const gmLink = (q, cls) => `<a class="${cls}" href="${esc(gmUrl(q))}" target="_blank" rel="noopener">在 Google 地圖開啟</a>`;
 /* 手機浮動卡：從開放時間挑出所選月份的時段。格式看不懂、或同時有好幾段都可能，就回傳 null，不猜 */
 const HM = "\\d{1,2}:\\d{2}";
 const inMonths = (m, a, b) => a <= b ? m >= a && m <= b : m >= a || m <= b;
@@ -2065,9 +2082,7 @@ function kindOf(d){
 }
 const KIND_TXT = {museum:"室內場館", outdoor:"戶外作品", onsen:"溫泉", station:"車站作品"};
 /* ===== popups and markers ===== */
-const llq = (lat, lng) => `${(+lat).toFixed(6)},${(+lng).toFixed(6)}`;
-const gmUrl = (lat, lng) => "https://www.google.com/maps/search/?api=1&query=" + llq(lat, lng);
-const gmLink = (lat, lng, cls) => `<a class="${cls}" href="${gmUrl(lat, lng)}" target="_blank" rel="noopener">在 Google 地圖開啟</a>`;
+const officialLink = d => `<div class="pp-off"><a href="${esc(d.官網連結)}" target="_blank" rel="noopener">官網作品頁 ↗</a></div>`;
 function popupHtml(d){
   const di = d._day || {state:"unknown", tags:[]};
   const title = d.中文名 ? `${esc(d.中文名)}<div class="pp-ja" lang="ja">${esc(d.作品名稱)}</div>` : `<span lang="ja">${esc(d.作品名稱)}</span>`;
@@ -2085,10 +2100,10 @@ function popupHtml(d){
   if (d._rule && d._rule.stayIn) h += `<div class="pp-note">館內僅限住宿者，外觀可自由觀看</div>`;
   else if (d._rule && d._rule.stay) h += `<div class="pp-note">僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀</div>`;
   if (d.座標來源 === "同場館推定") h += `<div class="pp-note">位置依同場館推定，現場請再確認</div>`;
+  if (d.官網連結) h += officialLink(d);
   h += `<div class="pp-acts">`;
-  if (d.官網連結) h += `<a class="pp-link" href="${esc(d.官網連結)}" target="_blank" rel="noopener">官網作品頁</a>`;
   if (d.marker) h += `<button class="pp-add" data-addroute="${esc(d.作品編號)}">＋加入路線</button>`;
-  if (d.ll) h += gmLink(d.ll[0], d.ll[1], "pp-add pp-gm");
+  if (d.ll) h += gmLink(gmQuery(d), "pp-add pp-gm");
   h += `</div>`;
   h += transitHtml(d);
   h += nearbyHtml(d);
@@ -2641,7 +2656,7 @@ function renderRouteList(pending){
       (parkNote ? `<span class="muted">${esc(parkNote)}</span>` : "") +
       (s.stay_min != null || s.tip ? `<span class="sfan">${s.stay_min != null ? `停留約 ${esc(s.stay_min)} 分` : ""}${s.stay_min != null && s.tip ? "，" : ""}${s.tip ? esc(s.tip) : ""}</span>` : "") +
       (fanX.length ? `<details class="sdet"><summary>排程細節</summary>${fanX.map(([k, t]) => `<div><b>${t}</b>：${esc(s[k])}</div>`).join("")}</details>` : "") +
-      (ll ? gmLink(ll[0], ll[1], "sgm") : "") + `</span>` +
+      (ll ? gmLink(stopQuery(s), "sgm") : "") + `</span>` +
       `<span class="ud"><button data-up="${i}" title="往上" aria-label="第 ${vi} 站往上移">↑</button><button data-down="${i}" title="往下" aria-label="第 ${vi} 站往下移">↓</button><button data-del="${i}" title="移除" aria-label="移除第 ${vi} 站">✕</button></span>`;
     li.onclick = e => { if (e.target.closest("button,a,details")) return; if (s.c && BY[s.c]) zoomTo(BY[s.c]); else if (ok) map.setView(stopLL(s), 14); };
     ul.appendChild(li);
@@ -2809,20 +2824,25 @@ function openQr(preset){
   refreshOpenQr = () => { if ($("qrm") && $("qrm").isConnected) show(); };
   if (qrBefore) qrBefore(body, show, closeQr); else show();
 }
-function gmapsUrls(){
-  const st = validStops(route.stops); if (st.length < 2) return [];
-  const pts = st.map(s => stopLL(s).map(x => (+x).toFixed(6)).join(","));
-  const out = [], MAXP = 10; // 每段最多 10 站：起點＋8 個中途點＋終點
+const stopQuery = s => s.c ? gmQuery(BY[s.c]) : llq(s.lat, s.lng);
+/* 導航網址：起點、中途點、終點都走 gmQuery，室內作品帶場所名稱。每段最多 10 站：起點＋8 個中途點＋終點 */
+function gmDirUrls(stops, mode){
+  const pts = stops.map(stopQuery);
+  const out = [], MAXP = 10;
   for (let i = 0; i < pts.length - 1; i += MAXP - 1){
     const seg = pts.slice(i, i + MAXP);
     if (seg.length < 2) break;
     const u = new URL("https://www.google.com/maps/dir/");
     u.searchParams.set("api", "1"); u.searchParams.set("origin", seg[0]); u.searchParams.set("destination", seg[seg.length - 1]);
     if (seg.length > 2) u.searchParams.set("waypoints", seg.slice(1, -1).join("|"));
-    u.searchParams.set("travelmode", route.mode === "walk" ? "walking" : "driving");
+    u.searchParams.set("travelmode", mode === "walk" ? "walking" : "driving");
     out.push({url:u.toString(), from:i + 1, to:i + seg.length});
   }
   return out;
+}
+function gmapsUrls(){
+  const st = validStops(route.stops); if (st.length < 2) return [];
+  return gmDirUrls(st, route.mode);
 }
 /* ===== KML 匯出（Google My Maps） ===== */
 const xesc = s => String(s == null ? "" : s).replace(/[<>&'"]/g, c => ({"<":"&lt;",">":"&gt;","&":"&amp;","'":"&apos;","\"":"&quot;"}[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
@@ -3469,14 +3489,13 @@ let cardCheckin = d => "";
 let cardExtra = d => ({detail:"", body:""});
 function workCardHtml(d){
   const c = d.作品編號, day = curDay(), di = d._day || dayInfo(d, day), nm = d.中文名 || d.作品名稱, sv = isSaved(c), ja = d.中文名 ? "" : ' lang="ja"';
-  const title = d.官網連結 ? `<a class="wc-name" href="${esc(d.官網連結)}" target="_blank" rel="noopener" aria-label="${esc(nm)}，官網作品頁"><span class="wc-nt"${ja}>${esc(nm)}</span><span class="wc-ext" aria-hidden="true">↗</span></a>`
-    : `<b class="wc-name"><span class="wc-nt"${ja}>${esc(nm)}</span></b>`;
+  const title = `<b class="wc-name"><span class="wc-nt"${ja}>${esc(nm)}</span></b>`;
   const alerts = di.tags.concat(noteHits(d, day));
   const acts = cardCheckin(d) +
     `<button type="button" class="wc-btn${sv ? " on" : ""}" data-fav="${esc(c)}" aria-pressed="${sv}" aria-label="${sv ? "從清單移除" : "加入清單"}"><span aria-hidden="true">${sv ? "★" : "☆"}</span>想去</button>` +
     (!d.marker ? "" : inRoute(c) ? `<button type="button" class="wc-btn wc-route" disabled aria-label="已在路線"><span aria-hidden="true">✓</span>路線</button>`
       : `<button type="button" class="wc-btn wc-route" data-addroute="${esc(c)}" aria-label="加入路線"><span aria-hidden="true">＋</span>路線</button>`) +
-    (d.ll ? `<a class="wc-btn" href="${gmUrl(d.ll[0], d.ll[1])}" target="_blank" rel="noopener" aria-label="在 Google 地圖開啟"><span aria-hidden="true">📍</span>地圖</a>` : "");
+    (d.ll ? `<a class="wc-btn" href="${esc(gmUrl(gmQuery(d)))}" target="_blank" rel="noopener" aria-label="在 Google 地圖開啟"><span aria-hidden="true">📍</span>地圖</a>` : "");
   const hrs = di.state === "open" ? dayHours(d, day) : null, last = lastEntry(d, hrs);
   const who = [d.藝術家, d.設置地點].filter(Boolean).map(esc).join("｜");
   const ex = cardExtra(d);
@@ -3491,7 +3510,8 @@ function workCardHtml(d){
     (di.state === "open" ? `<div class="wc-hours">這天開放${hrs ? " " + esc(hrs) : ""}${last ? `<span class="wc-last">｜最後入場 ${esc(last)}</span>` : ""}</div>` : "") + notes + ex.body + photoHtml(d) +
     `<details class="wc-det"><summary>詳細資訊</summary>${rows.map(([k, t]) => `<div><span>${k}：</span>${esc(t)}</div>`).join("")}${ex.detail}` +
     (d.類型 === "戶外" ? `<div class="pp-etq">${ETIQUETTE}</div>` : "") +
-    (d.資料來源 ? `<a class="pp-src" href="${SRC_URL}" target="_blank" rel="noopener" title="${esc(d.資料來源)}">開放資訊來源</a>` : "") + `</details>` +
+    (d.資料來源 ? `<a class="pp-src" href="${SRC_URL}" target="_blank" rel="noopener" title="${esc(d.資料來源)}">開放資訊來源</a>` : "") +
+    (d.官網連結 ? officialLink(d) : "") + `</details>` +
     transitHtml(d) + nearbyCardHtml(d) + `</div>`;
 }
 var wcard = null;
@@ -4084,7 +4104,7 @@ function openHashTrip(){
 }
 function bootTrips(){
   const pr = $("pane-r");
-  if (pr && !$("fanday")) pr.insertAdjacentHTML("afterbegin", `<div class="fanbox fday" id="fanday" role="status"></div><div class="fanbox ftv" id="fantripview" hidden aria-label="分享的行程"></div><div class="fanbox" id="fantrip"></div><div class="box ftrips" id="fantrips" hidden></div><div class="fan-mnote" id="route-mnote">寬螢幕可以編輯多日行程。手機可以切換天數、看這一天的路線。</div>`);
+  if (pr && !$("fanday")) pr.insertAdjacentHTML("afterbegin", `<div class="fanbox fday" id="fanday" role="status"></div><div class="fanbox ftv" id="fantripview" hidden aria-label="分享的行程"></div><div class="fanbox" id="fantrip"></div><div class="box ftrips" id="fantrips" hidden></div><div class="fan-mnote" id="route-mnote">新增作品請用電腦；手機可刪除、調順序、改名</div>`);
   migrateTrips(); openHashTrip(); renderTripBox();
 }
 bootTrips();
