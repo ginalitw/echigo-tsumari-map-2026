@@ -1039,10 +1039,10 @@ a{color:inherit}
 /* 說明卡（第一次使用） */
 #mhelp{height:40px;padding:0 12px;border:none;border-radius:10px;background:rgba(255,255,255,.96);box-shadow:0 1px 2px rgba(0,0,0,.1),0 4px 14px rgba(0,0,0,.1);font:inherit;font-size:14px;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 #mhelp .mh-q{width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;font-size:12px;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
-/* 傳到手機：寬 768px 以上（電腦、平板）才顯示；QR 視窗 */
-@media (max-width:767.98px){#rqr{display:none!important}}
+/* 存進富搖小幫手：寬螢幕彈 QR，手機直接開同一個網址。按鈕兩種寬度都顯示。 */
+.qrm-acts a.qrm-copy{display:flex;text-decoration:none}
 .qrm{position:fixed;inset:0;z-index:3100;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(29,29,27,.45)}
-.qrm-box{position:relative;width:100%;max-width:320px;box-sizing:border-box;padding:20px 24px 18px;background:#fff;border-radius:14px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.qrm-box{position:relative;width:100%;max-width:420px;max-height:min(640px,calc(100vh - 32px));overflow-y:auto;box-sizing:border-box;padding:20px 24px 18px;background:#fff;border-radius:14px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .qrm-t{font-weight:700;font-size:16px;margin:0 0 12px}
 .qrm-x{position:absolute;top:6px;right:6px;width:40px;height:40px;border:0;border-radius:8px;background:none;font-size:24px;line-height:1;color:var(--mute);cursor:pointer}
 .qrm-x:hover,.qrm-x:focus-visible{background:var(--wash)}
@@ -1053,7 +1053,7 @@ a{color:inherit}
 .qrm-url{width:100%;box-sizing:border-box;padding:6px 8px;font-size:12px;border:1px solid var(--line);border-radius:8px}
 .qrm-link{display:flex;gap:6px;margin-top:10px}
 .qrm-link .qrm-url{flex:1;min-width:0}
-.qrm-ask{margin:0 0 12px;font-size:14px;line-height:1.6;text-align:left}
+.qrm-ask{margin:0 0 12px;font-size:14px;line-height:1.6;text-align:center}
 .qrm-acts{display:flex;flex-direction:column;gap:6px}
 .qrm-acts button{min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:14px;cursor:pointer}
 .qrm-acts button.pri{background:#1d1d1b;border-color:#1d1d1b;color:#fff}
@@ -1175,6 +1175,26 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 .about h2{font-size:14px;margin:0 0 4px;color:var(--ink);font-weight:600}
 .about p{margin:0 0 6px}
 .about a{color:var(--ink)}
+/* 多日行程：公開版與飯團版共用。蓋章、實踩路線不在這裡。 */
+.fanbox{background:#f7f6f2;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:13px;line-height:1.55}
+.fan-mnote{font-size:12.5px;color:#5c5a55;background:#f1efe9;border-radius:8px;padding:6px 10px;margin-bottom:10px;line-height:1.5}
+#fantrip:empty{display:none}
+.fthead{display:flex;gap:8px;align-items:center}
+.fthead input{flex:1;font:inherit;min-height:34px;padding:0 8px;border:1px solid #c9c6bd;border-radius:6px}
+.ftdays{list-style:none;margin:8px 0;padding:0}
+.ftdays li{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:5px 6px;border-radius:6px}
+.ftdays li.ed{background:#FFF6D1}
+.ftd{font-weight:700;width:48px}
+.ftn{flex:1;font-size:12.5px}
+.ftdays input{font:inherit;font-size:12.5px;min-height:32px}
+.fted{font-size:12px;font-weight:700;padding:0 8px}
+.fday{background:#fff;border:1px solid #e1ded6;border-left:3px solid #1d1d1b}
+.fdh{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline}
+.fdays{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.fdays .b{min-height:32px;padding:0 10px;font-size:12.5px}
+.fdays .b.on{background:#1d1d1b;border-color:#1d1d1b;color:#fff}
+.ftrips li.on .t{font-weight:600}
+.ftrips .fcur{font-size:12px;padding:0 6px}
 </style>
 </head>
 <body>
@@ -1487,7 +1507,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
     <div id="rkml" class="kmlbox" hidden><button id="rkmlbtn" type="button" class="kbtn">匯出到 Google My Maps</button><div class="muted knote">匯入需用電腦：Google My Maps → 建立新地圖 → 匯入 → 選這個檔案。之後在手機 Google 地圖的『已儲存 › 地圖』就看得到這些圖釘。</div></div>
     <div class="btns redit-only" style="margin-top:6px"><button id="raddfav">加入清單全部作品</button><button id="rsel">路線作品加進清單</button></div>
     <div class="btns redit-only" style="margin-top:6px"><select id="rplace" class="b" aria-label="選擇車站"><option>十日町站</option><option>越後湯澤站</option><option>まつだい站</option><option>津南站</option></select><button id="raddplace">加入車站</button></div>
-    <div class="btns" style="margin-top:6px"><button id="rsave" class="redit-only">儲存路線</button><button id="rfit">看整條路線</button><button id="rshare" type="button">複製分享連結</button><button id="rqr" type="button" aria-haspopup="dialog">傳到手機</button></div>
+    <div class="btns" style="margin-top:6px"><button id="rsave" class="redit-only">儲存路線</button><button id="rfit">看整條路線</button><button id="rshare" type="button">複製分享連結</button><button id="rqr" type="button" aria-haspopup="dialog">存進富搖小幫手</button></div>
     <div id="rmsg" class="okmsg"></div>
     <div class="box redit-only"><b>已儲存的路線</b><ul class="lst" id="rsaved"></ul></div>
     <div class="muted redit-only" style="margin-top:6px">可拖曳或用 ↑ ↓ 調整順序，或按「自動排順序」（起點不動）。路線時間由 OSRM 免費路線服務估算；開車或步行連不上時改用直線估算並註明。</div>
@@ -1505,10 +1525,97 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 //# sourceMappingURL=leaflet.js.map</script>
 <script>window.ETMAP = {style:"plain", sheet:true, presetOrder:[1,0,3,2], onPreset(){ showTab("r"); setTimeout(fitRoute, 320); }};</script>
 <script>
+/* LIFF 的 ?it= 行程參數。既有 #it= 分享連結不走這裡，格式也不改。 */
+const LIFF_MODES = ["drive", "walk", "bus", "train"];
+const LIFF_URL_LIMIT = 1500;
+/* encodeURIComponent 不會轉 ! 與 ~，這兩個是參數自己的分隔字，要另外轉成 %21、%7E。 */
+function encPart(s){
+  return encodeURIComponent(String(s)).replace(/[!'()~*]/g, c => "%" + c.charCodeAt(0).toString(16).toUpperCase());
+}
+
+function liffDateOk(s){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m) return false;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  const dt = new Date(Date.UTC(y, mo - 1, d));
+  return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
+}
+/* 站點只收作品編號、四個車站、或 @名稱@緯度,經度。名稱不含會變成 HTML 的字。 */
+function liffStopOk(token){
+  if (/^[A-Z]\d{3}$/.test(token)) return true;
+  if (/^S[0-3]$/.test(token)) return true;
+  const m = /^@([^@!~<>"'&]{1,80})@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(token);
+  if (!m) return false;
+  const lat = +m[2], lng = +m[3];
+  return lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+}
+function encodeLiffIt(trip){
+  if (!trip || !LIFF_MODES.includes(trip.mode)) return "";
+  const id = String(trip.id || "");
+  if (!/^[A-Za-z0-9_-]{1,40}$/.test(id)) return "";
+  const name = encPart(String(trip.name || "我的行程").slice(0, 40));
+  const days = [];
+  for (const d of trip.days || []){
+    if (!d || !liffDateOk(d.date)) return "";
+    const stops = [];
+    for (const s of d.stops || []){
+      const token = String(s || "");
+      if (!liffStopOk(token)) return "";
+      stops.push(encPart(token));
+    }
+    if (!stops.length) return "";
+    days.push(d.date + ":" + stops.join("~"));
+  }
+  if (!days.length) return "";
+  return "3!" + id + "!" + name + "!" + trip.mode + "!" + days.join("!");
+}
+
+function decodeLiffIt(raw){
+  const it = String(raw || "");
+  if (!it.startsWith("3!")) return null;
+  const parts = it.split("!");
+  if (parts.length < 5) return null;
+  const id = parts[1];
+  if (!/^[A-Za-z0-9_-]{1,40}$/.test(id)) return null;
+  let name;
+  try { name = decodeURIComponent(parts[2]); } catch (e) { return null; }
+  name = String(name || "").slice(0, 40) || "我的行程";
+  const mode = parts[3];
+  if (!LIFF_MODES.includes(mode)) return null;
+  const days = [];
+  for (const x of parts.slice(4)){
+    const m = /^(\d{4}-\d{2}-\d{2}):(.+)$/.exec(x);
+    if (!m || !liffDateOk(m[1])) return null;
+    const stops = [];
+    for (const piece of m[2].split("~")){
+      if (!piece) return null;
+      let token;
+      try { token = decodeURIComponent(piece); } catch (e) { return null; }
+      if (!liffStopOk(token)) return null;
+      stops.push(token);
+    }
+    if (!stops.length) return null;
+    days.push({date:m[1], stops});
+  }
+  return {id, name, mode, days};
+}
+
+function liffSaveUrl(liffId, trip){
+  const it = encodeLiffIt(trip);
+  if (!it || !liffId) return "";
+  return "https://liff.line.me/" + liffId + "/?it=" + encodeURIComponent(it);
+}
+
+function liffSaveAsk(trip){
+  const n = trip.days.length;
+  const m = trip.days.reduce((a, d) => a + d.stops.length, 0);
+  return "把『" + trip.name + "』（" + n + " 天，" + m + " 站）存進我的行程？";
+}
 /* 大地藝術祭2026 作品地圖：共用程式（plain 與 illustrated 兩版共用） */
 const FAN_ENABLED = false;        // 第 4 階段才改 true
 const LINE_ADD_FRIEND_URL = "https://lin.ee/R12Vd62";  // Bot 加好友網址。說明卡與解鎖按鈕都直接用這個，不加參數。之後若改 LIFF 只改這裡。
 const LINE_BASIC_ID = "@800dbehr";  // 電腦版 LINE 的基本 ID。公開版說明卡寬螢幕版的搜尋 ID 與〔複製 ID〕都用這個。
+const LIFF_ID = "2011920898-CrQ02DQ7";  // 存進富搖小幫手的網址。值在 data/liff.json，建置時注入。
 function isFan(){ return false; }
 function loadFanRoutes(){ return Promise.resolve([]); }
 const DEV = "";
@@ -2431,7 +2538,7 @@ function saveShared(list, r){
   list.push(copy); return {item:copy, added:true};
 }
 /* SHARESAVE-END */
-/* 傳到手機（寬螢幕才顯示）：把「複製分享連結」同一個網址做成 QR 碼；QR 程式庫第一次按才從 cdnjs 載入 */
+/* 寬螢幕 QR：公開版送 LIFF 網址，飯團版仍送既有的 # 分享連結。QR 程式庫第一次按才從 cdnjs 載入 */
 const QR_LIB = {src:"https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js", sri:"sha512-pUhApVQtLbnpLtJn6DuzDD5o2xtmLJnJ7oBoMsBnzOkVkpqofGLGPaBJ6ayD2zQe3lCgCibhJBi4cj5wAxwVKA=="};
 let qrLibP = null;
 function loadQrLib(){
@@ -2454,13 +2561,15 @@ function copyText(u, okMsg){
   const done = () => toast(okMsg || "已複製連結"), fb = () => { prompt("複製這個連結", u); };
   if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(u).then(done, fb); else fb();
 }
-function openQr(){
+function openQr(preset){
   closeQr();
   const u = shareUrl(), opener = document.activeElement;
-  if (!qrPayload(u)){ sayR("路線是空的"); return; }
+  const first = preset || qrPayload(u);
+  if (!first){ sayR("路線是空的"); return; }
   const m = document.createElement("div"); m.id = "qrm"; m.className = "qrm";
   m.innerHTML = `<div class="qrm-box" role="dialog" aria-modal="true" aria-labelledby="qrm-t" aria-describedby="qrm-cap"><button type="button" class="qrm-x" aria-label="關閉">×</button>` +
-    `<div class="qrm-t" id="qrm-t">傳到手機</div><div class="qrm-body"></div></div>`;
+    `<div class="qrm-t" id="qrm-t"></div><div class="qrm-body"></div></div>`;
+  m.querySelector(".qrm-t").textContent = first.title || "傳到手機";
   m.addEventListener("click", e => { if (e.target === m || e.target.closest(".qrm-x")) closeQr(); });
   const key = e => {
     if (e.key === "Escape"){ e.preventDefault(); e.stopImmediatePropagation(); closeQr(); return; }
@@ -2475,7 +2584,7 @@ function openQr(){
   const body = m.querySelector(".qrm-body");
   const show = () => {
     if (!m.isConnected) return;
-    const pl = qrPayload(shareUrl()); if (!pl){ closeQr(); sayR("路線是空的"); return; }
+    const pl = preset || qrPayload(shareUrl()); if (!pl){ closeQr(); sayR("路線是空的"); return; }
     m.querySelector(".qrm-t").textContent = pl.title;
     body.innerHTML = `<div class="qrm-code" aria-live="polite"><span class="muted">產生 QR 碼中…</span></div><p class="qrm-cap" id="qrm-cap"></p>` +
       (pl.copy ? `<div class="qrm-link"><input class="qrm-url" readonly aria-label="分享連結"><button type="button" class="qrm-copy">複製連結</button></div>` : "");
@@ -2490,6 +2599,12 @@ function openQr(){
     }, () => {
       if (!m.isConnected) return;
       const box = body.querySelector(".qrm-code"); body.querySelector(".qrm-cap").hidden = true;
+      if (preset){
+        box.innerHTML = `<p class="qrm-err">QR 碼載入失敗，可能離線或網路擋住。請用手機直接開啟，或複製下面的連結。</p><input class="qrm-url" readonly aria-label="連結"><button type="button" class="qrm-copy">複製連結</button>`;
+        const inp = box.querySelector(".qrm-url"); inp.value = pl.url; inp.onfocus = () => inp.select();
+        box.querySelector(".qrm-copy").onclick = () => copyText(pl.url, "已複製連結");
+        return;
+      }
       if (pl.copy){ box.innerHTML = `<p class="qrm-err">QR 碼載入失敗（可能離線或網路擋住），請改用下面的複製連結傳到手機。</p>`; return; }
       box.innerHTML = `<p class="qrm-err">QR 碼載入失敗（可能離線或網路擋住），請改用複製連結傳到手機。</p><input class="qrm-url" readonly aria-label="分享連結"><button type="button" class="qrm-copy">複製分享連結</button>`;
       const inp = box.querySelector(".qrm-url"); inp.value = pl.url; inp.onfocus = () => inp.select();
@@ -2624,7 +2739,7 @@ async function optimizeRoute(){
 }
 if ($("ropt")) $("ropt").onclick = optimizeRoute;
 if ($("rloop")) $("rloop").onchange = e => setLoop(e.target.checked);
-function setRoute(r, fit){ route = {name:r.name || "", stops:JSON.parse(JSON.stringify(r.stops || [])), mode:r.mode || "drive", url:r.url || ""}; persist(); updateRoute(fit); }
+function setRoute(r, fit){ route = {name:r.name || "", stops:JSON.parse(JSON.stringify(r.stops || [])), mode:r.mode || "drive", url:r.url || "", liffId:typeof r.liffId === "string" ? r.liffId : ""}; persist(); updateRoute(fit); }
 const ul = $("rlist");
 let dragI = null;
 ul.addEventListener("dragstart", e => { const li = e.target.closest("li.stop"); if (li){ dragI = +li.dataset.i; e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", dragI); li.classList.add("dragging"); } });
@@ -2654,7 +2769,49 @@ if ($("rkmlbtn")) $("rkmlbtn").onclick = exportRouteKml;
 if ($("lkmlbtn")) $("lkmlbtn").onclick = exportListKml;
 $("rfit").onclick = fitRoute;
 if ($("rshare")) $("rshare").onclick = copyShare;
-if ($("rqr")) $("rqr").onclick = openQr;
+function newLiffId(){ return "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function liffStopToken(s){
+  if (!okLL(stopLL(s))) return "";
+  if (!s.c && s.p && PLACES[s.p] && hav(PLACES[s.p], stopLL(s)) < 0.05) return "S" + Object.keys(PLACES).indexOf(s.p);
+  if (s.c && /^[A-Z]\d{3}$/.test(s.c)) return s.c;
+  const t = tok(s);
+  if (!t || /[~!]/.test(t)) return "";
+  return t;
+}
+function publicLiffTrip(){
+  const live = (typeof trip !== "undefined" && trip && Array.isArray(trip.days)) ? trip : null;
+  const days = [];
+  const pushDay = (date, stops) => {
+    const tokens = [];
+    for (const s of stops || []){ const token = liffStopToken(s); if (token) tokens.push(token); }
+    if (tokens.length && /^\d{4}-\d{2}-\d{2}$/.test(date || "")) days.push({date, stops:tokens});
+  };
+  if (live) live.days.forEach(d => pushDay(d && d.date, d && d.stops));
+  if (!days.length) pushDay(curDay(), route.stops);
+  if (!days.length) return null;
+  let id = live && typeof live.id === "string" ? live.id : (route.liffId || "");
+  if (!/^[A-Za-z0-9_-]{1,40}$/.test(id)){
+    id = newLiffId();
+    if (live) live.id = id; else { route.liffId = id; persist(); }
+  }
+  const modeSrc = live ? live.mode : route.mode;
+  const nameSrc = live ? live.name : route.name;
+  const mode = LIFF_MODES.includes(modeSrc) ? modeSrc : "drive";
+  const name = String(nameSrc || "我的行程").trim().slice(0, 40) || "我的行程";
+  return {id, name, mode, days};
+}
+function saveToLine(){
+  const trip = publicLiffTrip();
+  if (!trip){ sayR("路線是空的"); return; }
+  const url = liffSaveUrl(LIFF_ID, trip);
+  if (!url){ sayR("這份行程無法存進富搖小幫手"); return; }
+  if (url.length > LIFF_URL_LIMIT){ sayR("行程太長，請分成兩份存"); toast("行程太長，請分成兩份存"); return; }
+  if (window.matchMedia("(max-width:767.98px)").matches){ location.assign(url); return; }
+  openQr({url, title:"存進富搖小幫手", cap:"用手機相機掃描，行程會存進富搖小幫手的飯團專頁", copy:false, aria:"存進富搖小幫手的 QR 碼"});
+}
+let openRouteQr = () => openQr();
+if ($("rqr")) $("rqr").onclick = () => openRouteQr();
+openRouteQr = saveToLine;
 $("rsave").onclick = () => {
   let name = ($("rname").value || "").trim();
   if (!name){ name = prompt("路線名稱，例如 10/31 明石之湯日", "") || ""; name = name.trim(); }
@@ -3356,6 +3513,224 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || location.
   const sync = () => { el.hidden = navigator.onLine !== false; };
   window.addEventListener("online", sync); window.addEventListener("offline", sync); sync();
 })();
+/* 從飯團版被導回來：不在 LINE 裡打開飯團專頁 */
+(function(){
+  const q = new URLSearchParams(location.search);
+  if (q.get("fanline") !== "1") return;
+  q.delete("fanline");
+  const qs = q.toString();
+  history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+  const m = document.createElement("div"); m.className = "qrm"; m.id = "fanline";
+  m.innerHTML = `<div class="qrm-box" role="dialog" aria-modal="true" aria-labelledby="fanline-t"><button type="button" class="qrm-x" aria-label="關閉">×</button><div class="qrm-t" id="fanline-t">飯團專頁</div><p class="qrm-ask"></p><div class="qrm-acts"><a class="qrm-copy" href="${LINE_ADD_FRIEND_URL}">加入富搖小幫手</a></div></div>`;
+  m.querySelector(".qrm-ask").textContent = "飯團專頁請用手機 LINE，從富搖小幫手開啟";
+  m.addEventListener("click", e => { if (e.target === m || e.target.closest(".qrm-x")) m.remove(); });
+  document.addEventListener("keydown", function esc(e){ if (e.key !== "Escape" || !m.isConnected) return; m.remove(); document.removeEventListener("keydown", esc, true); }, true);
+  document.body.appendChild(m); m.querySelector(".qrm-x").focus();
+})();
+/* 多日行程：公開版與飯團版共用。蓋章、實踩路線、打卡圖不在這裡。
+   公開版存在 etmap_pub_*。飯團版在 bootTrips 之前把 key 改成 etmapfan2026_*。 */
+let LS_TRIPS = "etmap_pub_trips", LS_CUR = "etmap_pub_cur", LS_TRIPED = "etmap_pub_edit", LS_BAK = "etmap_pub_bak";
+let LS_TRIP = "etmap_pub_old", LS_TRIPV = "etmap_pub_oldview", LS_MODEL = "etmap_pub_model";
+let tripWide = () => !useSheet();
+let trips = [], trip = null, tripView = null, editing = null, tripLoading = false;
+const MODES = ["drive", "walk", "bus", "train"];
+const newId = () => "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const cleanTrip = t => t && Array.isArray(t.days) ? {id:typeof t.id === "string" && t.id ? t.id : newId(), name:String(t.name || "我的行程").slice(0, 40), mode:MODES.includes(t.mode) ? t.mode : "drive", ...(t.from === "shared" ? {from:"shared"} : {}), days:t.days.filter(d => d && /^\d{4}-\d{2}-\d{2}$/.test(d.date) && Array.isArray(d.stops)).map(d => ({date:d.date, stops:d.stops.filter(s => s && (s.c ? BY[s.c] : okLL(stopLL(s))))}))} : null;
+const saveTrip = () => { store(LS_TRIPS, trips); store(LS_CUR, trip ? trip.id : null); store(LS_TRIPED, trip ? editing : null); };
+const dayLbl = v => `${v.slice(5).replace("-", "/")}（${WD[new Date(v + "T00:00").getDay()]}）`;
+const cpy = x => JSON.parse(JSON.stringify(x));
+const addDays = (v, n) => { const d = new Date(v + "T00:00"); d.setDate(d.getDate() + n); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const stationStop = n => ({p:n, lat:PLACES[n][0], lng:PLACES[n][1]});
+const tripMode = m => MODES.includes(m) ? m : "drive";
+const dayRouteKey = (t, D) => routeKey({stops:D.stops, mode:t.mode});
+const tripKey = t => t.name + "|" + t.mode + "|" + t.days.map(D => D.date + ">" + dayRouteKey(t, D)).join("!");
+const baseName = n => String(n || "").replace(/\s*第 \d+ 天$/, "").trim();
+const defName = () => `我的行程 ${curDay().slice(5).replace("-", "/")}`;
+const uniqName = n => { let x = n, i = 2; while (trips.some(t => t.name === x)) x = `${n}（${i++}）`; return x; };
+const syncTV = () => { tripView = trip && trip.from === "shared" ? trip : null; };
+const tripStops = t => t.days.reduce((a, D) => a + D.stops.filter(x => okLL(stopLL(x))).length, 0);
+function findDay(r){ const k = routeKey(r); for (const t of trips){ const i = t.days.findIndex(D => dayRouteKey(t, D) === k); if (i >= 0) return [t, i]; } return null; }
+function newTrip(r, name){ const t = {id:newId(), name:uniqName(String(name || baseName(r.name) || defName()).slice(0, 40)), mode:tripMode(r.mode), days:[{date:curDay(), stops:cpy(r.stops || [])}]}; trips.push(t); return t; }
+function writeBack(){
+  if (tripLoading) return;
+  if (trip && trip.days[editing]){ trip.days[editing].stops = cpy(route.stops); trip.mode = tripMode(route.mode); saveTrip(); return; }
+  if (validStops(route.stops).length){ trip = newTrip(route); editing = 0; syncTV(); saveTrip(); toast(`已建立 1 天行程「${trip.name}」`); }
+}
+persist = (orig => () => { orig(); writeBack(); renderTripBox(); })(persist);
+function showDay(t, k, fit = true, setDate = true){
+  if (!t || !t.days[k]) return;
+  trip = t; editing = k; syncTV();
+  tripLoading = true; setRoute({name:`${t.name} 第 ${k + 1} 天`, stops:t.days[k].stops, mode:t.mode}, fit); tripLoading = false;
+  saveTrip();
+  const D = t.days[k]; if (setDate && D.date >= dayEl.min && D.date <= dayEl.max && dayEl.value !== D.date){ dayEl.value = D.date; dayEl.dispatchEvent(new Event("change", {bubbles:true})); }
+  renderTripBox(); if (typeof renderTripView === "function") renderTripView();
+}
+setRoute = (orig => (r, fit) => {
+  if (tripLoading) return orig(r, fit);
+  if (!r || !validStops(r.stops || []).length) return;
+  const hit = findDay(r); if (hit){ showDay(hit[0], hit[1], fit, false); return; }
+  const t = newTrip(r); showDay(t, 0, fit, false); toast(`已建立 1 天行程「${t.name}」`);
+})(setRoute);
+function deleteTrip(t){
+  const i = trips.indexOf(t); if (i < 0) return;
+  trips.splice(i, 1);
+  if (trip === t){ trip = null; editing = null; syncTV();
+    if (trips.length) showDay(trips[0], 0, true, false);
+    else { tripLoading = true; setRoute({name:"", stops:[], mode:route.mode}, false); tripLoading = false; } }
+  saveTrip(); renderTripBox(); if (typeof renderTripView === "function") renderTripView();
+}
+function migrateTrips(){
+  const raw = k => { try { return localStorage.getItem(k); } catch(e){ return null; } };
+  if (raw(LS_BAK) == null) store(LS_BAK, {ts:new Date().toISOString(), route:raw(LS_ROUTE), routes:raw(LS_ROUTES), trip:raw(LS_TRIP), tripview:raw(LS_TRIPV), tripedit:raw(LS_TRIPED)});
+  let list = load(LS_TRIPS, null);
+  if (!Array.isArray(list)){
+    list = [];
+    const ot = cleanTrip(load(LS_TRIP, null)); if (ot && ot.days.length) list.push(ot);
+    const ov = cleanTrip(load(LS_TRIPV, null)); if (ov && ov.days.length && !list.some(x => tripKey(x) === tripKey(ov))) list.push(Object.assign(ov, {from:"shared"}));
+  }
+  trips = list.map(cleanTrip).filter(t => t && t.days.length);
+  trip = trips.find(t => t.id === load(LS_CUR, null)) || null;
+  editing = trip ? Math.max(0, Math.min(trip.days.length - 1, +load(LS_TRIPED, 0) || 0)) : null;
+  if (validStops(route.stops).length){
+    if (!(trip && trip.days[editing] && dayRouteKey(trip, trip.days[editing]) === routeKey(route))){
+      const hit = findDay(route);
+      if (hit){ trip = hit[0]; editing = hit[1]; } else { trip = newTrip(route); editing = 0; }
+    }
+  } else if (!trip && trips.length){ trip = trips[0]; editing = 0; }
+  syncTV(); saveTrip(); store(LS_MODEL, 2);
+  if (trip && trip.days[editing] && dayRouteKey(trip, trip.days[editing]) !== routeKey(route)){ tripLoading = true; setRoute({name:`${trip.name} 第 ${editing + 1} 天`, stops:trip.days[editing].stops, mode:trip.mode}, false); tripLoading = false; }
+}
+function addDay(){
+  if (!trip){ toast("先加第一站，會自動建立行程"); return; }
+  const last = trip.days[trip.days.length - 1];
+  trip.days.push({date:last ? addDays(last.date, 1) : curDay(), stops:[]});
+  showDay(trip, trip.days.length - 1, false, true); toast(`已加第 ${trip.days.length} 天`);
+}
+function saveTripFromPlan(days){
+  if (!days.length) return;
+  const t = cleanTrip({name:`建議排法 ${days[0].date.slice(5).replace("-", "/")} 起`, mode:"drive", days});
+  const hit = trips.find(x => tripKey(x) === tripKey(t));
+  if (!hit){ t.name = uniqName(t.name); trips.push(t); }
+  showDay(hit || t, 0, true, true); showTab("r"); toast(hit ? "這份建議排法已經存過了" : `已存成 ${days.length} 天的多日行程`);
+}
+const encStop = s => { if (!s.c && s.p && PLACES[s.p] && okLL(stopLL(s)) && hav(PLACES[s.p], stopLL(s)) < 0.05) return "S" + Object.keys(PLACES).indexOf(s.p); return s.c ? s.c : encodeURIComponent(tok(s)); };
+const decStop = t => { const m = /^S(\d)$/.exec(t); if (m){ const n = Object.keys(PLACES)[+m[1]]; return n ? stationStop(n) : null; } return untok(t); };
+const MODE_CH = {drive:"d", walk:"w", bus:"b", train:"t"}, CH_MODE = {d:"drive", w:"walk", b:"bus", t:"train"};
+const MODE_LBL = {drive:"開車", walk:"步行", bus:"巴士", train:"電車"};
+function tripUrl(t){
+  const it = "2!" + (MODE_CH[t.mode] || "d") + "!" + t.days.map(d => d.date.slice(2).replace(/-/g, "") + "*" + d.stops.filter(s => okLL(stopLL(s))).map(encStop).join("~")).join("!");
+  return location.origin + location.pathname + "#it=" + it + "&in=" + encodeURIComponent(t.name);
+}
+function decodeTrip(it, name){
+  it = String(it || ""); const v2 = it.startsWith("2!");
+  const parts = it.split(v2 ? "!" : "|"); if (!["1", "2"].includes(parts[0])) return null;
+  const days = parts.slice(2).map(x => { const m = /^(\d{2})(\d{2})(\d{2})[:*](.*)$/.exec(x); if (!m) return null;
+    return {date:`20${m[1]}-${m[2]}-${m[3]}`, stops:m[4] ? m[4].split("~").map(decStop).filter(Boolean) : []}; }).filter(d => d && d.stops.length);
+  return days.length ? cleanTrip({name:name || "分享的行程", mode:CH_MODE[parts[1]] || "drive", days}) : null;
+}
+renderRouteList = (orig => pending => { orig(pending);
+  const rt = $("rheadt"); if (rt && trip && editing != null) rt.textContent = `第 ${editing + 1} 天 ${route.stops.length} 站`;
+})(renderRouteList);
+function renderDayHead(){
+  const box = $("fanday"); if (!box) return;
+  box.replaceChildren();
+  if (!trip){
+    const b = document.createElement("b"); b.textContent = "還沒有行程";
+    const d = document.createElement("div"); d.className = "muted"; d.textContent = "在「搜尋」按作品的「＋路線」加第一站，就會自動建立 1 天行程。";
+    box.append(b, d);
+  } else {
+    const h = document.createElement("div"); h.className = "fdh";
+    const b = document.createElement("b"); b.textContent = "正在看：" + trip.name + " 第 " + (editing + 1) + " 天";
+    const meta = document.createElement("span"); meta.className = "muted";
+    const mode = document.createElement("span"); mode.className = "fmode"; mode.textContent = MODE_LBL[trip.mode] || "開車";
+    meta.append(dayLbl(trip.days[editing].date) + "，", mode);
+    if (trip.from === "shared") meta.append("，收到的行程");
+    h.append(b, meta); box.append(h);
+    if (trip.days.length > 1){
+      const g = document.createElement("div"); g.className = "fdays"; g.setAttribute("role", "group"); g.setAttribute("aria-label", "切換天數");
+      trip.days.forEach((D, k) => {
+        const btn = document.createElement("button"); btn.type = "button"; btn.className = "b" + (k === editing ? " on" : "");
+        btn.dataset.tday = String(k); btn.setAttribute("aria-pressed", k === editing ? "true" : "false"); btn.textContent = "第 " + (k + 1) + " 天";
+        g.append(btn);
+      });
+      box.append(g);
+    }
+  }
+  const lb = $("fantrips"); if (!lb) return;
+  lb.hidden = !trips.length; lb.replaceChildren(); if (!trips.length) return;
+  const title = document.createElement("b"); title.textContent = "我的行程（" + trips.length + "）";
+  const ul = document.createElement("ul"); ul.className = "lst";
+  trips.forEach((t, i) => {
+    const li = document.createElement("li"); if (t === trip) li.className = "on";
+    const span = document.createElement("span"); span.className = "t"; span.textContent = t.name;
+    const mute = document.createElement("span"); mute.className = "muted";
+    mute.textContent = "，" + t.days.length + " 天，" + tripStops(t) + " 站" + (t.from === "shared" ? "，收到的" : "");
+    span.append(mute); li.append(span);
+    if (t === trip){ const cur = document.createElement("span"); cur.className = "muted fcur"; cur.textContent = "正在看"; li.append(cur); }
+    else { const see = document.createElement("button"); see.className = "rm"; see.dataset.tsel = String(i); see.textContent = "看"; li.append(see); }
+    const del = document.createElement("button"); del.className = "rm"; del.dataset.tdelt = String(i); del.textContent = "刪除"; li.append(del);
+    ul.append(li);
+  });
+  lb.append(title, ul);
+}
+function renderTripBox(){
+  renderDayHead();
+  const note = $("route-mnote"); if (note) note.hidden = tripWide();
+  const box = $("fantrip"); if (!box) return;
+  if (!tripWide() || !trip || !trip.days.length){ box.innerHTML = ""; return; }
+  const min = dayEl.min || "2026-04-25", max = dayEl.max || "2027-03-31";
+  box.innerHTML = `<div class="fthead"><b>多日行程</b></div><ol class="ftdays">` +
+    trip.days.map((D, k) => { const n = D.stops.filter(s => s.c).length, cl = D.stops.filter(s => s.c && BY[s.c] && dayInfo(BY[s.c], D.date).state === "closed").length;
+      return `<li class="${editing === k ? "ed" : ""}"><span class="ftd">第 ${k + 1} 天</span><input type="date" data-tdate="${k}" value="${D.date}" min="${min}" max="${max}" aria-label="第 ${k + 1} 天日期"><span class="ftn">${n} 件${cl ? `，<span class="warn">${cl} 件休館</span>` : ""}</span>` +
+        (editing === k ? `<span class="fted">正在看</span>` : `<button type="button" class="b" data-tday="${k}">看這天</button>`) + `<button type="button" class="b" data-tdel="${k}" aria-label="刪除第 ${k + 1} 天">刪除</button></li>`; }).join("") + `</ol>` +
+    `<div class="muted">下面路線的加入、移除、排序與交通方式會直接存進正在看的那一天，不用另外存。</div>` +
+    `<div class="btns"><button type="button" class="b" data-tadd="1">新增一天</button></div>`;
+  const nm = document.createElement("input"); nm.id = "ftname"; nm.value = trip.name; nm.maxLength = 40; nm.setAttribute("aria-label", "行程名稱");
+  box.querySelector(".fthead").appendChild(nm);
+  nm.onchange = () => { trip.name = nm.value.trim().slice(0, 40) || "我的行程"; saveTrip(); renderTripBox(); };
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-tday],[data-tdel],[data-tadd],[data-tsel],[data-tdelt],[data-tvshow],[data-tvclear]"); if (!t) return;
+  e.stopPropagation(); const ds = t.dataset;
+  if (ds.tday != null) showDay(trip, +ds.tday);
+  else if (ds.tdel != null){ const k = +ds.tdel;
+    if (trip.days.length === 1){ if (confirm(`這份行程只有 1 天，要刪除整份行程「${trip.name}」嗎？`)) deleteTrip(trip); return; }
+    if (!confirm(`刪除第 ${k + 1} 天？`)) return; trip.days.splice(k, 1); showDay(trip, Math.min(editing > k ? editing - 1 : editing, trip.days.length - 1), false, false); }
+  else if (ds.tadd) addDay();
+  else if (ds.tsel != null) showDay(trips[+ds.tsel], 0);
+  else if (ds.tdelt != null){ const x = trips[+ds.tdelt]; if (x && confirm(`刪除行程「${x.name}」？`)) deleteTrip(x); }
+  else if (ds.tvshow != null){ showDay(trip, +ds.tvshow); toast(`地圖上是第 ${+ds.tvshow + 1} 天`); }
+  else if (ds.tvclear){ if (confirm("從這台裝置移除這份行程？")) deleteTrip(trip); }
+}, true);
+document.addEventListener("change", e => { const t = e.target.closest && e.target.closest("[data-tdate]"); if (!t || !trip) return; const D = trip.days[+t.dataset.tdate]; if (D && /^\d{4}-\d{2}-\d{2}$/.test(t.value)){ D.date = t.value; saveTrip(); renderTripBox(); } });
+function openTripOnMap(t){
+  const D = t && t.days && t.days[0]; if (!D) return;
+  const inT = t.days.some(X => routeKey({stops:X.stops, mode:t.mode}) === routeKey(route));
+  if (!trip && !inT){ if (validStops(route.stops).length) saveShared(routes, route); }
+  const hit = trips.find(x => tripKey(x) === tripKey(t));
+  const T = hit || Object.assign(cpy(t), {id:newId(), from:"shared"});
+  if (!hit) trips.push(T);
+  showDay(T, 0, true, true);
+  const n = $("rnote"); if (n) n.textContent = "";
+  return !!hit;
+}
+function openHashTrip(){
+  const H2 = new URLSearchParams(location.hash.slice(1));
+  if (!H2.get("it")) return;
+  const t = decodeTrip(H2.get("it"), H2.get("in"));
+  history.replaceState(null, "", location.pathname + location.search);
+  if (!t){ setTimeout(() => toast("這個行程連結無法讀取"), 300); return; }
+  const dup = openTripOnMap(t);
+  if (typeof applyMode === "function") applyMode();
+  showTab("r");
+  setTimeout(() => toast(dup ? `行程「${t.name}」已經在這台裝置上，沒有重複存` : `已打開行程「${t.name}」，存成這台裝置上的一份行程`), 300);
+}
+function bootTrips(){
+  const pr = $("pane-r");
+  if (pr && !$("fanday")) pr.insertAdjacentHTML("afterbegin", `<div class="fanbox fday" id="fanday" role="status"></div><div class="fanbox ftv" id="fantripview" hidden aria-label="分享的行程"></div><div class="fanbox" id="fantrip"></div><div class="box ftrips" id="fantrips" hidden></div><div class="fan-mnote" id="route-mnote">寬螢幕可以編輯多日行程。手機可以切換天數、看這一天的路線。</div>`);
+  migrateTrips(); openHashTrip(); renderTripBox();
+}
+bootTrips();
 </script>
 </body>
 </html>
