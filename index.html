@@ -1549,11 +1549,22 @@ function liffStopOk(token){
   const lat = +m[2], lng = +m[3];
   return lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
 }
+/* 行程名稱：去掉控制字元，最多 30 個字。沒有名稱時用第一天的「我的行程 MM/DD」。 */
+function liffCleanName(name){
+  return [...String(name || "").replace(/[\u0000-\u001F\u007F]/g, "").trim()].slice(0, 30).join("");
+}
+function liffFallbackName(date){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date || ""));
+  return m ? "我的行程 " + m[2] + "/" + m[3] : "我的行程";
+}
+function liffTripName(name, date){
+  return liffCleanName(name) || liffFallbackName(date);
+}
 function encodeLiffIt(trip){
   if (!trip || !LIFF_MODES.includes(trip.mode)) return "";
   const id = String(trip.id || "");
   if (!/^[A-Za-z0-9_-]{1,40}$/.test(id)) return "";
-  const name = encPart(String(trip.name || "我的行程").slice(0, 40));
+  const name = encPart(liffTripName(trip.name, trip.days && trip.days[0] && trip.days[0].date));
   const days = [];
   for (const d of trip.days || []){
     if (!d || !liffDateOk(d.date)) return "";
@@ -1577,9 +1588,8 @@ function decodeLiffIt(raw){
   if (parts.length < 5) return null;
   const id = parts[1];
   if (!/^[A-Za-z0-9_-]{1,40}$/.test(id)) return null;
-  let name;
-  try { name = decodeURIComponent(parts[2]); } catch (e) { return null; }
-  name = String(name || "").slice(0, 40) || "我的行程";
+  let rawName;
+  try { rawName = decodeURIComponent(parts[2]); } catch (e) { return null; }
   const mode = parts[3];
   if (!LIFF_MODES.includes(mode)) return null;
   const days = [];
@@ -1597,6 +1607,8 @@ function decodeLiffIt(raw){
     if (!stops.length) return null;
     days.push({date:m[1], stops});
   }
+  if (!days.length) return null;
+  const name = liffCleanName(rawName) || liffFallbackName(days[0].date);
   return {id, name, mode, days};
 }
 
@@ -1650,7 +1662,16 @@ const AREA_REPS = {
 const COLORS = {"十日町":"#E4572E","川西":"#2E86AB","中里":"#3BB273","松代":"#7768AE","松之山":"#D81E5B","津南":"#F18F01","廣域":"#8D6E63"};
 const ORDER = ["十日町","川西","中里","松代","松之山","津南","廣域"];
 const LS_KEY = "etmap2026_saved", LS_ROUTE = "etmap2026_route", LS_ROUTES = "etmap2026_routes";
-const PLACES = {"越後湯澤站":[36.93567,138.80909],"十日町站":[37.13482,138.75683],"まつだい站":[37.13221,138.61373],"津南站":[37.02324,138.63929]};
+/* 起點清單。kind: station 車站、rental 租借處。租借處座標待補，先不放進 PLACES，選單也不出現。 */
+const START_POINTS = [
+  {name:"越後湯澤站", kind:"station", ll:[36.93567,138.80909]},
+  {name:"十日町站", kind:"station", ll:[37.13482,138.75683]},
+  {name:"まつだい站", kind:"station", ll:[37.13221,138.61373]},
+  {name:"津南站", kind:"station", ll:[37.02324,138.63929]},
+  {name:"", kind:"rental", ll:null}, // TODO: 租借處名稱與座標待 Gina 提供，本版不開放選取
+];
+const PLACES = {};
+START_POINTS.forEach(p => { if (p.kind === "station" && p.ll) PLACES[p.name] = p.ll; });
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 const $ = id => document.getElementById(id);
 const BY = {}; DATA.forEach(d => BY[d.作品編號] = d);
@@ -2317,11 +2338,23 @@ function hav(a, b){ const R = 6371, r = x => x * Math.PI / 180, dp = r(b[0] - a[
   return 2 * R * Math.asin(Math.sqrt(Math.sin(dp / 2) ** 2 + Math.cos(r(a[0])) * Math.cos(r(b[0])) * Math.sin(dl / 2) ** 2)); }
 const fmtMin = m => m >= 60 ? `${Math.floor(m / 60)} 小時 ${Math.round(m % 60)} 分` : `${Math.round(m)} 分`;
 const fmtKm = k => k < 1 ? `${Math.round(k * 1000)} 公尺` : `${k.toFixed(1)} 公里`;
+/* 交通方式設定。speed 公里／小時，factor 直線改路網的倍數，loop 必須繞回起點，maxKm 單日總距離上限。
+   電動自行車必須繞回起點；速度與續航留空，等 Gina 提供。open:false 不放進選單。 */
+const TRAVEL_MODES = {
+  drive: {label:"開車", speed:35, factor:1.4, loop:false, maxKm:null, open:true},
+  walk: {label:"步行", speed:4.5, factor:1.3, loop:false, maxKm:null, open:true},
+  bus: {label:"巴士", speed:null, factor:null, loop:false, maxKm:null, open:true, timetable:true},
+  train: {label:"電車", speed:null, factor:null, loop:false, maxKm:null, open:true, timetable:true},
+  ebike: {label:"電動自行車", speed:null, /* TODO: 等 Gina 提供時速 */ factor:null, loop:true, maxKm:null, /* TODO: 等 Gina 提供續航公里 */ open:false, rangeWarn:"可能超過電池續航"},
+};
 const routeCache = {};
 let routeInfo = null, routeAlt = null, routeSeq = 0;
 function estimate(pts, mode){
-  const f = mode === "walk" ? [1.3, 4.5] : [1.4, 35];
-  return {src:"est", geom:null, legs: pts.slice(1).map((p, i) => { const km = hav(pts[i], p) * f[0]; return {km, min: km / f[1] * 60}; })};
+  const cfg = TRAVEL_MODES[mode] || TRAVEL_MODES.drive;
+  const factor = cfg.factor || (mode === "walk" ? 1.3 : 1.4);
+  const speed = cfg.speed || (mode === "walk" ? 4.5 : 35);
+  if (mode === "ebike" && cfg.speed == null) return {src:"est", geom:null, legs: pts.slice(1).map((p, i) => ({km: hav(pts[i], p) * (cfg.factor || 1.3), min:null}))};
+  return {src:"est", geom:null, legs: pts.slice(1).map((p, i) => { const km = hav(pts[i], p) * factor; return {km, min: km / speed * 60}; })};
 }
 /* 步行：OSRM 步行路線（routing.openstreetmap.de）；連不上（例如離線）就用直線距離乘 1.3、時速 4.5 公里粗估，並標「直線估算」 */
 /* 同一棟建物（相距 60 公尺內）的連續站點視為同一點，避免路網把館內作品繞到建物兩側 */
@@ -2392,27 +2425,41 @@ async function updateRoute(fit){
   if (seq !== routeSeq) return;
   routeInfo = info;
   drawRoute(); renderRouteList(); if (typeof zoomUpdate === "function") zoomUpdate();
-  /* 每段另外算另一種方式的時間（開車路線補步行、步行路線補開車），連不上就用直線估算並標示 */
-  if (!TT(route.mode)){
-    const pts = st.map(stopLL);
-    let alt = route.mode === "walk" ? await computeRoute(pts, "drive") : await walkRoute(pts);
-    if (!alt || alt.src === "none") alt = estimate(pts, route.mode === "walk" ? "drive" : "walk");
-    if (seq !== routeSeq) return;
-    routeAlt = alt; renderRouteList();
-  }
 }
-/* 每段文字：開車與步行分鐘數；估算的部分標「直線估算」 */
+/* 每段只顯示目前選的交通方式。估算的部分標「直線估算」。停車場步行不放在這裡。 */
+function legLine(mode, leg, est, samePlace){
+  if (samePlace) return "↓ 同一場館";
+  if (!leg) return "";
+  const cfg = TRAVEL_MODES[mode] || TRAVEL_MODES.drive;
+  const how = cfg.label || "開車";
+  const time = leg.min == null ? "" : `${how} ${leg.min > 180 && mode === "walk" ? "3 小時以上" : fmtMin(leg.min)}${est ? "（直線估算）" : ""}`;
+  return `↓ ${time || "計算中"}${leg.km != null ? `，${fmtKm(leg.km)}` : ""}`;
+}
 function legText(i){
-  const P = routeInfo, A = routeAlt, p = P && P.legs[i], a = A && A.legs[i];
+  const P = routeInfo, p = P && P.legs[i];
   if (!p) return "";
   const vs = validStops(route.stops), s0 = vs[i] && stopLL(vs[i]), s1 = vs[i + 1] && stopLL(vs[i + 1]);
-  if (s0 && s1 && hav(s0, s1) < 0.06) return "↓ 同一場館";
-  const walk = route.mode === "walk" ? {l:p, est:P.src === "est"} : (a ? {l:a, est:A.src === "est"} : null);
-  const drive = route.mode === "walk" ? (a ? {l:a, est:A.src === "est"} : null) : {l:p, est:P.src === "est"};
-  const f = (x, how) => !x || x.l.min == null ? "" : `${how} ${x.l.min > 180 && how === "步行" ? "3 小時以上" : fmtMin(x.l.min)}${x.est ? "（直線估算）" : ""}`;
-  const parts = route.mode === "walk" ? [f(walk, "步行"), f(drive, "開車")] : [f(drive, "開車"), f(walk, "步行")];
-  const km = p.km != null ? p.km : (a && a.km);
-  return `↓ ${parts.filter(Boolean).join("・") || "計算中"}${km != null ? `，${fmtKm(km)}` : ""}`;
+  return legLine(route.mode, p, !!(P && P.src === "est"), !!(s0 && s1 && hav(s0, s1) < 0.06));
+}
+function stayMinOf(stops){
+  return (stops || []).reduce((a, s) => a + (s && isFinite(+s.stay_min) ? +s.stay_min : 0), 0);
+}
+function routeClock(legs, stops){
+  const travel = (legs || []).reduce((a, l) => a + (l && isFinite(+l.min) ? +l.min : 0), 0);
+  const stay = stayMinOf(stops);
+  return {travel, stay, total: travel + stay};
+}
+/* 作品若有「停車場步行」（分鐘），只寫在該站備註，不計入站間移動，也不計入總時間 */
+function parkWalkLabel(code){
+  const d = code && BY[code];
+  const n = d && +d.停車場步行;
+  if (!isFinite(n) || n <= 0) return "";
+  return `停車場步行約 ${Math.round(n)} 分`;
+}
+function batteryWarn(mode, km){
+  const cfg = TRAVEL_MODES[mode];
+  if (!cfg || cfg.maxKm == null || !(+km > +cfg.maxKm)) return "";
+  return cfg.rangeWarn || "可能超過電池續航";
 }
 function fitRoute(){
   const st = validStops(route.stops); if (!st.length) return;
@@ -2438,7 +2485,7 @@ function renderRouteList(pending){
   st.forEach((s, i) => {
     const ok = !!stopLL(s);
     if (TT(route.mode)){ /* official timetable, no leg estimates */ }
-    else if (ok && vi > 0 && routeInfo && (routeInfo.src !== "none" || routeAlt) && routeInfo.legs[vi - 1]){
+    else if (ok && vi > 0 && routeInfo && routeInfo.src !== "none" && routeInfo.legs[vi - 1]){
       const leg = document.createElement("li"); leg.className = "leg";
       leg.textContent = legText(vi - 1);
       ul.appendChild(leg);
@@ -2448,8 +2495,10 @@ function renderRouteList(pending){
     li.className = "stop"; li.draggable = !useSheet() || document.body.classList.contains("redit-on"); li.dataset.i = i;
     const ll = ok && okLL(stopLL(s)) ? stopLL(s) : null;
     const fanX = [["lunch", "午餐"], ["parking", "停車"], ["toilet", "廁所"], ["photo", "拍照"], ["warn", "注意"]].filter(([k]) => s[k]);
+    const parkNote = s.c ? parkWalkLabel(s.c) : "";
     /* 站名後面不再接狀態字：狀態只放在下一行的標籤（stopStatus），避免「光之館開放」黏在一起又重複 */
     li.innerHTML = `<span class="no">${ok ? ++vi : "?"}</span><span class="t">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${s.c && BY[s.c] && BY[s.c].中文名 && BY[s.c].中文名 !== BY[s.c].作品名稱 ? `<span class="tja" lang="ja">${esc(BY[s.c].作品名稱)}</span>` : ""}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}${s.c ? ` <code>${esc(s.c)}</code>` : ""}<br>${stopStatus(s)}` +
+      (parkNote ? `<span class="muted">${esc(parkNote)}</span>` : "") +
       (s.stay_min != null || s.tip ? `<span class="sfan">${s.stay_min != null ? `停留約 ${esc(s.stay_min)} 分` : ""}${s.stay_min != null && s.tip ? "，" : ""}${s.tip ? esc(s.tip) : ""}</span>` : "") +
       (fanX.length ? `<details class="sdet"><summary>排程細節</summary>${fanX.map(([k, t]) => `<div><b>${t}</b>：${esc(s[k])}</div>`).join("")}</details>` : "") +
       (ll ? gmLink(ll[0], ll[1], "sgm") : "") + `</span>` +
@@ -2473,10 +2522,13 @@ function renderRouteList(pending){
       (closed ? `<br><span class="warn">有 ${closed} 站在 ${curDay().replace(/-/g, "/")} 休館</span>` : "") + (unk ? `<br><span class="muted">${unk} 站尚未公布開放資訊</span>` : "") + (nstay ? `<br><span class="warn">${nstay} 站僅限住宿者</span>` : "") + (nview ? `<br><span class="muted">${nview} 站定休日可觀看</span>` : "") + (nwin ? `<br><span class="muted">${nwin} 站冬季開放，日期與時間以官方公告為準</span>` : "");
   }
   else {
-    const T = routeInfo.legs.reduce((a, l) => a + l.min, 0), K = routeInfo.legs.reduce((a, l) => a + l.km, 0);
-    const how = route.mode === "walk" ? "步行" : "開車";
+    const K = routeInfo.legs.reduce((a, l) => a + l.km, 0);
+    const clock = routeClock(routeInfo.legs, st);
+    const how = (TRAVEL_MODES[route.mode] && TRAVEL_MODES[route.mode].label) || (route.mode === "walk" ? "步行" : "開車");
     const src = routeInfo.src === "osrm" ? "OSRM 路線估算" : routeInfo.src === "osrm-foot" ? "OSRM 步行路線估算" : (route.mode === "walk" ? "步行路線服務暫時連不上，改用直線距離乘 1.3、時速 4.5 公里粗估" : "路線服務暫時連不上，改用直線距離乘 1.4、時速 35 公里估算");
-    sum.innerHTML = `<b>共 ${n} 站，${how}約 ${fmtMin(T)}，${fmtKm(K)}</b><br><span class="muted">${src}，未含停留時間。${route.mode === "walk" ? "" : "時間以開車計算，不自駕請另查巴士。"}</span>` +
+    const warn = batteryWarn(route.mode, K);
+    sum.innerHTML = `<b>共 ${n} 站，${how}約 ${fmtMin(clock.travel)}${clock.stay ? `，停留約 ${fmtMin(clock.stay)}` : ""}，總時間約 ${fmtMin(clock.total)}，${fmtKm(K)}</b><br><span class="muted">${src}。總時間是移動時間加上各站停留。</span>` +
+      (warn ? `<br><span class="warn">${esc(warn)}</span>` : "") +
       (closed ? `<br><span class="warn">有 ${closed} 站在 ${curDay().replace(/-/g, "/")} 休館</span>` : "") + (unk ? `<br><span class="muted">${unk} 站尚未公布開放資訊</span>` : "") + (nstay ? `<br><span class="warn">${nstay} 站僅限住宿者</span>` : "") + (nview ? `<br><span class="muted">${nview} 站定休日可觀看</span>` : "") + (nwin ? `<br><span class="muted">${nwin} 站冬季開放，日期與時間以官方公告為準</span>` : "") +
       (route.url ? `<br><a href="${esc(route.url)}" target="_blank" rel="noopener">官方行程頁</a>` : "");
   }
@@ -2484,7 +2536,7 @@ function renderRouteList(pending){
   if (mini){
     if (TT(route.mode) && n >= 2){ const tt = route.stops.filter(s => s.time); mini.innerHTML = `<b>${esc(route.name)}</b>，${n} 站，${TTL(route.mode)} ${tt.length ? esc(tt[0].time) + "～" + esc(tt[tt.length - 1].time) : ""}`; mini.style.display = ""; }
     else if (n >= 2 && routeInfo && routeInfo.src === "none"){ mini.innerHTML = `<b>${esc(route.name || "我的路線")}</b>，${n} 站，步行`; mini.style.display = ""; }
-    else if (n >= 2 && routeInfo){ const T = routeInfo.legs.reduce((a, l) => a + l.min, 0); mini.innerHTML = `<b>${esc(route.name || "我的路線")}</b>，${n} 站，${route.mode === "walk" ? "步行" : "開車"}約 ${fmtMin(T)}${routeInfo.src === "est" ? "（估算）" : ""}${closed ? `，<span class="warn">${closed} 站休館</span>` : ""}`; mini.style.display = ""; }
+    else if (n >= 2 && routeInfo){ const clock = routeClock(routeInfo.legs, route.stops); const how = (TRAVEL_MODES[route.mode] && TRAVEL_MODES[route.mode].label) || "開車"; mini.innerHTML = `<b>${esc(route.name || "我的路線")}</b>，${n} 站，${how}總時間約 ${fmtMin(clock.total)}${routeInfo.src === "est" ? "（估算）" : ""}${closed ? `，<span class="warn">${closed} 站休館</span>` : ""}`; mini.style.display = ""; }
     else mini.style.display = "none";
   }
   const lp = $("rloop"); if (lp) lp.checked = isLoop();
@@ -2511,7 +2563,7 @@ function renderRouteCheck(){
     (rows.length ? "" : `<div class="muted">${n} 件作品這天都開放</div>`);
   box.hidden = false;
 }
-/* 分享路線連結：作品編號與地點、日期、交通方式、名稱放在網址 # 後面 */
+/* 分享路線連結：作品編號與地點、日期、交通方式、名稱放在網址 # 後面。it 不走這裡，存進富搖小幫手用 3! 格式。 */
 function shareUrl(){
   const p = new URLSearchParams();
   p.set("r", route.stops.filter(s => stopLL(s)).map(tok).join("~"));
@@ -2552,7 +2604,8 @@ function loadQrLib(){
   }).catch(e => { qrLibP = null; throw e; });
   return qrLibP;
 }
-function closeQr(){ const m = $("qrm"); if (!m) return; m.remove(); if (m._close) m._close(); }
+let refreshOpenQr = () => {};
+function closeQr(){ const m = $("qrm"); refreshOpenQr = () => {}; if (!m) return; m.remove(); if (m._close) m._close(); }
 /* 傳到手機要送的內容：預設是目前路線；專頁版在 fan_trip.js 改成多日行程並在視窗裡加複製連結。回傳 null 表示沒有東西可送 */
 let qrPayload = u => route.stops.length ? {url:u, title:"傳到手機", cap:"用手機相機掃描，路線就會出現在手機上", copy:false} : null;
 /* 送出前的步驟（專頁版：目前路線不在行程裡時先問）；(body, show, close) => 自己決定何時呼叫 show() */
@@ -2582,9 +2635,10 @@ function openQr(preset){
   m._close = () => { window.removeEventListener("keydown", key, true); if (opener && opener.focus) opener.focus(); };
   document.body.appendChild(m); m.querySelector(".qrm-x").focus();
   const body = m.querySelector(".qrm-body");
+  const readPayload = () => typeof preset === "function" ? preset() : (preset || qrPayload(shareUrl()));
   const show = () => {
     if (!m.isConnected) return;
-    const pl = preset || qrPayload(shareUrl()); if (!pl){ closeQr(); sayR("路線是空的"); return; }
+    const pl = readPayload(); if (!pl){ closeQr(); sayR("路線是空的"); return; }
     m.querySelector(".qrm-t").textContent = pl.title;
     body.innerHTML = `<div class="qrm-code" aria-live="polite"><span class="muted">產生 QR 碼中…</span></div><p class="qrm-cap" id="qrm-cap"></p>` +
       (pl.copy ? `<div class="qrm-link"><input class="qrm-url" readonly aria-label="分享連結"><button type="button" class="qrm-copy">複製連結</button></div>` : "");
@@ -2611,6 +2665,7 @@ function openQr(preset){
       box.querySelector(".qrm-copy").onclick = copyShare;
     });
   };
+  refreshOpenQr = () => { if ($("qrm") && $("qrm").isConnected) show(); };
   if (qrBefore) qrBefore(body, show, closeQr); else show();
 }
 function gmapsUrls(){
@@ -2747,8 +2802,36 @@ ul.addEventListener("dragover", e => { if (dragI != null){ e.preventDefault(); }
 ul.addEventListener("drop", e => { e.preventDefault(); const li = e.target.closest("li.stop"); if (li == null || dragI == null) return;
   const to = +li.dataset.i; const [s] = route.stops.splice(dragI, 1); route.stops.splice(to, 0, s); dragI = null; persist(); updateRoute(false); });
 ul.addEventListener("dragend", () => { dragI = null; });
-$("rname").addEventListener("change", e => { route.name = e.target.value.trim(); persist(); });
-$("rmode").addEventListener("change", e => { route.mode = e.target.value; persist(); updateRoute(false); });
+function itineraryDate(){
+  if (typeof trip !== "undefined" && trip && trip.days && trip.days[0]) return trip.days[0].date;
+  return curDay();
+}
+/* 改名立刻寫進正在看的行程，已打開的 QR 用新的 3! 網址重畫，不沿用舊名稱 */
+function syncItineraryName(raw, commit){
+  const typed = String(raw || "").replace(/[\u0000-\u001F\u007F]/g, "");
+  const name = liffTripName(typed, itineraryDate());
+  route.name = commit ? name : typed;
+  if (typeof trip !== "undefined" && trip){
+    trip.name = name;
+    if (commit && typeof saveTrip === "function") saveTrip();
+    const ft = $("ftname"); if (ft && document.activeElement !== ft) ft.value = trip.name;
+  }
+  refreshOpenQr();
+}
+$("rname").addEventListener("input", e => { syncItineraryName(e.target.value, false); });
+$("rname").addEventListener("change", e => {
+  syncItineraryName(e.target.value, true);
+  e.target.value = route.name;
+  persist();
+});
+$("rmode").addEventListener("change", e => {
+  const next = e.target.value;
+  const cfg = TRAVEL_MODES[next];
+  if (!cfg || cfg.open === false){ e.target.value = route.mode || "drive"; return; }
+  route.mode = next;
+  if (cfg.loop && !isLoop() && route.stops.length >= 2){ setLoop(true); refreshOpenQr(); return; }
+  persist(); updateRoute(false); refreshOpenQr();
+});
 $("raddfav").onclick = () => { saved.forEach(c => { if (BY[c] && BY[c].marker && !route.stops.some(s => s.c === c)) route.stops.push({c}); }); persist(); updateRoute(true); };
 $("raddplace").onclick = () => { const n = $("rplace").value; if (PLACES[n]) addStop({p:n, lat:PLACES[n][0], lng:PLACES[n][1]}); };
 function clearRoute(){
@@ -2797,8 +2880,15 @@ function publicLiffTrip(){
   const modeSrc = live ? live.mode : route.mode;
   const nameSrc = live ? live.name : route.name;
   const mode = LIFF_MODES.includes(modeSrc) ? modeSrc : "drive";
-  const name = String(nameSrc || "我的行程").trim().slice(0, 40) || "我的行程";
+  const name = liffTripName(nameSrc, days[0].date);
   return {id, name, mode, days};
+}
+function lineQrPayload(){
+  const t = publicLiffTrip();
+  if (!t) return null;
+  const url = liffSaveUrl(LIFF_ID, t);
+  if (!url) return null;
+  return {url, title:"存進富搖小幫手", cap:"用手機相機掃描，行程會存進富搖小幫手的飯團專頁", copy:false, aria:"存進富搖小幫手的 QR 碼"};
 }
 function saveToLine(){
   const trip = publicLiffTrip();
@@ -2807,7 +2897,7 @@ function saveToLine(){
   if (!url){ sayR("這份行程無法存進富搖小幫手"); return; }
   if (url.length > LIFF_URL_LIMIT){ sayR("行程太長，請分成兩份存"); toast("行程太長，請分成兩份存"); return; }
   if (window.matchMedia("(max-width:767.98px)").matches){ location.assign(url); return; }
-  openQr({url, title:"存進富搖小幫手", cap:"用手機相機掃描，行程會存進富搖小幫手的飯團專頁", copy:false, aria:"存進富搖小幫手的 QR 碼"});
+  openQr(lineQrPayload);
 }
 let openRouteQr = () => openQr();
 if ($("rqr")) $("rqr").onclick = () => openRouteQr();
@@ -2816,7 +2906,8 @@ $("rsave").onclick = () => {
   let name = ($("rname").value || "").trim();
   if (!name){ name = prompt("路線名稱，例如 10/31 明石之湯日", "") || ""; name = name.trim(); }
   if (!name || !route.stops.length){ sayR(route.stops.length ? "請先取個名字" : "路線是空的"); return; }
-  route.name = name;
+  syncItineraryName(name, true);
+  name = route.name;
   const i = routes.findIndex(r => r.name === name);
   const copy = JSON.parse(JSON.stringify(route)); copy.ts = new Date().toISOString();
   i >= 0 ? (routes[i] = copy) : routes.push(copy);
@@ -3685,9 +3776,15 @@ function renderTripBox(){
         (editing === k ? `<span class="fted">正在看</span>` : `<button type="button" class="b" data-tday="${k}">看這天</button>`) + `<button type="button" class="b" data-tdel="${k}" aria-label="刪除第 ${k + 1} 天">刪除</button></li>`; }).join("") + `</ol>` +
     `<div class="muted">下面路線的加入、移除、排序與交通方式會直接存進正在看的那一天，不用另外存。</div>` +
     `<div class="btns"><button type="button" class="b" data-tadd="1">新增一天</button></div>`;
-  const nm = document.createElement("input"); nm.id = "ftname"; nm.value = trip.name; nm.maxLength = 40; nm.setAttribute("aria-label", "行程名稱");
+  const nm = document.createElement("input"); nm.id = "ftname"; nm.value = trip.name; nm.maxLength = 30; nm.setAttribute("aria-label", "行程名稱");
   box.querySelector(".fthead").appendChild(nm);
-  nm.onchange = () => { trip.name = nm.value.trim().slice(0, 40) || "我的行程"; saveTrip(); renderTripBox(); };
+  const paintName = commit => {
+    trip.name = liffTripName(nm.value, trip.days[0] && trip.days[0].date);
+    if (commit) nm.value = trip.name;
+    if (typeof refreshOpenQr === "function") refreshOpenQr();
+  };
+  nm.oninput = () => paintName(false);
+  nm.onchange = () => { paintName(true); saveTrip(); renderTripBox(); };
 }
 document.addEventListener("click", e => {
   const t = e.target.closest("[data-tday],[data-tdel],[data-tadd],[data-tsel],[data-tdelt],[data-tvshow],[data-tvclear]"); if (!t) return;
