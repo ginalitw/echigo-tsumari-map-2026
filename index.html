@@ -1003,6 +1003,28 @@ ul.lst li .addr{min-height:44px;border-radius:22px}
 .rlist li.empty{color:var(--mute);font-size:14px;padding:12px 0}
 .rsum{font-size:14px;margin:12px 0 6px;font-variant-numeric:tabular-nums}
 .gbtn{min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:15px;background:var(--link)}
+/* 行程分頁：行程本身在上，接著「帶走這條路線」，編輯工具與其他匯出方式收合 */
+.rtake{margin:var(--sp-4) 0 var(--sp-2);padding:var(--sp-3) var(--sp-4) var(--sp-2);border:1px solid var(--line);border-radius:var(--r-m);background:var(--paper)}
+.rtake[hidden]{display:none}
+.rtake-t{display:block;margin:0 0 var(--sp-2);font-size:var(--fs-body)}
+.rt-pri{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:48px;box-sizing:border-box;border:1px solid var(--gold);border-radius:var(--r-s);background:var(--gold);color:var(--ink);font:inherit;font-size:var(--fs-body);font-weight:700;cursor:pointer}
+.rt-pri:hover,.rt-pri:active{background:var(--gold-press);border-color:var(--gold-press)}
+.rt-row{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-top:var(--sp-2)}
+.rt-row>#rgmap{display:contents}
+.rt-sec{flex:1 1 calc(50% - var(--sp-1));min-width:0;min-height:44px;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;padding:var(--sp-1) var(--sp-2);border:1px solid var(--ink);border-radius:var(--r-s);background:var(--snow);color:var(--ink);font:inherit;font-size:var(--fs-s);line-height:1.35;text-align:center;text-decoration:none;cursor:pointer}
+.rt-sec:hover,.rt-sec:active{background:var(--paper)}
+.rt-note{margin-top:var(--sp-1);font-size:var(--fs-xs);line-height:1.5}
+.rt-note[hidden],.rfold[hidden]{display:none}
+.rfold{margin:var(--sp-2) 0 0;border-top:1px solid var(--line)}
+.rfold>summary{display:flex;align-items:center;min-height:44px;list-style:none;font-size:var(--fs-s);font-weight:700;color:var(--ink);cursor:pointer}
+.rfold>summary::-webkit-details-marker{display:none}
+.rfold>summary:after{content:"▾";margin-left:6px;color:var(--ink-soft)}
+.rfold[open]>summary:after{content:"▴"}
+.rtake .rfold{margin-bottom:0}
+.rtake .rfold .knote{margin:var(--sp-1) 0 var(--sp-2)}
+#redtools{margin-top:var(--sp-3)}
+#redtools .btns{margin-bottom:var(--sp-2)}
+#redtools .btns[hidden]{display:none}
 .cgroup{margin-bottom:18px}
 .cgt{font-size:13px;color:var(--mute);font-weight:600;letter-spacing:.04em;margin:4px 0 8px}
 .cards{gap:8px}
@@ -1244,7 +1266,6 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   .tabs button{flex:1 1 0;font-size:15px}
   #pback{display:flex;align-items:center;gap:8px;margin-bottom:8px}
   #rquick{display:flex;gap:8px;margin-bottom:8px}
-  #pane-r #rfit{display:none}  /* 改用上方「看整條路線」 */
   #rquick .b{flex:1;min-height:40px}
   .rhead-acts{display:inline-flex;gap:6px;align-items:center}
   #redit{display:inline-flex;min-height:36px;padding:0 12px;font-size:13px;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
@@ -1257,7 +1278,8 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   .fanbar{display:none}  /* 專頁提示改到 ⋯ 選單，首屏不佔空間 */
 }
 @media (min-width:768px){
-  #mmenu,#mmenupop,#rquick,#pback,#redit{display:none!important}
+  #mmenu,#mmenupop,#pback,#redit,#rpresets{display:none!important}
+  #rquick{display:flex;margin-bottom:var(--sp-2)}
   .rhead-acts #rclear{display:inline-flex}
 }
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
@@ -1319,16 +1341,13 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   .wc-btn.on{border-color:var(--ink);font-weight:600}
   .wc-btn:disabled{color:var(--mute);cursor:default}
   body:not(.redit-on) .wc-route{display:none}
-  .wc-more{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:15px;line-height:1.6}
+  .wc-more{margin-top:14px;font-size:15px;line-height:1.6}
   #wcard[data-state="peek"] .wc-more{visibility:hidden}
   .wc-more .pp-ja{margin:0}
   .wc-who{font-size:13px;color:var(--mute);margin:2px 0 0}
   .wc-hours{margin:-4px 0 10px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
-  .wc-det{margin-top:8px;border-top:1px solid var(--line);font-size:13px;line-height:1.6;color:var(--ink)}
-  .wc-det summary{display:flex;align-items:center;min-height:44px;list-style:none;font-size:14px;color:var(--ink);cursor:pointer}
-  .wc-det summary::-webkit-details-marker{display:none}
-  .wc-det summary:after{content:"▾";margin-left:6px;color:var(--mute);transition:transform .2s}
-  .wc-det[open] summary:after{transform:rotate(180deg)}
+  .wc-det{margin-top:8px;font-size:13px;line-height:1.6;color:var(--ink)}
+  .wc-det[hidden]{display:none}
   .wc-det>div{margin:0 0 4px}
   .wc-det span{color:var(--mute)}
   .wc-det .pp-etq{color:var(--note)}
@@ -1416,7 +1435,18 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 .ttable.unknown{background:var(--unknown-bg);color:var(--unknown)}
 /* 水波線：沿用 echigo.fans 的 .wave，縮成地圖卡片的尺寸 */
 .wave{height:12px;margin:var(--sp-3) 0;background:radial-gradient(circle at 6px -4px,transparent 7px,var(--line) 7px,var(--line) 8px,transparent 8px) 0 0/12px 12px repeat-x}
-.blurb{margin:0 0 var(--sp-1);font-size:var(--fs-body);line-height:1.75;color:var(--ink)}
+.blurb{margin:0 0 var(--sp-1);font-size:var(--fs-m);line-height:1.6;color:var(--ink)}
+.blurb .bq{margin-right:2px;font-family:var(--font-brand);font-size:var(--fs-l);line-height:0;color:var(--stamp)}
+/* 沒有一句話介紹時的標籤列；停留時間三種深淺：晃一眼最淺、約 1 小時中間、半天最深，字色對比都在 4.5:1 以上 */
+.wtags{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin:0 0 var(--sp-1)}
+.wtag{display:inline-flex;align-items:center;min-height:28px;padding:0 var(--sp-3);border-radius:var(--r-pill);background:var(--rice);color:var(--ink);font-size:var(--fs-s);font-weight:700;line-height:1.3}
+.wtag.tier-1{background:var(--gold-bg);color:var(--ink)}
+.wtag.tier-2{background:var(--gold);color:var(--ink)}
+.wtag.tier-3{background:var(--stamp-ink);color:var(--snow)}
+.tt-stay{font-size:var(--fs-xs);line-height:1.4;color:var(--ink)}
+/* 紀念章右下角的類型小圖示 */
+.stampw{position:relative;flex:none;display:inline-flex}
+.stamp-ic{position:absolute;right:-4px;bottom:-4px;width:20px;height:20px;box-sizing:border-box;padding:2px;border-radius:50%;background:var(--paper);box-shadow:0 0 0 1px var(--line);fill:none;stroke:var(--ink-soft);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ic{flex:none;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
 .ic .f{fill:var(--gold);stroke:var(--ink)}
 .pp-btn.pri,.wc-btn.pri{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:700}
@@ -1461,13 +1491,15 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   #wcard[data-state="full"] .wc-nt{-webkit-line-clamp:unset}
   .wc-who{margin:2px 0 0;font-size:var(--fs-s);color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .wc-head .wave{margin:var(--sp-3) 0}
-  .wc-head .blurb{margin-bottom:var(--sp-3)}
+  .wc-head .blurb,.wc-head .wtags{margin-bottom:var(--sp-3)}
   .wc-acts{gap:var(--sp-3)}
   .wc-btn{min-height:52px;border-radius:var(--r-s);font-size:var(--fs-body);gap:6px}
   .wc-btn.pri{flex-grow:1.4}
   .wc-foot{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);margin-top:var(--sp-3);border-top:1px solid var(--line)}
   .wc-foot button,.wc-foot span{min-height:44px;display:inline-flex;align-items:center;padding:0;border:none;background:none;font:inherit;font-size:var(--fs-s);color:var(--ink-soft);cursor:pointer;text-align:left}
   .wc-foot .wc-go-det{flex:none;color:var(--ink);font-weight:700;font-size:var(--fs-body)}
+  .wc-foot .wc-go-det:after{content:"▾";display:inline-block;margin-left:6px;color:var(--ink-soft);transition:transform .2s}
+  .wc-foot .wc-go-det[aria-expanded="true"]:after{transform:rotate(180deg)}
   .wc-more{margin-top:var(--sp-2)}
   #wcard.wc-closed[data-state="peek"] .stampb{filter:saturate(.2)}
   /* 首屏面板：日期已在頂端膠囊，這裡只留這天開放／休館件數與〔今天〕 */
@@ -1814,17 +1846,22 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
     <div class="btns rquick" id="rquick"><button type="button" class="b" id="rpresets">選建議</button><button type="button" class="b" id="rfit2">看整條路線</button></div>
     <div class="rrow"><input id="rname" aria-label="路線名稱" placeholder="路線名稱，例如 松代一日遊" class="redit-only"><select id="rmode" aria-label="交通方式"><option value="drive">開車</option><option value="walk">步行</option><option value="bus">巴士</option><option value="train">電車</option></select></div>
     <div class="rstart redit-only" id="rstart"><span class="rsl">起點</span></div>
-    <div class="btns rtools redit-only" id="rtools"><button id="ropt" type="button">自動排順序</button><label class="b chkb"><input type="checkbox" id="rloop">回到起點</label></div>
     <ol class="rlist" id="rlist"></ol>
     <div id="rsum" class="rsum"></div>
-    <div id="rgmap"></div>
-    <div id="rkml" class="kmlbox" hidden><button id="rkmlbtn" type="button" class="kbtn">匯出到 Google My Maps</button><div class="muted knote">匯入需用電腦：Google My Maps → 建立新地圖 → 匯入 → 選這個檔案。之後在手機 Google 地圖的『已儲存 › 地圖』就看得到這些圖釘。</div></div>
-    <div class="btns redit-only" style="margin-top:6px"><button id="raddfav">加入清單全部作品</button><button id="rsel">路線作品加進清單</button></div>
-    <div class="btns redit-only" style="margin-top:6px"><select id="rplace" class="b" aria-label="選擇車站"><option>十日町站</option><option>越後湯澤站</option><option>まつだい站</option><option>津南站</option></select><button id="raddplace">加入車站</button></div>
-    <div class="btns" style="margin-top:6px"><button id="rsave" class="redit-only">儲存路線</button><button id="rfit">看整條路線</button><button id="rshare" type="button">複製分享連結</button><button id="rqr" type="button" aria-haspopup="dialog">存進富搖小幫手</button></div>
+    <div class="rtake" id="rtake" hidden>
+      <b class="rtake-t">帶走這條路線</b>
+      <button id="rqr" type="button" class="rt-pri" aria-haspopup="dialog">存進富搖小幫手</button>
+      <div class="rt-row"><span id="rgmap"></span><button id="rshare" type="button" class="rt-sec">複製分享連結</button></div>
+      <div class="muted rt-note" id="rgnote" hidden>手機瀏覽器最多帶 3 個中途點，建議用 Google 地圖 App 開</div>
+      <details id="rkml" class="kmlbox rfold" hidden><summary>更多匯出方式</summary><button id="rkmlbtn" type="button" class="kbtn">匯出到 Google My Maps</button><div class="muted knote">匯入需用電腦：Google My Maps → 建立新地圖 → 匯入 → 選這個檔案。之後在手機 Google 地圖的『已儲存 › 地圖』就看得到這些圖釘。</div></details>
+    </div>
     <div id="rmsg" class="okmsg"></div>
-    <div class="box redit-only"><b>已儲存的路線</b><ul class="lst" id="rsaved"></ul></div>
-    <div class="muted redit-only" style="margin-top:6px">可拖曳或用 ↑ ↓ 調整順序，或按「自動排順序」（起點不動）。路線時間由 OSRM 免費路線服務估算；開車或步行連不上時改用直線估算並註明。</div>
+    <details class="rfold redit-only" id="redtools"><summary>編輯工具</summary>
+      <div class="btns rtools" id="rtools"><button id="ropt" type="button">自動排順序</button><label class="b chkb"><input type="checkbox" id="rloop">回到起點</label></div>
+      <div class="btns"><select id="rplace" class="b" aria-label="選擇車站"><option>十日町站</option><option>越後湯澤站</option><option>まつだい站</option><option>津南站</option></select><button id="raddplace">加入車站</button></div>
+      <div class="btns"><button id="raddfav">加入清單全部作品</button><button id="rsel">路線作品加進清單</button></div>
+      <div class="muted">可拖曳站點或用 ↑ ↓ 調整順序，自動排順序時起點不動</div>
+    </details>
   </div>
   <div id="pane-p" role="tabpanel" style="display:none"><div class="pane-head pback" id="pback"><button type="button" class="b" id="pbackb" data-back-r="1">← 回路線</button><span>推薦路線</span></div><div id="presetlist"></div></div>
   <div id="pane-d" style="display:none" aria-live="polite"></div>
@@ -1939,7 +1976,7 @@ function liffSaveAsk(trip){
 }
 /* 天氣預報：気象庁 bosai 新潟縣預報（150000.json）。
    天氣與降雨機率取「中越」（150020），氣溫取「長岡」（54501）。
-   短期預報只到後天；之後幾天週間預報只有「新潟県」（150000）與「新潟」（54232），中越、長岡沒有的欄位才拿它補。
+   短期預報只到後天；之後幾天只用週間預報「新潟県」（150000）的天氣代碼與降雨機率，氣溫留空，不拿「新潟」（54232）的氣溫補。
    週間預報附的往年平均不用。抓不到、格式不對、逾時都回傳 null，畫面就什麼都不顯示。 */
 const WX_URL = "https://www.jma.go.jp/bosai/forecast/data/forecast/150000.json";
 const WX_KEY = "etwx_v1";
@@ -1947,7 +1984,7 @@ const WX_TTL = 3 * 3600e3;
 const WX_TIMEOUT = 5000;
 const WX_RAIN_POP = 50;
 const WX_STALE_MS = 13 * 3600e3;  // 気象庁每天 5、11、17 點發布，最長間隔是 17 點到隔天 5 點，超過 13 小時就是沒抓到新的
-const WX_AREA = "150020", WX_TEMP = "54501", WX_WEEK_AREA = "150000", WX_WEEK_TEMP = "54232";
+const WX_AREA = "150020", WX_TEMP = "54501", WX_WEEK_AREA = "150000";
 /* 天氣代碼對照：看百位數，也就是主要天氣（100 晴、101 晴時々曇、200 曇、202 曇一時雨、300 雨、400 雪…） */
 const WX_ICONS = [
   {from: 100, to: 199, icon: "☀", name: "晴"},
@@ -1987,10 +2024,6 @@ function wxParse(raw){
   const wa = area(ts, WX_WEEK_AREA);
   each(ts, wa, "weatherCodes", (d, c) => { if (wxKind(c)) fill(d, "code", String(c)); });
   each(ts, wa, "pops", (d, p) => fill(d, "pop", num(p)));
-  ts = series(week, 1);
-  const wt = area(ts, WX_WEEK_TEMP);
-  each(ts, wt, "tempsMax", (d, v) => fill(d, "max", num(v)));
-  each(ts, wt, "tempsMin", (d, v) => fill(d, "min", num(v)));
   const out = {};
   Object.keys(days).sort().forEach(d => {
     const o = days[d]; if (!o.code) return;
@@ -2005,12 +2038,12 @@ function wxForDay(wx, day){
   return wx && wx.days && typeof day === "string" && Object.prototype.hasOwnProperty.call(wx.days, day) ? wx.days[day] : null;
 }
 function wxRain(f){ return !!f && f.pop != null && f.pop >= WX_RAIN_POP; }
-/* 手機日期膠囊：「☁ 14°」 */
+/* 手機日期膠囊：「☁ 14°」，沒有氣溫的日子只放圖示 */
 function wxShort(f){
   const k = f && wxKind(f.code); if (!k) return "";
   return f.max != null ? `${k.icon} ${f.max}°` : k.icon;
 }
-/* 電腦側欄：「☁ 8–14°　降雨 60%」，舊資料加「（17 點更新）」 */
+/* 電腦側欄：「☁ 8–14°　降雨 60%」，沒有氣溫的日子是「☁　降雨 60%」，舊資料加「（17 點更新）」 */
 function wxLine(f, stale, report, today){
   const k = f && wxKind(f.code); if (!k) return "";
   const t = f.max != null ? (f.min != null ? ` ${f.min}–${f.max}°` : ` ${f.max}°`) : "";
@@ -2323,6 +2356,9 @@ const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } ca
 let saved = load(LS_KEY, []).filter(c => BY[c]);
 let route = load(LS_ROUTE, {name:"", stops:[], mode:"drive"});
 let routes = load(LS_ROUTES, []);
+/* 匯入的舊格式路線交給 days.js 轉成行程，days.js 載入前先排隊 */
+const pendingRoutes = [];
+let routesImported = rs => { pendingRoutes.push(...rs); };
 const isSaved = c => saved.includes(c);
 function persist(){ store(LS_KEY, saved); store(LS_ROUTE, route); store(LS_ROUTES, routes); }
 function toggleSave(c){ saved = isSaved(c) ? saved.filter(x => x !== c) : saved.concat(c); persist(); refreshAll(c); }
@@ -2441,19 +2477,44 @@ const KIND_TXT = {museum:"室內場館", outdoor:"戶外作品", onsen:"溫泉",
 /* ===== popups and markers ===== */
 const officialLink = d => `<div class="pp-off"><a href="${esc(d.官網連結)}" target="_blank" rel="noopener">官網作品頁 ↗</a></div>`;
 /* 卡片元件：紀念章編號、開放時刻表、一句話介紹、按鈕。手機作品卡與電腦浮動視窗共用 */
-const stampBadge = d => `<span class="stampb" role="img" aria-label="${esc(d.地區)} ${esc(d.作品編號)}"><small aria-hidden="true">${esc(d.地區)}</small><b aria-hidden="true">${esc(d.作品編號)}</b></span>`;
+/* 停留時間分級：飯團版由 fan.js 從 visit_time 帶入；公開版沒有這份資料，回傳空字串就不顯示 */
+let visitTier = d => "";
+const TIERS = ["晃一眼", "約 1 小時", "半天"];
+const tierPill = t => TIERS.includes(t) ? `<span class="wtag tier-${TIERS.indexOf(t) + 1}">${esc(t)}</span>` : "";
+/* 紀念章右下角的類型小圖示：只看「類型」與特殊條件裡的住宿限制，判斷不出來就不放 */
+const TYPE_IC = {
+  outdoor:["戶外作品", '<path d="M3 19h18"/><path d="M4 19l5-8 3.5 5"/><path d="M10.5 15.5l3.5-5 6 8.5"/><circle cx="17" cy="6.5" r="2"/>'],
+  indoor:["室內作品", '<path d="M3 9.5L12 4l9 5.5z"/><path d="M5.5 10v8M10 10v8M14 10v8M18.5 10v8"/><path d="M3.5 20h17"/>'],
+  arch:["建築外觀", '<path d="M4 11.5L12 5l8 6.5"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/>'],
+  stay:["住宿", '<path d="M3 6v13"/><path d="M3 15h18v4"/><path d="M21 15v-2.5A2.5 2.5 0 0 0 18.5 10H11v5"/><circle cx="7" cy="12" r="1.8"/>']
+};
+function workType(d){
+  if (d._rule && (d._rule.stay || d._rule.stayIn)) return "stay";
+  return {"戶外":"outdoor", "室內":"indoor", "只能看外觀":"arch"}[d.類型] || "";
+}
+const stampBadge = d => { const k = workType(d), ic = TYPE_IC[k];
+  return `<span class="stampw"><span class="stampb" role="img" aria-label="${esc(d.地區)} ${esc(d.作品編號)}${ic ? "，" + ic[0] : ""}"><small aria-hidden="true">${esc(d.地區)}</small><b aria-hidden="true">${esc(d.作品編號)}</b></span>` +
+    (ic ? `<svg class="stamp-ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${ic[1]}</svg>` : "") + `</span>`; };
 const CLOSED_WHY = {notopen:"這天不是開放日", suspended:"暫停開放", off:"臨時休館", period:"不在開放期間"};
 function dayTableHtml(d, di, day){
   const hrs = di.state === "open" ? dayHours(d, day) : null, last = lastEntry(d, hrs);
+  const canSee = di.state === "open" || di.state === "view", tier = canSee ? visitTier(d) : "";
   let head = stateTxt(di), sub = "";
   if (di.state === "closed"){ head = STATE_TXT.closed; sub = di.reason === "season" ? stateTxt(di) : di.reason === "wd" ? `每週${WD[new Date(day + "T00:00").getDay()]}休館` : CLOSED_WHY[di.reason] || ""; }
   else if (di.state === "stay"){ head = STATE_SHORT.stay; sub = "只開放入住旅客參觀，非住宿者無法參觀"; }
   else if (di.reason === "winter"){ head = "冬季開放"; sub = "日期與時間以官方公告為準"; }
-  const lab = `${head}${hrs ? " " + hrs : ""}${last ? `｜最後入場 ${last}` : ""}${sub ? "，" + sub : ""}`;
-  return `<div class="ttable ${di.state}" role="group" aria-label="${esc(lab)}"><div class="tt-l" aria-hidden="true"><span>${esc(head)}</span>${hrs ? `<b>${esc(hrs)}</b>` : sub ? `<em>${esc(sub)}</em>` : ""}</div>` +
-    (last ? `<div class="tt-r" aria-hidden="true"><span>最後入場</span><b>${esc(last)}</b></div>` : "") + `</div>`;
+  else if (canSee && !hrs && d.類型 === "戶外"){ const t = d.開放時間 && d.開放時間 !== "—" ? d.開放時間 : ""; sub = t === "白天" ? "戶外，白天隨時可看" : t; }
+  const lab = `${head}${hrs ? " " + hrs : ""}${last ? `｜最後入場 ${last}` : ""}${sub ? "，" + sub : ""}${tier ? `，停留：${tier}` : ""}`;
+  return `<div class="ttable ${di.state}" role="group" aria-label="${esc(lab)}"><div class="tt-l" aria-hidden="true"><span>${esc(head)}</span>${hrs ? `<b>${esc(hrs)}</b>` : sub ? `<em>${esc(sub)}</em>` : ""}${last && tier ? `<small class="tt-stay">停留：${esc(tier)}</small>` : ""}</div>` +
+    (last ? `<div class="tt-r" aria-hidden="true"><span>最後入場</span><b>${esc(last)}</b></div>` : tier ? `<div class="tt-r" aria-hidden="true"><span>停留</span><b>${esc(tier)}</b></div>` : "") + `</div>`;
 }
-const blurbHtml = d => BLURBS[d.作品編號] ? `<p class="blurb">${esc(BLURBS[d.作品編號])}</p>` : "";
+/* 一句話介紹是卡片主角；沒有介紹就改放現有欄位組成的標籤，不留空 */
+function blurbHtml(d){
+  const b = BLURBS[d.作品編號];
+  if (b) return `<p class="blurb"><span class="bq" aria-hidden="true">“</span>${esc(b)}</p>`;
+  const tags = [d.類型 ? `<span class="wtag">${esc(d.類型)}</span>` : "", tierPill(visitTier(d)), d.冬季 ? `<span class="wtag">${esc(d.冬季)}</span>` : ""].filter(Boolean);
+  return tags.length ? `<p class="wtags">${tags.join('<span class="vh">，</span>')}</p>` : "";
+}
 const IC_STAR = on => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path${on ? ' class="f"' : ""} d="M12 3.8l2.5 5.1 5.6.8-4 3.9.9 5.6-5-2.6-5 2.6.9-5.6-4-3.9 5.6-.8z"/></svg>`;
 const IC_NAV = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-6.1-6.5-11a6.5 6.5 0 0 1 13 0c0 4.9-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
 const favBtn = (c, sv, cls) => `<button type="button" class="${cls} sec${sv ? " on" : ""}" data-fav="${esc(c)}" aria-pressed="${sv}" aria-label="${sv ? "從我的清單移除" : "加入我的清單"}" title="${sv ? "從我的清單移除" : "加入我的清單"}">${IC_STAR(sv)}想去</button>`;
@@ -3203,7 +3264,6 @@ function renderRouteList(pending){
   const lp = $("rloop"); if (lp) lp.checked = isLoop();
   const rt = $("rtools"); if (rt) rt.hidden = TT(route.mode) || validStops(st).length < 2;
   renderGmaps();
-  renderSavedRoutes();
   const rn = $("routen"); if (rn) rn.textContent = route.stops.length;
   const mn = $("mtripn"); if (mn) mn.textContent = route.stops.length || "";
   const dt = $("dtrip"); if (dt){ dt.textContent = `目前行程・${route.stops.length} 站`; const tt = routeTotalTxt(); if (tt) dt.textContent += "　" + tt.slice(1); }
@@ -3376,20 +3436,13 @@ function downloadKml(base, items){
 function exportRouteKml(){ let n = 0; const items = route.stops.map(s => okLL(stopLL(s)) ? kmlItem(s, ++n) : null).filter(Boolean); if (items.length) downloadKml(route.name || "我的路線", items); }
 function exportListKml(){ const items = saved.map(c => BY[c] && BY[c].ll ? kmlItem({c}) : null).filter(Boolean); if (items.length) downloadKml("我的清單", items); }
 function renderGmaps(){
-  const kb = $("rkml"); if (kb) kb.hidden = !route.stops.some(s => okLL(stopLL(s)));
+  const has = route.stops.some(s => okLL(stopLL(s)));
+  const kb = $("rkml"); if (kb) kb.hidden = !has;
+  const tk = $("rtake"); if (tk) tk.hidden = !has;
   const box = $("rgmap"); if (!box) return;
   const urls = TT(route.mode) ? [] : gmapsUrls();
-  box.innerHTML = urls.map((u, k) => `<a class="gbtn" href="${esc(u.url)}" target="_blank" rel="noopener">用 Google 地圖開啟${urls.length > 1 ? `（第 ${k + 1} 段：${u.from}～${u.to} 站）` : ""}</a>`).join("") +
-    (urls.length ? `<div class="muted">${urls.length > 1 ? "站數多，已自動分成幾段，每段最多 10 站。" : ""}${urls.some(u => u.to - u.from - 1 > 3) ? "依 Google 官方說明，手機瀏覽器版 Google 地圖最多支援 3 個中途點，用 Google 地圖 App 或電腦開啟才能帶入全部站點。" : ""}</div>` : "");
-}
-function renderSavedRoutes(){
-  const ul = $("rsaved"); if (!ul) return;
-  ul.innerHTML = routes.length ? "" : '<li class="empty">還沒有儲存的路線</li>';
-  routes.forEach((r, i) => {
-    const li = document.createElement("li");
-    li.innerHTML = `<span class="t">${esc(r.name)}<span class="muted">，${r.stops.length} 站</span></span><button class="rm" data-loadr="${i}">載入</button><button class="rm" data-delr="${i}">刪除</button>`;
-    ul.appendChild(li);
-  });
+  box.innerHTML = urls.map((u, k) => `<a class="rt-sec" href="${esc(u.url)}" target="_blank" rel="noopener">用 Google 地圖開啟${urls.length > 1 ? `（第 ${k + 1} 段：${u.from}～${u.to} 站）` : ""}</a>`).join("");
+  const gn = $("rgnote"); if (gn) gn.hidden = !urls.some(u => u.to - u.from - 1 > 3);
 }
 function addStop(s){
   /* 回到起點開著時，新站點加在回程那一站前面 */
@@ -3483,7 +3536,7 @@ function syncItineraryName(raw, commit){
   const name = liffTripName(typed, itineraryDate());
   route.name = commit ? name : typed;
   if (typeof trip !== "undefined" && trip){
-    trip.name = name;
+    trip.name = baseName(name) || name;
     if (commit && typeof saveTrip === "function") saveTrip();
     const ft = $("ftname"); if (ft && document.activeElement !== ft) ft.value = trip.name;
   }
@@ -3507,7 +3560,7 @@ $("raddfav").onclick = () => { saved.forEach(c => { if (BY[c] && BY[c].marker &&
 $("raddplace").onclick = () => { const n = $("rplace").value; if (PLACES[n]) addStop({p:n, lat:PLACES[n][0], lng:PLACES[n][1]}); };
 function clearRoute(){
   if (!route.stops.length) return;
-  if (!confirm(`確定要清除目前路線（${route.stops.length} 站）嗎？\n已儲存的路線不受影響。`)) return;
+  if (!confirm(`確定要清除目前路線（${route.stops.length} 站）嗎？\n我的行程裡的其他天與其他行程不受影響。`)) return;
   route = {name:"", stops:[], mode:route.mode, url:""};
   persist();
   const note = $("rnote"); if (note) note.innerHTML = "";
@@ -3521,7 +3574,6 @@ function clearRoute(){
 $("rclear").onclick = clearRoute;
 if ($("rkmlbtn")) $("rkmlbtn").onclick = exportRouteKml;
 if ($("lkmlbtn")) $("lkmlbtn").onclick = exportListKml;
-$("rfit").onclick = fitRoute;
 if ($("rshare")) $("rshare").onclick = copyShare;
 function newLiffId(){ return "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function liffStopToken(s){
@@ -3573,17 +3625,6 @@ function saveToLine(){
 let openRouteQr = () => openQr();
 if ($("rqr")) $("rqr").onclick = () => openRouteQr();
 openRouteQr = saveToLine;
-$("rsave").onclick = () => {
-  let name = ($("rname").value || "").trim();
-  if (!name){ name = prompt("路線名稱，例如 10/31 明石之湯日", "") || ""; name = name.trim(); }
-  if (!name || !route.stops.length){ sayR(route.stops.length ? "請先取個名字" : "路線是空的"); return; }
-  syncItineraryName(name, true);
-  name = route.name;
-  const i = routes.findIndex(r => r.name === name);
-  const copy = JSON.parse(JSON.stringify(route)); copy.ts = new Date().toISOString();
-  i >= 0 ? (routes[i] = copy) : routes.push(copy);
-  persist(); renderRouteList(); sayR(`已儲存「${name}」`);
-};
 const sayR = t => { const m = $("rmsg"); if (m) m.textContent = t; };
 $("rsel").onclick = () => { route.stops.filter(s => s.c).forEach(s => { if (!isSaved(s.c)) saved.push(s.c); }); persist(); refreshAll(); sayR("已把路線上的作品加進我的清單"); };
 
@@ -3724,10 +3765,6 @@ document.addEventListener("click", e => {
     else if (b.dataset.down != null){ const i = +b.dataset.down; if (i < st.length - 1) [st[i + 1], st[i]] = [st[i], st[i + 1]]; }
     else st.splice(+b.dataset.del, 1);
     persist(); updateRoute(false); return; }
-  const lr = e.target.closest("[data-loadr]");
-  if (lr){ e.stopPropagation(); setRoute(routes[+lr.dataset.loadr], true); const n = $("rnote"); if (n) n.textContent = ""; syncWinterBanner(); return; }
-  const dr = e.target.closest("[data-delr]");
-  if (dr){ e.stopPropagation(); const r0 = routes[+dr.dataset.delr]; if (confirm(`刪除路線「${r0.name}」？`)){ routes.splice(+dr.dataset.delr, 1); persist(); renderSavedRoutes(); } return; }
 }, true);
 
 /* ===== export / import ===== */
@@ -3746,11 +3783,13 @@ function importText(txt){
   if (obj){
     const rs = obj.r ? obj.r.map(r => ({name:r.n, mode:r.m === "w" ? "walk" : (r.m === "b" ? "bus" : (r.m === "t" ? "train" : "drive")), stops:(r.t || []).map((t, i) => { const s = untok(t); if (s && r.h && r.h[i]){ if (r.h[i][0]) s.time = r.h[i][0]; if (r.h[i][1]) s.tnote = r.h[i][1]; } return s; }).filter(Boolean)}))
                      : (obj.routes || []).map(r => ({name:r.name, mode:r.mode || "drive", stops:(r.stops || []).filter(s => s.c ? BY[s.c] : s.lat != null)}));
-    rs.filter(r => r.name && r.stops.length).forEach(r => { const i = routes.findIndex(x => x.name === r.name); i >= 0 ? (routes[i] = r) : routes.push(r); nr++; });
+    const ok = rs.filter(r => r.name && r.stops.length);
+    ok.forEach(r => { const i = routes.findIndex(x => x.name === r.name); i >= 0 ? (routes[i] = r) : routes.push(r); nr++; });
+    if (ok.length) routesImported(ok);
   }
   persist(); refreshAll(); return [n, all, nr];
 }
-const impMsg = ([n, all, nr]) => (all || nr) ? `匯入完成，清單新增 ${n} 件${nr ? `，路線 ${nr} 條` : ""}` : "沒有讀到作品編號，請確認貼上的內容";
+const impMsg = ([n, all, nr]) => (all || nr) ? `匯入完成，清單新增 ${n} 件${nr ? `，路線 ${nr} 條，已放進我的行程` : ""}` : "沒有讀到作品編號，請確認貼上的內容";
 $("copy").onclick = () => {
   const code = "大地清單:" + JSON.stringify(exportObj());
   io.value = code; io.select();
@@ -4022,12 +4061,12 @@ function workCardHtml(d){
     (alerts.length ? `<ul class="wc-alert">${alerts.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : "") + notes +
     `<div class="wave" aria-hidden="true"></div>` + blurbHtml(d) +
     `<div class="wc-acts">${acts}</div>` +
-    `<div class="wc-foot">${ns.length ? `<button type="button" data-wcgo="near">附近 ${NEAR_M} 公尺內還有 ${ns.length} 件</button>` : `<span>附近 ${NEAR_M} 公尺內沒有其他作品</span>`}<button type="button" class="wc-go-det" data-wcgo="det">詳細資訊</button></div></div>` +
+    `<div class="wc-foot">${ns.length ? `<button type="button" data-wcgo="near">附近 ${NEAR_M} 公尺內還有 ${ns.length} 件</button>` : `<span>附近 ${NEAR_M} 公尺內沒有其他作品</span>`}<button type="button" class="wc-go-det" data-wcgo="det" aria-expanded="false" aria-controls="wcdet">詳細資訊</button></div></div>` +
     `<div class="wc-more">` + ex.body + photoHtml(d) +
-    `<details class="wc-det"><summary>詳細資訊</summary>${rows.map(([k, t]) => `<div><span>${k}：</span>${esc(t)}</div>`).join("")}${ex.detail}` +
+    `<div class="wc-det" id="wcdet" hidden>${rows.map(([k, t]) => `<div><span>${k}：</span>${esc(t)}</div>`).join("")}${ex.detail}` +
     (d.類型 === "戶外" ? `<div class="pp-etq">${ETIQUETTE}</div>` : "") +
     (d.資料來源 ? `<a class="pp-src" href="${SRC_URL}" target="_blank" rel="noopener" title="${esc(d.資料來源)}">開放資訊來源</a>` : "") +
-    (d.官網連結 ? officialLink(d) : "") + `</details>` +
+    (d.官網連結 ? officialLink(d) : "") + `</div>` +
     transitHtml(d) + nearbyCardHtml(d) + `</div>`;
 }
 var wcard = null;
@@ -4106,9 +4145,10 @@ if (SHEET){
   box.addEventListener("click", e => {
     const go = e.target.closest("[data-wcgo]");
     if (go){
+      const det = go.dataset.wcgo === "det", t = box.querySelector(det ? ".wc-det" : ".wc-near");
+      if (det && t && !t.hidden){ t.hidden = true; go.setAttribute("aria-expanded", "false"); return; }
       setState("full");
-      const t = box.querySelector(go.dataset.wcgo === "near" ? ".wc-near" : ".wc-det");
-      if (t){ if (t.tagName === "DETAILS") t.open = true; setTimeout(() => t.scrollIntoView({block:"start", behavior:RM.matches ? "auto" : "smooth"}), 300); }
+      if (t){ if (det){ t.hidden = false; go.setAttribute("aria-expanded", "true"); } setTimeout(() => t.scrollIntoView({block:"start", behavior:RM.matches ? "auto" : "smooth"}), 300); }
       return;
     }
     if (st === "peek" && !e.target.closest("button,a,input,select,summary,label")) setState("full");
@@ -4138,7 +4178,7 @@ if (H.get("r")){
     const rm = H.get("rm"); sharedRoute = {name:H.get("rn") || "分享的路線", mode:["walk", "bus", "train"].includes(rm) ? rm : "drive", stops};
     const same = route.stops.length === stops.length && route.stops.every((s, i) => sameStop(s, stops[i]));
     if (same){ saveShared(routes, sharedRoute); persist(); sharedRoute = null; }
-    else if (route.stops.length && !confirm(`這個連結帶有一條路線「${sharedRoute.name}」（${stops.length} 站）。\n要用它取代目前的路線（${route.stops.length} 站）嗎？\n目前的路線會先存到「已儲存的路線」。`)){ sharedRoute = null; setTimeout(() => toast("沒有載入分享的路線，目前路線不變"), 300); }
+    else if (route.stops.length && !confirm(`這個連結帶有一條路線「${sharedRoute.name}」（${stops.length} 站）。\n要用它取代目前的路線（${route.stops.length} 站）嗎？\n目前的路線仍會留在「我的行程」。`)){ sharedRoute = null; setTimeout(() => toast("沒有載入分享的路線，目前路線不變"), 300); }
     else if (route.stops.length){
       const nm = (route.name || "目前路線") + `（${new Date().toLocaleDateString("zh-TW")} 前）`;
       const copy = JSON.parse(JSON.stringify(route)); copy.name = nm; copy.ts = new Date().toISOString();
@@ -4159,7 +4199,7 @@ updateRoute(bootRoute);
 const tabMap = {list:"l", route:"r", presets:"p", search:"s"};
 if (H.get("preset")) loadPreset(H.get("preset"));
 if (H.get("tab")) showTab(tabMap[H.get("tab")] || H.get("tab"));
-if (sharedRoute){ showTab("r"); if (!bootRoute) updateRoute(true); toast(`已載入分享的路線「${sharedRoute.name}」，也存進「已儲存的路線」`); }
+if (sharedRoute){ showTab("r"); if (!bootRoute) updateRoute(true); toast(`已載入分享的路線「${sharedRoute.name}」，也存進「我的行程」`); }
 if (H.get("open") && BY[H.get("open")]) zoomTo(BY[H.get("open")]);
 if (H.get("q")){ q.value = H.get("q"); render(); }
 if (/^\d+(\.\d+)?$/.test(H.get("z") || "")) map.setView(H.get("c") ? H.get("c").split(",").map(Number) : map.getCenter(), +H.get("z"), {animate:false});
@@ -4385,7 +4425,7 @@ function onbClose(){
   });
   /* 選建議：打開推薦路線分頁（手機沒有第四個 tab） */
   if ($("rpresets")) $("rpresets").onclick = () => { showTab("p"); if (typeof setSheet === "function" && sheetState === "peek") setSheet("half"); };
-  if ($("rfit2")) $("rfit2").onclick = () => { if ($("rfit")) $("rfit").click(); else if (typeof fitRoute === "function") fitRoute(); };
+  if ($("rfit2")) $("rfit2").onclick = fitRoute;
   if ($("pbackb")) $("pbackb").onclick = () => showTab("r");
   /* 載入建議路線後回路線分頁 */
   if (typeof loadPreset === "function"){
@@ -4447,7 +4487,8 @@ const stationStop = n => ({p:n, lat:PLACES[n][0], lng:PLACES[n][1]});
 const tripMode = m => MODES.includes(m) ? m : "drive";
 const dayRouteKey = (t, D) => routeKey({stops:D.stops, mode:t.mode});
 const tripKey = t => t.name + "|" + t.mode + "|" + t.days.map(D => D.date + ">" + dayRouteKey(t, D)).join("!");
-const baseName = n => String(n || "").replace(/\s*第 \d+ 天$/, "").trim();
+/* 行程名稱不帶「第 N 天」，天數只由標題加；舊存檔結尾已有的就去掉 */
+const baseName = n => String(n || "").replace(/[\s：:]*第 \d+ 天$/, "").trim();
 const defName = () => `我的行程 ${curDay().slice(5).replace("-", "/")}`;
 const uniqName = n => { let x = n, i = 2; while (trips.some(t => t.name === x)) x = `${n}（${i++}）`; return x; };
 const syncTV = () => { tripView = trip && trip.from === "shared" ? trip : null; };
@@ -4463,7 +4504,7 @@ persist = (orig => () => { orig(); writeBack(); renderTripBox(); })(persist);
 function showDay(t, k, fit = true, setDate = true){
   if (!t || !t.days[k]) return;
   trip = t; editing = k; syncTV();
-  tripLoading = true; setRoute({name:`${t.name} 第 ${k + 1} 天`, stops:t.days[k].stops, mode:t.mode}, fit); tripLoading = false;
+  tripLoading = true; setRoute({name:baseName(t.name) || t.name, stops:t.days[k].stops, mode:t.mode}, fit); tripLoading = false;
   saveTrip();
   const D = t.days[k]; if (setDate && D.date >= dayEl.min && D.date <= dayEl.max && dayEl.value !== D.date){ dayEl.value = D.date; dayEl.dispatchEvent(new Event("change", {bubbles:true})); }
   renderTripBox(); if (typeof renderTripView === "function") renderTripView();
@@ -4542,6 +4583,9 @@ function migrateTrips(){
     const ov = cleanTrip(load(LS_TRIPV, null)); if (ov && ov.days.length && !list.some(x => tripKey(x) === tripKey(ov))) list.push(Object.assign(ov, {from:"shared"}));
   }
   trips = list.map(cleanTrip).filter(t => t && t.days.length);
+  /* LS_MODEL 到 3 表示舊路線已轉過，之後不再轉 */
+  if ((+load(LS_MODEL, 0) || 0) < 3) routesToTrips(routes);
+  routesToTrips(pendingRoutes.splice(0));
   trip = trips.find(t => t.id === load(LS_CUR, null)) || null;
   editing = trip ? Math.max(0, Math.min(trip.days.length - 1, +load(LS_TRIPED, 0) || 0)) : null;
   if (validStops(route.stops).length){
@@ -4550,8 +4594,20 @@ function migrateTrips(){
       if (hit){ trip = hit[0]; editing = hit[1]; } else { trip = newTrip(route); editing = 0; }
     }
   } else if (!trip && trips.length){ trip = trips[0]; editing = 0; }
-  syncTV(); saveTrip(); store(LS_MODEL, 2);
-  if (trip && trip.days[editing] && dayRouteKey(trip, trip.days[editing]) !== routeKey(route)){ tripLoading = true; setRoute({name:`${trip.name} 第 ${editing + 1} 天`, stops:trip.days[editing].stops, mode:trip.mode}, false); tripLoading = false; }
+  if (trip) route.name = baseName(trip.name) || trip.name;
+  syncTV(); saveTrip(); store(LS_MODEL, 3);
+  if (trip && trip.days[editing] && dayRouteKey(trip, trip.days[editing]) !== routeKey(route)){ tripLoading = true; setRoute({name:baseName(trip.name) || trip.name, stops:trip.days[editing].stops, mode:trip.mode}, false); tripLoading = false; }
+  routesImported = rs => { routesToTrips(rs); saveTrip(); renderTripBox(); };
+}
+/* 舊版「已儲存的路線」每條轉成 1 天行程，站點與交通方式相同的已在行程裡就略過。原資料不刪，匯出格式照舊 */
+function routesToTrips(list){
+  let n = 0;
+  (Array.isArray(list) ? list : []).forEach(r => {
+    if (!r || !Array.isArray(r.stops) || !validStops(r.stops).length || findDay(r)) return;
+    const t = cleanTrip({id:newId(), name:uniqName(String(baseName(r.name) || defName()).slice(0, 40)), mode:tripMode(r.mode), days:[{date:curDay(), stops:cpy(r.stops)}]});
+    if (t && t.days.length && t.days[0].stops.length){ trips.push(t); n++; }
+  });
+  return n;
 }
 function addDay(){
   if (!trip){ toast("先加第一站，會自動建立行程"); return; }
@@ -4593,7 +4649,7 @@ function renderDayHead(){
     box.append(b, d);
   } else {
     const h = document.createElement("div"); h.className = "fdh";
-    const b = document.createElement("b"); b.textContent = "正在看：" + trip.name + " 第 " + (editing + 1) + " 天";
+    const b = document.createElement("b"); b.textContent = "正在看：" + trip.name.replace(/[\s：:]*第 \d+ 天$/, "") + " 第 " + (editing + 1) + " 天";
     const meta = document.createElement("span"); meta.className = "muted";
     const mode = document.createElement("span"); mode.className = "fmode"; mode.textContent = MODE_LBL[trip.mode] || "開車";
     meta.append(dayLbl(trip.days[editing].date) + "，", mode);
