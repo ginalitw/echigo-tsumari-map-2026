@@ -851,11 +851,11 @@ ul.lst li.grp:hover{background:none}
 .rcheck ul{margin:4px 0 0;padding-left:18px}
 #offline{position:fixed;z-index:1200;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top));max-width:calc(100% - 24px);box-sizing:border-box;background:#1d1d1b;color:#fff;font-size:12.5px;line-height:1.4;padding:6px 12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 #offline[hidden]{display:none}
-@media (min-width:701px){#offline{top:12px}}
+@media (min-width:768px){#offline{top:12px}}
 .pp-bus summary{cursor:pointer;padding:7px 0}
 .pp-bus summary b{font-weight:700}
 .pp-bus>div{margin-top:2px}
-@media (min-width:701px){.leaflet-popup-content{max-height:min(480px, calc(100vh - 160px));overflow-y:auto;overscroll-behavior:contain}}
+@media (min-width:768px){.leaflet-popup-content{max-height:min(480px, calc(100vh - 160px));overflow-y:auto;overscroll-behavior:contain}}
 
 /* 清單排序：熱門／編號（精簡切換） */
 .listbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;flex-wrap:wrap}
@@ -864,7 +864,7 @@ ul.lst li.grp:hover{background:none}
 .lsort button{appearance:none;border:0;background:transparent;padding:5px 10px;font:inherit;font-size:12px;color:#6b6b6b;cursor:pointer;min-height:30px;line-height:1}
 .lsort button.on{background:#1d1d1b;color:#fff;font-weight:600}
 .lsort button:focus-visible{outline:2px solid #1a5fc8;outline-offset:-2px}
-@media (max-width:700px){
+@media (max-width:767.98px){
   .listbar{margin:4px 0 2px}
   .lsort button{padding:4px 9px;font-size:11.5px;min-height:28px}
 }
@@ -1094,7 +1094,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 @keyframes onbIn{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.onb-card{animation:none}}
 /* ===== mobile: bottom sheet ===== */
-@media (max-width:700px){
+@media (max-width:767.98px){
   #panel{top:auto;left:0;right:0;bottom:0;width:auto;max-height:none;height:calc(158px + env(safe-area-inset-bottom));border-radius:16px 16px 0 0;box-shadow:0 -1px 0 rgba(0,0,0,.06),0 -8px 28px rgba(0,0,0,.12);padding-bottom:env(safe-area-inset-bottom);transition:height .28s cubic-bezier(.2,.8,.2,1)}
   #panel.dragging{transition:none}
   #panel h1,#panel .sub{display:none}
@@ -1165,12 +1165,12 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   body.redit-on #redit{background:#1d1d1b;color:#fff;border-color:#1d1d1b}
   .fanbar{display:none}  /* 專頁提示改到 ⋯ 選單，首屏不佔空間 */
 }
-@media (min-width:701px){
+@media (min-width:768px){
   #mmenu,#mmenupop,#rquick,#pback,#redit{display:none!important}
   .rhead-acts #rclear{display:inline-flex}
 }
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
-@media (min-width:701px){#panel>.sheet-body{flex:1 1 auto}}
+@media (min-width:768px){#panel>.sheet-body{flex:1 1 auto}}
 .about{margin:20px 0 4px;padding:14px 0 0;border-top:1px solid var(--line);font-size:13px;line-height:1.7;color:var(--mute)}
 .about h2{font-size:14px;margin:0 0 4px;color:var(--ink);font-weight:600}
 .about p{margin:0 0 6px}
@@ -1195,6 +1195,54 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 .fdays .b.on{background:#1d1d1b;border-color:#1d1d1b;color:#fff}
 .ftrips li.on .t{font-weight:600}
 .ftrips .fcur{font-size:12px;padding:0 6px}
+/* 手機首屏按鈕列與作品浮動卡；寬度 768 以上不顯示 */
+.mbar,.lg-more,#wcard{display:none}
+@media (max-width:767.98px){
+  .mbar{display:flex;gap:8px;margin:10px 12px 10px}
+  .mbar button{flex:1 1 0;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:4px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
+  .mbar button:active{background:var(--wash)}
+  .mbar .n{min-width:18px;padding:0 5px;border-radius:9px;background:var(--wash);color:var(--mute);font-size:12px;line-height:18px;font-variant-numeric:tabular-nums;box-sizing:border-box}
+  .mbar .n:empty{display:none}
+  body:not(.sheet-peek) .mbar{display:none}
+  body.sheet-peek #tabs{display:none}
+  .lg-more{display:inline-flex;align-items:center;min-height:32px;padding:0 10px;margin-left:auto;border:1px solid var(--line);border-radius:16px;background:#fff;font:inherit;font-size:12.5px;color:var(--ink);cursor:pointer}
+  body.wc-on #panel{visibility:hidden}
+  #wcard{display:flex;flex-direction:column;position:fixed;z-index:1100;left:0;right:0;bottom:0;height:25vh;box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom);background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -1px 0 rgba(0,0,0,.06),0 -8px 28px rgba(0,0,0,.16);overflow:hidden;touch-action:none;transition:height .28s cubic-bezier(.2,.8,.2,1),transform .28s cubic-bezier(.2,.8,.2,1)}
+  #wcard[hidden]{transform:translateY(105%);visibility:hidden;transition:transform .24s ease-in,visibility 0s .24s}
+  #wcard.dragging{transition:none}
+  .wc-grip{flex:none;display:flex;align-items:center;justify-content:center;width:100%;height:24px;padding:0;border:none;background:none;cursor:grab}
+  .wc-grip:before{content:"";width:40px;height:5px;border-radius:3px;background:#cfccc4}
+  .wc-scroll{flex:1 1 auto;min-height:0;overflow:hidden;padding:0 16px 16px}
+  #wcard[data-state="full"] .wc-scroll{overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+  .wc-t{display:flex;align-items:center;gap:8px;min-width:0}
+  .wc-name{flex:1;min-width:0;display:flex;align-items:baseline;gap:3px;font-size:17px;font-weight:700;line-height:1.35;color:inherit;text-decoration:none}
+  .wc-nt{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #wcard[data-state="full"] .wc-nt{white-space:normal}
+  .wc-ext{flex:none;font-size:12px;font-weight:400;color:var(--mute)}
+  .wc-day{display:flex;align-items:center;gap:8px;margin:2px 0 10px;font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums}
+  .wc-day .st{margin:0;font-size:13px;line-height:24px;padding:0 10px;border-radius:12px;font-weight:600}
+  .wc-alert{list-style:none;margin:-2px 0 10px;padding:6px 10px;border:1px solid #EBDDB5;border-radius:8px;background:#FBF4E2;color:#5a4410;font-size:13px;line-height:1.5}
+  .wc-acts{display:flex;gap:8px}
+  .wc-btn{flex:1 1 0;min-width:0;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:4px;margin:0;padding:0 6px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;font-size:14px;color:var(--ink);text-decoration:none;white-space:nowrap;box-sizing:border-box;cursor:pointer}
+  .wc-btn:active{background:var(--wash)}
+  .wc-btn.on{border-color:var(--ink);font-weight:600}
+  .wc-btn:disabled{color:var(--mute);cursor:default}
+  body:not(.redit-on) .wc-route{display:none}
+  .wc-more{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:15px;line-height:1.6}
+  #wcard[data-state="peek"] .wc-more{visibility:hidden}
+  .wc-more .pp-ja{margin:0}
+  .wc-who{font-size:13px;color:var(--mute);margin:2px 0 0}
+  .wc-hours{margin:10px 0 4px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+  .wc-det{margin-top:8px;border-top:1px solid var(--line);font-size:13px;line-height:1.6;color:#3d3d3d}
+  .wc-det summary{display:flex;align-items:center;min-height:44px;list-style:none;font-size:14px;color:var(--ink);cursor:pointer}
+  .wc-det summary::-webkit-details-marker{display:none}
+  .wc-det summary:after{content:"▾";margin-left:6px;color:var(--mute);transition:transform .2s}
+  .wc-det[open] summary:after{transform:rotate(180deg)}
+  .wc-det>div{margin:0 0 4px}
+  .wc-det span{color:var(--mute)}
+  .wc-det .pp-etq{color:#8F5600}
+  .wc-more .pp-rule,.wc-more .pp-src{font-size:13px}
+}
 </style>
 </head>
 <body>
@@ -1210,6 +1258,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   <div id="mdesc">選日期看作品當天能不能參觀，點地圖上的點看詳情</div>
   <div class="daterow" id="daterow"><label for="day">今天開不開</label><input type="date" id="day" min="2026-04-25" max="2027-03-31"><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
   <div id="daystat" aria-live="polite"></div>
+  <div class="mbar" id="mbar"><button type="button" id="mfilter" aria-controls="sheet-body">篩選</button><button type="button" id="mtrip" aria-controls="sheet-body">我的行程<span class="n" id="mtripn"></span></button></div>
   <div class="tabs" id="tabs" role="tablist" aria-label="面板分頁"><button id="tab-s" class="on" role="tab" aria-selected="true" aria-controls="pane-s">搜尋</button><button id="tab-l" role="tab" aria-selected="false" aria-controls="pane-l"><span class="tl-long">我的</span>清單<span class="n" id="favn">0</span></button><button id="tab-r" role="tab" aria-selected="false" aria-controls="pane-r">路線<span class="n" id="routen">0</span></button><button id="tab-p" role="tab" aria-selected="false" aria-controls="pane-p">推薦路線</button></div>
   <div class="sheet-body" id="sheet-body">
   <div id="pane-s" role="tabpanel">
@@ -1638,7 +1687,7 @@ let FAN_ROUTES = [], FAN_NOTES = [];
 const CFG = window.ETMAP || {style:"plain"};
 const ILL = CFG.style === "illustrated";
 const SHEET = !!CFG.sheet;
-const MQ = window.matchMedia("(max-width:700px)");
+const MQ = window.matchMedia("(max-width:767.98px)");
 const useSheet = () => SHEET && MQ.matches;
 const RM = window.matchMedia("(prefers-reduced-motion: reduce)");
 const anim = d => RM.matches ? {animate:false} : {duration:d};
@@ -1808,6 +1857,42 @@ function isWinterDay(dateStr){ const [, m, d] = dateStr.split("-").map(Number); 
 const isWinterWork = d => d.冬季線 === "是" || d.冬季 === "冬季開放";
 const isOffSeason = dateStr => dateStr < "2026-04-25" || dateStr > "2026-11-08";
 /* RULES-END */
+/* 手機浮動卡：從開放時間挑出所選月份的時段。格式看不懂、或同時有好幾段都可能，就回傳 null，不猜 */
+const HM = "\\d{1,2}:\\d{2}";
+const inMonths = (m, a, b) => a <= b ? m >= a && m <= b : m >= a || m <= b;
+function dayHours(d, dateStr){
+  const m = +dateStr.slice(5, 7), segs = [];
+  for (const raw of String(d.開放時間 || "").split(/[；;]/).map(s => s.trim()).filter(Boolean)){
+    const pm = /^(\d{1,2})(?:\s*[–-]\s*(\d{1,2}))?\s*月\s*/.exec(raw), rest = pm ? raw.slice(pm[0].length) : raw;
+    const tm = new RegExp("^(" + HM + ")\\s*[–-]\\s*(" + HM + ")").exec(rest);
+    const S = {months:pm ? [+pm[1], +(pm[2] || pm[1])] : null, open:tm && tm[1], close:tm && tm[2], ex:[]};
+    for (const [, p] of rest.matchAll(/[（(]([^）)]*)[）)]/g)){
+      if (!/月/.test(p)) continue;
+      let x;
+      if ((x = new RegExp("^(\\d{1,2})\\s*[–-]\\s*(\\d{1,2})\\s*月\\s*至\\s*(" + HM + ")$").exec(p))) S.ex.push({months:[+x[1], +x[2]], close:x[3]});
+      else if ((x = new RegExp("^(\\d{1,2})\\s*月起至\\s*(" + HM + ")$").exec(p))) S.ex.push({months:[+x[1], 3], close:x[2]});
+      else if ((x = new RegExp("^(\\d{1,2})\\s*[–-]\\s*(\\d{1,2})\\s*月\\s*(" + HM + ")\\s*[–-]\\s*(" + HM + ")$").exec(p))) S.ex.push({months:[+x[1], +x[2]], open:x[3], close:x[4]});
+      else return null;
+    }
+    segs.push(S);
+  }
+  const hit = segs.filter(S => !S.months || inMonths(m, S.months[0], S.months[1]));
+  if (hit.length !== 1 || !hit[0].open) return null;
+  const S = hit[0], e = S.ex.find(x => inMonths(m, x.months[0], x.months[1]));
+  return `${(e && e.open) || S.open}–${(e && e.close) || S.close}`;
+}
+/* 備註裡寫到的日期（10/19 休館、11/1 起不開放、7/18–8/31 …）命中所選日期時，回傳那一段原文。4–12 月算 2026 年，1–3 月算 2027 年 */
+function noteHits(d, dateStr){
+  const [y, mo, da] = dateStr.split("-").map(Number), v = (y > 2026 ? 10000 : 0) + mo * 100 + da;
+  const ord = (m, dd) => (+m < 4 ? 10000 : 0) + (+m) * 100 + (+dd);
+  return String(d.備註 || "").split(/[；;]/).map(s => s.trim()).filter(seg => {
+    let s = seg, on = false;
+    s = s.replace(/(\d{1,2})\/(\d{1,2})\s*[–-]\s*(\d{1,2})\/(\d{1,2})/g, (_, a, b, c, e) => { if (v >= ord(a, b) && v <= ord(c, e)) on = true; return ""; });
+    s = s.replace(/(\d{1,2})\/(\d{1,2})\s*起/g, (_, a, b) => { if (v >= ord(a, b)) on = true; return ""; });
+    s.replace(/(\d{1,2})\/(\d{1,2})/g, (_, a, b) => { if (v === ord(a, b)) on = true; return ""; });
+    return on;
+  });
+}
 const SRC_URL = "https://www.echigo-tsumari.jp/assets/uploads/2026/10/" + encodeURIComponent("「2026年の越後妻有」作品公開カレンダー（英）.pdf");
 const SEASON = ["2026-04-25", "2026-11-08"];
 const STATE_TXT = {open:"這天開放", view:"定休日可觀看", stay:"僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀", closed:"這天休館", unknown:"尚未公布開放資訊"};
@@ -2055,7 +2140,8 @@ const legendSw = st => { const c = LG_C, s = {open:`r="6.5" fill="${c}" stroke="
   return `<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" ${s}/></svg>`; };
 const LEGEND_ITEMS = [["open", "開放", "實心"], ["view", "定休日可觀看", "空心粗框：當天是定休日，戶外部分仍可觀看（官方說明）"], ["stay", "僅限住宿者", "白底虛線框：只開放入住旅客，非住宿者無法參觀"], ["closed", "休館", "灰色淡化"], ["unknown", "未公布", "淡色小點：尚未公布開放資訊；會期外的冬季開放作品也是這個樣式"]];
 if (!ILL && $("stat")){
-  $("stat").insertAdjacentHTML("afterend", `<div id="legend" class="legend" aria-label="地圖標記說明">${LEGEND_ITEMS.slice(0, 4).map(([k, t]) => `<span class="lg lg-${k}">${legendSw(k)}${t}</span>`).join("")}<span class="lg lg-note">顏色代表地區</span></div>`);
+  $("stat").insertAdjacentHTML("afterend", `<div id="legend" class="legend" aria-label="地圖標記說明">${LEGEND_ITEMS.slice(0, 4).map(([k, t]) => `<span class="lg lg-${k}">${legendSw(k)}${t}</span>`).join("")}<span class="lg lg-note">顏色代表地區</span><button type="button" class="lg-more" id="lgmore" aria-controls="legendpop">完整圖例</button></div>`);
+  $("lgmore").onclick = () => { const lg = $("mlegend"); if (lg) lg.click(); };
 }
 if ($("legendpop")){
   const pop = $("legendpop"), btn = $("mlegend");
@@ -2171,6 +2257,7 @@ let detailCode = null, lastTab = "s";
 function showTab(t){
   TABS.forEach(x => { const p = $("pane-" + x), b = $("tab-" + x); if (p) p.style.display = x === t ? "" : "none"; if (b){ b.classList.toggle("on", x === t); b.setAttribute("aria-selected", x === t); b.tabIndex = x === t ? 0 : -1; } });
   const pd = $("pane-d"); if (pd) pd.style.display = "none";
+  if (wcard) wcard.hide();
   if (detailCode) selMarker(null);
   detailCode = null; lastTab = t;
   document.body.dataset.tab = t;
@@ -2192,6 +2279,7 @@ function selMarker(d){
 }
 function showDetail(d){
   detailCode = d.作品編號;
+  if (useSheet() && wcard){ wcard.open(d); selMarker(d); if (zoomUpdate) zoomUpdate(); return; }
   TABS.forEach(x => { const p = $("pane-" + x), b = $("tab-" + x); if (p) p.style.display = "none"; if (b){ b.classList.remove("on"); b.setAttribute("aria-selected", "false"); } });
   $("pane-d").style.display = "";
   renderDetail();
@@ -2202,6 +2290,7 @@ function showDetail(d){
 }
 function renderDetail(){
   const d = BY[detailCode]; if (!d) return;
+  if (useSheet() && wcard && wcard.isOpen()){ wcard.render(d); selMarker(d); return; }
   $("pane-d").innerHTML = `<div class="dnav"><button class="dback" data-back>‹ 返回${({s:"搜尋", l:"我的清單", r:"路線", p:"推薦路線"})[lastTab]}</button></div><div class="dcard">${popupHtml(d)}</div>`;
   selMarker(d);
 }
@@ -2544,6 +2633,7 @@ function renderRouteList(pending){
   renderGmaps();
   renderSavedRoutes();
   const rn = $("routen"); if (rn) rn.textContent = route.stops.length;
+  const mn = $("mtripn"); if (mn) mn.textContent = route.stops.length || "";
   const rh = $("rhead"); if (rh){ rh.hidden = !route.stops.length; $("rheadt").textContent = `目前路線 ${route.stops.length} 站`; }
 }
 /* 路線檢查：所選日期每一站的狀態，有問題的站列在路線最上方；非開車路線附上有官方出處的末班巴士 */
@@ -3039,6 +3129,7 @@ document.addEventListener("click", e => {
   const a = e.target.closest("[data-addroute]");
   if (a){ e.preventDefault(); e.stopPropagation(); addStop({c:a.dataset.addroute});
     if (a.classList.contains("addr")){ a.textContent = "已加入"; a.disabled = true; a.removeAttribute("data-addroute"); toast(`已加入路線，共 ${route.stops.length} 站`); }
+    else if (a.classList.contains("wc-route")){ a.innerHTML = '<span aria-hidden="true">✓</span>路線'; a.setAttribute("aria-label", "已在路線"); a.disabled = true; a.removeAttribute("data-addroute"); toast(`已加入路線，共 ${route.stops.length} 站`); }
     else a.textContent = "已加入路線";
     return; }
   const b = e.target.closest("[data-up],[data-down],[data-del]");
@@ -3271,7 +3362,7 @@ $("tabs").addEventListener("keydown", e => {
   const i = bs.indexOf(document.activeElement); if (i < 0) return;
   const n = bs[(i + (e.key === "ArrowRight" ? 1 : bs.length - 1)) % bs.length]; n.focus(); n.click(); e.preventDefault();
 });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && detailCode && !e.target.closest("input,textarea,select")) showTab(lastTab); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && detailCode && !e.target.closest("input,textarea,select")){ if (wcard && wcard.isOpen()) wcard.close(); else showTab(lastTab); } });
 
 /* ===== toast ===== */
 function toast(t){
@@ -3283,11 +3374,13 @@ function toast(t){
 var sheetState = "half", setSheet = null;
 if (SHEET){
   const panel = $("panel"), handle = $("sheet-handle"), root = document.documentElement;
-  const peekH = () => { const tb = $("tabs"); return tb.offsetTop + tb.offsetHeight + 10 + (parseFloat(getComputedStyle(panel).paddingBottom) || 0); };
+  /* 收合時只露出日期與〔篩選〕〔我的行程〕；分頁在半開以上才顯示，所以高度用固定的按鈕列高度算，不量隱藏中的元素 */
+  const peekH = () => { const dr = $("daterow"), ds = $("daystat"), top = ds && ds.offsetParent ? ds.offsetTop + ds.offsetHeight : dr.offsetTop + dr.offsetHeight; return top + 64 + (parseFloat(getComputedStyle(panel).paddingBottom) || 0); };
   const snapH = s => { const H = window.innerHeight; return s === "peek" ? peekH() : s === "half" ? (H <= 680 ? Math.max(peekH(), Math.min(Math.round(H * 0.45), H - 300)) : Math.round(H * 0.52)) : H - 64; };
   const apply = h => { panel.style.height = h + "px"; root.style.setProperty("--sheet-h", h + "px"); };
   setSheet = function(s){
     sheetState = s;
+    document.body.classList.toggle("sheet-peek", useSheet() && s === "peek");
     if (!useSheet()){ panel.style.height = ""; root.style.setProperty("--sheet-h", "0px"); return; }
     apply(snapH(s)); panel.dataset.state = s;
     if (areaRedraw){ areaRedraw(); clearTimeout(panel._art); panel._art = setTimeout(areaRedraw, 320); }
@@ -3314,8 +3407,119 @@ if (SHEET){
   q.addEventListener("keydown", e => { if (e.key === "Enter" && useSheet()){ q.blur(); setSheet("half"); } });
   window.addEventListener("resize", () => setSheet(sheetState));
   MQ.addEventListener("change", () => setSheet(sheetState));
-  setSheet("half");  /* 手機預設半開，約一半地圖可見；可再往下收 */
+  setSheet("peek");  /* 手機首屏只留地圖、日期與〔篩選〕〔我的行程〕 */
   if ($("mall")) $("mall").onclick = () => fitAll(true);
+  if ($("mfilter")) $("mfilter").onclick = () => { showTab("s"); setSheet("half"); };
+  if ($("mtrip")) $("mtrip").onclick = () => { showTab("r"); setSheet("half"); };
+}
+
+/* ===== 手機作品浮動卡：點地圖圓點從底部滑出，不換頁。收合約螢幕 1/4，往上拉展開，往下滑或點地圖空白處關閉 ===== */
+let cardCheckin = d => "";
+let cardExtra = d => ({detail:"", body:""});
+function workCardHtml(d){
+  const c = d.作品編號, day = curDay(), di = d._day || dayInfo(d, day), nm = d.中文名 || d.作品名稱, sv = isSaved(c), ja = d.中文名 ? "" : ' lang="ja"';
+  const title = d.官網連結 ? `<a class="wc-name" href="${esc(d.官網連結)}" target="_blank" rel="noopener" aria-label="${esc(nm)}，官網作品頁"><span class="wc-nt"${ja}>${esc(nm)}</span><span class="wc-ext" aria-hidden="true">↗</span></a>`
+    : `<b class="wc-name"><span class="wc-nt"${ja}>${esc(nm)}</span></b>`;
+  const alerts = di.tags.concat(noteHits(d, day));
+  const acts = cardCheckin(d) +
+    `<button type="button" class="wc-btn${sv ? " on" : ""}" data-fav="${esc(c)}" aria-pressed="${sv}" aria-label="${sv ? "從清單移除" : "加入清單"}"><span aria-hidden="true">${sv ? "★" : "☆"}</span>想去</button>` +
+    (!d.marker ? "" : inRoute(c) ? `<button type="button" class="wc-btn wc-route" disabled aria-label="已在路線"><span aria-hidden="true">✓</span>路線</button>`
+      : `<button type="button" class="wc-btn wc-route" data-addroute="${esc(c)}" aria-label="加入路線"><span aria-hidden="true">＋</span>路線</button>`) +
+    (d.ll ? `<a class="wc-btn" href="${gmUrl(d.ll[0], d.ll[1])}" target="_blank" rel="noopener" aria-label="在 Google 地圖開啟"><span aria-hidden="true">📍</span>地圖</a>` : "");
+  const hrs = di.state === "open" ? dayHours(d, day) : null;
+  const who = [d.藝術家, d.設置地點].filter(Boolean).map(esc).join("｜");
+  const ex = cardExtra(d);
+  const rows = [["開放規則", d.開放規則], ["開放時間", d.開放時間 === "—" ? "" : d.開放時間], ["特殊條件", d.特殊條件], ["備註", d.備註], ["場所", d["官方場所（原文）"]]].filter(r => r[1]);
+  const notes = (d._rule && d._rule.stayIn ? `<div class="pp-note">館內僅限住宿者，外觀可自由觀看</div>` : d._rule && d._rule.stay ? `<div class="pp-note">僅限住宿者：只開放入住旅客參觀，非住宿者無法參觀</div>` : "") +
+    (d.座標來源 === "同場館推定" ? `<div class="pp-note">位置依同場館推定，現場請再確認</div>` : "");
+  return `<div class="wc-head"><div class="wc-t"><span class="pp-code">${esc(c)}</span>${title}</div>` +
+    `<div class="wc-day"><span class="st st-${di.state}">${esc(stateShort(di))}</span><span class="wc-date">${day.slice(5).replace("-", "/")}（${WD[new Date(day + "T00:00").getDay()]}）${esc(d.地區)}</span></div>` +
+    (alerts.length ? `<ul class="wc-alert">${alerts.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : "") +
+    `<div class="wc-acts">${acts}</div></div>` +
+    `<div class="wc-more">${d.中文名 ? `<div class="pp-ja" lang="ja">${esc(d.作品名稱)}</div>` : ""}${who ? `<div class="wc-who" lang="ja">${who}</div>` : ""}` +
+    (di.state === "open" ? `<div class="wc-hours">這天開放${hrs ? " " + esc(hrs) : ""}</div>` : "") + notes + ex.body + photoHtml(d) +
+    `<details class="wc-det"><summary>詳細資訊</summary>${rows.map(([k, t]) => `<div><span>${k}：</span>${esc(t)}</div>`).join("")}${ex.detail}` +
+    (d.類型 === "戶外" ? `<div class="pp-etq">${ETIQUETTE}</div>` : "") +
+    (d.資料來源 ? `<a class="pp-src" href="${SRC_URL}" target="_blank" rel="noopener" title="${esc(d.資料來源)}">開放資訊來源</a>` : "") + `</details>` +
+    transitHtml(d) + nearbyHtml(d) + `</div>`;
+}
+var wcard = null;
+if (SHEET){
+  const root = document.documentElement, el = document.createElement("div");
+  el.id = "wcard"; el.setAttribute("role", "dialog"); el.setAttribute("aria-label", "作品資訊"); el.hidden = true; el.dataset.state = "peek";
+  el.innerHTML = `<button type="button" class="wc-grip" aria-expanded="false" aria-label="展開作品資訊"></button><div class="wc-scroll"></div>`;
+  document.body.appendChild(el);
+  const grip = el.firstElementChild, box = el.lastElementChild;
+  let st = "peek", drag = null, pk = 0;
+  const vh = () => window.innerHeight;
+  const fullH = () => vh() - 64;
+  const peekH = () => { const hd = box.querySelector(".wc-head"), need = grip.offsetHeight + (hd ? hd.offsetHeight : 0) + (parseFloat(getComputedStyle(el).paddingBottom) || 0) + 8;
+    return Math.min(fullH(), Math.max(Math.round(vh() * 0.25), Math.ceil(need))); };
+  /* 地圖下緣的保留高度最多到收合高度，展開時署名列才不會跑到卡片上方 */
+  const apply = h => { el.style.height = h + "px"; root.style.setProperty("--sheet-h", Math.round(Math.min(h, pk || h)) + "px"); };
+  const setState = s => {
+    st = s; el.dataset.state = s;
+    if (s !== "full") box.scrollTop = 0;
+    pk = peekH();
+    apply(s === "full" ? fullH() : pk);
+    grip.setAttribute("aria-expanded", s === "full"); grip.setAttribute("aria-label", s === "full" ? "收合作品資訊" : "展開作品資訊");
+  };
+  const isOpen = () => !el.hidden;
+  const render = d => { box.innerHTML = workCardHtml(d); if (isOpen()){ pk = peekH(); if (st === "peek") apply(pk); } };
+  const open = d => {
+    render(d);
+    if (!isOpen()){ if (sheetState !== "peek") setSheet("peek"); el.hidden = false; document.body.classList.add("wc-on"); }
+    setState("peek");
+  };
+  const hide = () => { if (!isOpen()) return; el.hidden = true; document.body.classList.remove("wc-on"); setSheet(sheetState); };
+  const close = () => { if (detailCode) selMarker(null); detailCode = null; hide(); if (zoomUpdate) zoomUpdate(); };
+  wcard = {open, render, hide, close, isOpen};
+  const begin = y => { drag = {y0:y, h0:el.getBoundingClientRect().height, t0:performance.now(), moved:false}; };
+  const move = y => {
+    const dy = drag.y0 - y;
+    if (!drag.moved && Math.abs(dy) > 6){ drag.moved = true; el.classList.add("dragging"); }
+    if (drag.moved) apply(Math.max(0, Math.min(fullH(), drag.h0 + dy)));
+  };
+  const finish = y => {
+    const d = drag; drag = null; el.classList.remove("dragging");
+    if (!d || !d.moved) return false;
+    const h = el.getBoundingClientRect().height, v = (d.y0 - y) / Math.max(1, performance.now() - d.t0), p = peekH(), f = fullH();
+    let s;
+    if (v > 0.5) s = "full";
+    else if (v < -0.5) s = st === "full" && h > p * 0.6 ? "peek" : "close";
+    else s = h < p * 0.6 ? "close" : Math.abs(h - p) <= Math.abs(h - f) ? "peek" : "full";
+    if (s === "close") close(); else setState(s);
+    return true;
+  };
+  /* 展開時內容可捲動：捲到最上面再往下拉才收合 */
+  el.addEventListener("touchstart", e => {
+    drag = null; if (e.touches.length !== 1) return;
+    const inBox = box.contains(e.target);
+    if (st === "full" && inBox && box.scrollTop > 0) return;
+    begin(e.touches[0].clientY); drag.scroll = st === "full" && inBox;
+  }, {passive:true});
+  el.addEventListener("touchmove", e => {
+    if (!drag) return;
+    const y = e.touches[0].clientY;
+    if (drag.scroll && !drag.moved && y < drag.y0 - 6){ drag = null; return; }
+    move(y); if (drag.moved && e.cancelable) e.preventDefault();
+  }, {passive:false});
+  el.addEventListener("touchend", e => { if (drag && finish(e.changedTouches[0].clientY) && e.cancelable) e.preventDefault(); });
+  el.addEventListener("touchcancel", () => { if (drag){ drag = null; el.classList.remove("dragging"); setState(st); } });
+  let skipClick = false;
+  grip.addEventListener("pointerdown", e => { if (e.pointerType === "touch") return; begin(e.clientY); grip.setPointerCapture(e.pointerId); });
+  grip.addEventListener("pointermove", e => { if (drag && e.pointerType !== "touch") move(e.clientY); });
+  grip.addEventListener("pointerup", e => { if (e.pointerType !== "touch" && drag) skipClick = finish(e.clientY); });
+  grip.addEventListener("click", () => { if (skipClick){ skipClick = false; return; } setState(st === "full" ? "peek" : "full"); });
+  box.addEventListener("click", e => { if (st === "peek" && !e.target.closest("button,a,input,select,summary,label")) setState("full"); });
+  map.on("click", e => {
+    if (!useSheet()) return;
+    const t = e.originalEvent && e.originalEvent.target;
+    if (t && t.closest && t.closest("path.mk")) return;
+    if (isOpen()) close(); else if (sheetState !== "peek") setSheet("peek");
+  });
+  window.addEventListener("resize", () => { if (isOpen()) setState(st); });
+  MQ.addEventListener("change", () => { if (!useSheet() && isOpen()) close(); });
 }
 fitAll();
 
