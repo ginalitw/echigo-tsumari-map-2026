@@ -4479,7 +4479,8 @@ let trips = [], trip = null, tripView = null, editing = null, tripLoading = fals
 const MODES = ["drive", "walk", "bus", "train"];
 const newId = () => "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const cleanTrip = t => t && Array.isArray(t.days) ? {id:typeof t.id === "string" && t.id ? t.id : newId(), name:String(t.name || "我的行程").slice(0, 40), mode:MODES.includes(t.mode) ? t.mode : "drive", ...(t.from === "shared" ? {from:"shared"} : {}), days:t.days.filter(d => d && /^\d{4}-\d{2}-\d{2}$/.test(d.date) && Array.isArray(d.stops)).map(d => ({date:d.date, stops:d.stops.filter(s => s && (s.c ? BY[s.c] : okLL(stopLL(s))))}))} : null;
-const saveTrip = () => { store(LS_TRIPS, trips); store(LS_CUR, trip ? trip.id : null); store(LS_TRIPED, trip ? editing : null); };
+/* let：私人版可包一層同步到 Firestore；公開版／飯團版行為不變 */
+let saveTrip = () => { store(LS_TRIPS, trips); store(LS_CUR, trip ? trip.id : null); store(LS_TRIPED, trip ? editing : null); };
 const dayLbl = v => `${v.slice(5).replace("-", "/")}（${WD[new Date(v + "T00:00").getDay()]}）`;
 const cpy = x => JSON.parse(JSON.stringify(x));
 const addDays = (v, n) => { const d = new Date(v + "T00:00"); d.setDate(d.getDate() + n); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
