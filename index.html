@@ -1437,7 +1437,8 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 .tt-r span{color:var(--ink-soft);font-weight:400}
 .ttable b{font-size:var(--fs-l);font-weight:700;line-height:1.2;color:var(--ink);white-space:nowrap}
 .ttable em{font-style:normal;font-size:var(--fs-s);line-height:1.5;color:var(--ink)}
-.ttable.closed{background:var(--closed-bg);color:var(--closed)}
+.ttable.closed,.ttable.shut{background:var(--closed-bg);color:var(--closed)}
+.ttable .tt-was{display:block;font-size:var(--fs-xs);font-weight:400;line-height:1.4;color:var(--ink-soft)}
 .ttable.view{background:var(--view-bg);color:var(--view)}
 .ttable.stay{background:var(--stay-bg);color:var(--stay)}
 .ttable.unknown{background:var(--unknown-bg);color:var(--unknown)}
@@ -1492,7 +1493,7 @@ a.wt-link{color:inherit;text-decoration:none;cursor:pointer}
 .leaflet-container a.leaflet-popup-close-button{top:10px;right:8px;width:28px;height:28px;font-size:22px;line-height:26px;color:var(--ink-soft)}
 #pane-d .pp-head{margin-top:var(--sp-2)}
 @media (min-width:768px){
-  .dbox .day-wrap{position:static;height:auto}
+  .dbox .day-wrap{position:relative;flex:0 1 auto;height:auto}
   .dbox .day-show{padding:0;font-size:var(--fs-l);font-weight:700;line-height:1.3}
 }
 @media (pointer:coarse){.pp-foot summary{min-height:44px}}
@@ -1551,6 +1552,46 @@ a.wt-link{color:inherit;text-decoration:none;cursor:pointer}
   #mtitle.season-below ~ #mrain{top:calc(112px + env(safe-area-inset-top))}
 }
 @media (min-width:768px){#mrain{display:none!important}}
+/* 日落時間：手機在日期膠囊，電腦在日期旁邊 */
+.day-line{display:contents}
+.day-sun{font-variant-numeric:tabular-nums;white-space:nowrap}
+.day-sun[hidden]{display:none!important}
+@media (min-width:768px){
+  .dbox .day-line{display:flex;align-items:center;gap:8px;min-width:0;width:100%}
+  .day-sun{flex:none;font-size:var(--fs-s);font-weight:700;line-height:1.3;color:var(--ink-soft)}
+}
+@media (max-width:767.98px){
+  #mtitle .day-line{display:flex;align-items:center;gap:6px;min-width:0}
+  #mtitle .day-sun{display:block;flex:none;font-size:12px;font-weight:700;line-height:1.3;color:var(--ink)}
+}
+/* 日文出示卡的小按鈕，觸控至少 44px */
+.ja-btn{flex:none;min-width:44px;min-height:44px;margin-top:6px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font:inherit;font-size:14px;line-height:1;cursor:pointer}
+.ja-btn:hover{background:var(--wash)}
+.ja-btn .ic{width:18px;height:18px}
+.wc-t .ja-btn{margin-top:0;margin-left:auto}
+.sun-hint{margin:6px 0 0;font-size:var(--fs-xs);line-height:1.45;color:var(--ink-soft)}
+.admit{display:block;margin-top:2px;font-size:var(--fs-xs);font-weight:700;line-height:1.3;color:var(--warn);white-space:nowrap}
+p.admit{margin:6px 0 0}
+/* 出示給司機、店員看的全日文卡片 */
+#jcard{position:fixed;inset:0;z-index:5000;display:flex;flex-direction:column;box-sizing:border-box;padding:32px 24px calc(16px + env(safe-area-inset-bottom));background:#fff;color:#000}
+#jcard[hidden]{display:none!important}
+#jcard [hidden]{display:none!important}
+.jc-body{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;gap:12px;min-height:0}
+.jc-place{margin:0;font-size:36px;font-weight:700;line-height:1.35;overflow-wrap:anywhere}
+.jc-title{margin:0;font-size:22px;font-weight:500;line-height:1.45;overflow-wrap:anywhere}
+.jc-addr{margin:0;font-size:18px;line-height:1.5;overflow-wrap:anywhere}
+.jc-ask{margin:18px 0 0;font-size:22px;font-weight:700;line-height:1.45}
+.jc-acts{flex:none;display:flex;gap:12px}
+.jc-acts a,.jc-acts button{flex:1 1 auto;min-height:44px;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;padding:0 12px;border:1px solid #000;border-radius:10px;background:#fff;color:#000;font:inherit;font-size:16px;line-height:1.3;text-align:center;text-decoration:none;white-space:nowrap;cursor:pointer}
+.jc-acts .jc-map{flex:1.6 1 auto}
+.jc-acts .jc-x{flex:0.8 1 auto}
+@media (orientation:landscape) and (max-height:520px){
+  #jcard{padding:16px 28px calc(12px + env(safe-area-inset-bottom))}
+  .jc-place{font-size:48px}
+  .jc-title{font-size:30px}
+  .jc-addr{font-size:22px}
+  .jc-ask{margin-top:8px;font-size:28px}
+}
 </style>
 </head>
 <body>
@@ -1567,7 +1608,7 @@ a.wt-link{color:inherit;text-decoration:none;cursor:pointer}
   <h1>大地藝術祭 2026 作品地圖</h1>
   <div class="sub">越後妻有常設與公開作品 <b id="total"></b> 件</div>
   <div id="mdesc">選日期看作品那天能不能參觀，點地圖上的點看詳情</div>
-  <div class="daterow" id="daterow"><span class="dbox" id="dbox"><label for="day">今天開不開</label><span class="day-wrap"><span class="day-show" id="dayshow" aria-hidden="true"></span><span class="day-wx" id="daywx" hidden></span><input type="date" id="day" min="2026-04-25" max="2027-03-31"></span></span><span class="dcount" id="dcount" aria-hidden="true"></span><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
+  <div class="daterow" id="daterow"><span class="dbox" id="dbox"><label for="day">今天開不開</label><span class="day-line"><span class="day-wrap"><span class="day-show" id="dayshow" aria-hidden="true"></span><span class="day-wx" id="daywx" hidden></span><input type="date" id="day" min="2026-04-25" max="2027-03-31"></span><span class="day-sun" id="daysun" hidden></span></span></span><span class="dcount" id="dcount" aria-hidden="true"></span><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
   <div class="dwx" id="dwx" hidden></div>
   <div id="daystat" aria-live="polite"></div>
   <div class="mbar" id="mbar"><button type="button" id="mfilter" aria-controls="sheet-body">篩選</button><button type="button" id="mtrip" aria-controls="sheet-body">我的行程<span class="n" id="mtripn"></span></button></div>
@@ -2129,6 +2170,7 @@ const PHOTOS = {};
 /* 季節提醒（data/season.json）與一句話介紹（data/blurbs.json），建置時注入 */
 const SEASONS = [{"key": "spring", "name": "春", "months": [3, 4, 5], "text": ""}, {"key": "summer", "name": "夏", "months": [6, 7, 8], "text": ""}, {"key": "autumn", "name": "秋", "months": [9, 10, 11], "text": "秋・紅葉季　清津峽全日預約"}, {"key": "winter", "name": "冬", "months": [12, 1, 2], "text": ""}];
 const BLURBS = {"K005": "詹姆斯・特瑞爾的屋子，屋頂能打開看天空，還可以住一晚。"};
+const ADDRESS_JA = {"D001": "新潟県十日町市松代", "D002": "新潟県十日町市松代", "D003": "新潟県十日町市松代", "D004": "新潟県十日町市松代", "D005": "新潟県十日町市松代", "D006": "新潟県十日町市松代", "D007": "新潟県十日町市松代", "D008": "新潟県十日町市松代", "D010": "新潟県十日町市松代", "D011": "新潟県十日町市松代", "D012": "新潟県十日町市松代", "D013": "新潟県十日町市松代", "D014": "新潟県十日町市松代", "D015": "新潟県十日町市松代", "D016": "新潟県十日町市松代", "D046": "新潟県十日町市太平", "D047": "新潟県十日町市犬伏", "D048": "新潟県十日町市犬伏", "D050": "新潟県十日町市蓬平", "D051": "新潟県十日町市蓬平", "D053": "新潟県十日町市松代", "D054": "新潟県十日町市松代", "D055": "新潟県十日町市松代", "D057": "新潟県十日町市松代", "D058": "新潟県十日町市松代", "D060": "新潟県十日町市松代", "D061": "新潟県十日町市松代", "D063": "新潟県十日町市松代", "D064": "新潟県十日町市松代", "D066": "新潟県十日町市松代", "D067": "新潟県十日町市松代", "D068": "新潟県十日町市松代", "D070": "新潟県十日町市松代", "D099": "新潟県十日町市松代", "D101": "新潟県十日町市犬伏", "D104": "新潟県十日町市小池", "D106": "新潟県十日町市室野", "D125": "新潟県十日町市松代", "D129": "新潟県十日町市犬伏", "D132": "新潟県十日町市清水", "D143": "新潟県十日町市峠", "D155": "新潟県十日町市松代", "D184": "新潟県十日町市松代", "D186": "新潟県十日町市松代", "D194": "新潟県十日町市小荒戸", "D218": "新潟県十日町市松代", "D247": "新潟県十日町市松代", "D248": "新潟県十日町市松代", "D311": "新潟県十日町市松代", "D312": "新潟県十日町市松代", "D317": "新潟県十日町市松代", "D320": "新潟県十日町市松代", "D331": "新潟県十日町市室野", "D332": "新潟県十日町市室野", "D334": "新潟県十日町市室野", "D338": "新潟県十日町市室野", "D344": "新潟県十日町市室野", "D346": "新潟県十日町市田野倉", "D348": "新潟県十日町市室野", "D351": "新潟県十日町市松代", "D353": "新潟県十日町市松代", "D362": "新潟県十日町市松代", "D363": "新潟県十日町市松代", "D364": "新潟県十日町市松代", "D365": "新潟県十日町市松代", "D366": "新潟県十日町市松代", "D377": "新潟県十日町市松代", "D378": "新潟県十日町市松代", "D379": "新潟県十日町市松代", "D380": "新潟県十日町市松代", "D385": "新潟県十日町市田野倉", "D387": "新潟県十日町市清水", "D389": "新潟県十日町市松代", "D392": "新潟県十日町市松代", "D393": "新潟県十日町市松代", "D397": "新潟県十日町市室野", "D398": "新潟県十日町市室野", "D399": "新潟県十日町市室野", "D400": "新潟県十日町市室野", "D402": "新潟県十日町市松代", "K002": "新潟県十日町市上野甲", "K003": "新潟県十日町市上野甲", "K004": "新潟県十日町市上野甲", "K005": "新潟県十日町市上野甲", "K007": "新潟県十日町市新町新田", "K008": "新潟県十日町市新町新田", "K009": "新潟県十日町市新町新田", "K010": "新潟県十日町市新町新田", "K011": "新潟県十日町市新町新田", "K012": "新潟県十日町市新町新田", "K013": "新潟県十日町市新町新田", "K014": "新潟県十日町市新町新田", "K019": "新潟県十日町市仁田", "K022": "新潟県十日町市上野甲", "K023": "新潟県十日町市上野甲", "K033": "新潟県十日町市上野甲", "K034": "新潟県十日町市霜条", "K107": "新潟県十日町市上新井", "M001": "新潟県中魚沼郡津南町大字上郷上田", "M002": "新潟県中魚沼郡津南町大字上郷上田", "M003": "新潟県中魚沼郡津南町大字上郷上田", "M005": "新潟県中魚沼郡津南町大字上郷上田", "M011": "新潟県中魚沼郡津南町大字上郷上田", "M019": "新潟県中魚沼郡津南町大字上郷寺石", "M024": "新潟県中魚沼郡津南町大字上郷上田", "M026": "新潟県中魚沼郡津南町大字上郷上田", "M028": "新潟県中魚沼郡津南町大字上郷寺石", "M052": "新潟県中魚沼郡津南町大字上郷宮野原", "M057": "新潟県中魚沼郡津南町大字上郷宮野原", "M063": "新潟県中魚沼郡津南町大字上郷宮野原", "M064": "新潟県中魚沼郡津南町大字上郷宮野原", "M065": "新潟県中魚沼郡津南町大字上郷宮野原", "M074": "新潟県中魚沼郡津南町大字大赤沢", "M076": "新潟県中魚沼郡津南町大字結東", "M083": "新潟県中魚沼郡津南町大字上郷宮野原", "M090": "新潟県中魚沼郡津南町大字上郷宮野原", "M091": "新潟県中魚沼郡津南町大字大赤沢", "M092": "新潟県中魚沼郡津南町大字大赤沢", "M093": "新潟県中魚沼郡津南町大字大赤沢", "M094": "新潟県中魚沼郡津南町大字大赤沢", "M095": "新潟県中魚沼郡津南町大字大赤沢", "M097": "新潟県中魚沼郡津南町大字大赤沢", "N001": "新潟県十日町市堀之内", "N002": "新潟県十日町市堀之内", "N003": "新潟県十日町市堀之内", "N004": "新潟県十日町市宮中", "N005": "新潟県十日町市宮中", "N006": "新潟県十日町市宮中", "N009": "新潟県十日町市上山", "N010": "新潟県十日町市桔梗原", "N012": "新潟県十日町市東田尻", "N017": "新潟県十日町市白羽毛", "N019": "新潟県十日町市倉俣", "N021": "新潟県十日町市田代", "N028": "新潟県十日町市桔梗原", "N046": "新潟県十日町市小原", "N058": "新潟県十日町市芋川", "N071": "新潟県十日町市白羽毛", "N072": "新潟県十日町市角間", "N079": "新潟県十日町市葎沢", "N082": "新潟県十日町市角間", "N088": "新潟県十日町市角間", "N089": "新潟県十日町市角間", "T020": "新潟県十日町市下条四丁目", "T021": "新潟県十日町市下条四丁目", "T025": "新潟県十日町市本町六の一丁目", "T026": "新潟県十日町市本町六の一丁目", "T027": "新潟県十日町市本町六の一丁目", "T028": "新潟県十日町市本町六の一丁目", "T067": "新潟県十日町市西本町三丁目", "T074": "新潟県十日町市川治", "T076": "新潟県十日町市伊達庚", "T112": "新潟県十日町市下組", "T120": "新潟県十日町市東下組", "T121": "新潟県十日町市東下組", "T122": "新潟県十日町市東下組", "T123": "新潟県十日町市東下組", "T124": "新潟県十日町市東下組", "T134": "新潟県十日町市東下組", "T139": "新潟県十日町市中条戊", "T154": "新潟県十日町市伊達庚", "T173": "新潟県十日町市真田甲", "T207": "新潟県十日町市戌", "T214": "新潟県十日町市戊", "T221": "新潟県十日町市本町六の一丁目", "T222": "新潟県十日町市本町六の一丁目", "T226": "新潟県十日町市本町六の一丁目", "T230": "新潟県十日町市本町六の一丁目", "T253": "新潟県十日町市下条四丁目", "T268": "新潟県十日町市中条丁", "T280": "新潟県十日町市本町六の一丁目", "T304": "新潟県十日町市本町六の一丁目", "T305": "新潟県十日町市本町六の一丁目", "T309": "新潟県十日町市本町五丁目", "T317": "新潟県十日町市本町六の一丁目", "T320": "新潟県十日町市旭町", "T323": "新潟県十日町市伊達庚", "T351": "新潟県十日町市中条甲", "T352": "新潟県十日町市本町六の一丁目", "T388": "新潟県十日町市本町一丁目上", "T390": "新潟県十日町市本町一丁目上", "T411": "新潟県十日町市本町六の一丁目", "T412": "新潟県十日町市本町六の一丁目", "T413": "新潟県十日町市本町六の一丁目", "T414": "新潟県十日町市本町六の一丁目", "T415": "新潟県十日町市本町六の一丁目", "T416": "新潟県十日町市本町六の一丁目", "T419": "新潟県十日町市本町六の一丁目", "T421": "新潟県十日町市本町六の一丁目", "T450": "新潟県十日町市中条乙", "T451": "新潟県十日町市真田甲", "T457": "新潟県十日町市本町六の一丁目", "T461": "新潟県十日町市本町六の一丁目", "T466": "新潟県十日町市本町六の一丁目", "T467": "新潟県十日町市本町六の一丁目", "T468": "新潟県十日町市本町六の一丁目", "T469": "新潟県十日町市本町六の一丁目", "T470": "新潟県十日町市真田甲", "T471": "新潟県十日町市本町六の一丁目", "Y002": "新潟県十日町市浦田", "Y003": "新潟県十日町市松之山天水越", "Y005": "新潟県十日町市松之山天水越", "Y006": "新潟県十日町市浦田", "Y011": "新潟県十日町市松之山湯本", "Y012": "新潟県十日町市松之山湯本", "Y013": "新潟県十日町市松之山湯本", "Y019": "新潟県十日町市松之山松口", "Y020": "新潟県十日町市松之山松口", "Y021": "新潟県十日町市松之山松口", "Y022": "新潟県十日町市松之山松口", "Y023": "新潟県十日町市松之山松口", "Y025": "新潟県十日町市松之山松口", "Y026": "新潟県十日町市松之山小谷", "Y027": "新潟県十日町市松之山小谷", "Y029": "新潟県十日町市松之山", "Y041": "新潟県十日町市松之山松口", "Y045": "新潟県十日町市松之山小谷", "Y052": "新潟県十日町市松之山東川", "Y065": "新潟県十日町市浦田", "Y068": "新潟県十日町市松之山天水越", "Y072": "新潟県十日町市松之山下鰕池", "Y082": "新潟県十日町市浦田", "Y083": "新潟県十日町市浦田", "Y101": "新潟県十日町市松之山東川", "Y106": "新潟県十日町市松之山湯本", "Y107": "新潟県十日町市浦田", "Y109": "新潟県十日町市松之山小谷", "Y110": "新潟県十日町市松之山松口", "Y122": "新潟県十日町市松之山小谷"};
 /* ===== 各區代表作品：拉遠時區域標籤下方顯示的兩件作品 [作品編號, 短名稱]，想換就改這裡 ===== */
 const AREA_REPS = {
   "十日町":[["T025", "MonET"], ["T173", "繪本美術館"]],
@@ -2386,6 +2428,88 @@ var ICONS = {
   station: c => `<svg viewBox="0 0 24 24" width="22" height="22"><rect x="5.2" y="4.2" width="13.6" height="13" rx="3" fill="${c}" stroke="#3a3a3a" stroke-width="1.3" transform="rotate(-2 12 11)"/><rect x="7.5" y="7" width="9" height="4" rx="1" fill="#fff" stroke="#3a3a3a" stroke-width="1"/><path d="M8 20.5 L9.5 17.5 M16 20.5 L14.5 17.5" stroke="#3a3a3a" stroke-width="1.3" stroke-linecap="round"/></svg>`
 };
 
+/* ===== 日落：NOAA 太陽位置公式，在本機算，不連網。預設座標是十日町站，時區 Asia/Tokyo ===== */
+const SUN_LAT = 37.1316, SUN_LNG = 138.7569, SUN_TZ = 9;
+const sunRad = d => d * Math.PI / 180;
+const sunDeg = r => r * 180 / Math.PI;
+function sunsetMin(dateStr, lat, lng){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr || "");
+  if (!m) return null;
+  const y = +m[1], mo = +m[2], day = +m[3];
+  if (lat == null) lat = SUN_LAT;
+  if (lng == null) lng = SUN_LNG;
+  const a = Math.floor((14 - mo) / 12);
+  const yy = y + 4800 - a;
+  const mm = mo + 12 * a - 3;
+  const jdn = day + Math.floor((153 * mm + 2) / 5) + 365 * yy + Math.floor(yy / 4) - Math.floor(yy / 100) + Math.floor(yy / 400) - 32045;
+  let minutes = 12 * 60;
+  for (let i = 0; i < 3; i++){
+    const jd = jdn - 0.5 + (minutes - SUN_TZ * 60) / 1440;
+    const jc = (jd - 2451545) / 36525;
+    const L0 = (280.46646 + jc * (36000.76983 + jc * 0.0003032)) % 360;
+    const M = 357.52911 + jc * (35999.05029 - 0.0001537 * jc);
+    const e = 0.016708634 - jc * (0.000042037 + 0.0000001267 * jc);
+    const Mr = sunRad(M);
+    const C = Math.sin(Mr) * (1.914602 - jc * (0.004817 + 0.000014 * jc)) + Math.sin(2 * Mr) * (0.019993 - 0.000101 * jc) + Math.sin(3 * Mr) * 0.000289;
+    const omega = 125.04 - 1934.136 * jc;
+    const lambda = L0 + C - 0.00569 - 0.00478 * Math.sin(sunRad(omega));
+    const sec = 21.448 - jc * (46.815 + jc * (0.00059 - jc * 0.001813));
+    const obliq = 23 + (26 + sec / 60) / 60;
+    const obliqCorr = obliq + 0.00256 * Math.cos(sunRad(omega));
+    const dec = sunDeg(Math.asin(Math.sin(sunRad(obliqCorr)) * Math.sin(sunRad(lambda))));
+    const varY = Math.tan(sunRad(obliqCorr / 2)) ** 2;
+    const L0r = sunRad(L0);
+    const eqTime = 4 * sunDeg(varY * Math.sin(2 * L0r) - 2 * e * Math.sin(Mr) + 4 * e * varY * Math.sin(Mr) * Math.cos(2 * L0r) - 0.5 * varY * varY * Math.sin(4 * L0r) - 1.25 * e * e * Math.sin(2 * Mr));
+    const cosH = Math.cos(sunRad(90.833)) / (Math.cos(sunRad(lat)) * Math.cos(sunRad(dec))) - Math.tan(sunRad(lat)) * Math.tan(sunRad(dec));
+    if (cosH < -1 || cosH > 1) return null;
+    const ha = sunDeg(Math.acos(cosH));
+    minutes = 720 - 4 * lng - eqTime + SUN_TZ * 60 + ha * 4;
+  }
+  return minutes;
+}
+function sunsetText(dateStr, lat, lng){
+  const min = sunsetMin(dateStr, lat, lng);
+  if (min == null || !isFinite(min)) return "";
+  const t = Math.round(min);
+  return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
+}
+function hmMin(s){
+  const m = /^(\d{1,2}):(\d{2})$/.exec(s || "");
+  return m ? +m[1] * 60 + +m[2] : null;
+}
+/* 類型是戶外才提醒。有最後入場或關門時刻時，晚於日落才顯示；開放時間寫白天、沒有可解析的結束時刻，也顯示 */
+function duskHint(type, endHM, setHM, daytime){
+  if (type !== "戶外" || !setHM) return "";
+  if (endHM){
+    const end = hmMin(endHM), set = hmMin(setHM);
+    if (end == null || set == null || end <= set) return "";
+  } else if (!daytime) return "";
+  return "日落後看不清楚，建議 " + setHM + " 前到";
+}
+/* on 由呼叫端決定：地圖選的日期是日本今天，而且這件作品今天開放。時間是 Asia/Tokyo 從 0 點起的分鐘 */
+function admissionNote(o){
+  if (!o || !o.on || o.now == null || o.close == null) return null;
+  if (o.now >= o.close) return {kind:"closed", text:"今天已閉館"};
+  if (o.open != null && o.now < o.open) return null;
+  if (o.last == null) return null;
+  if (o.now > o.last) return {kind:"past", text:"已過最後入場"};
+  const left = o.last - o.now;
+  if (left <= 60) return {kind:"soon", text:"還有 " + left + " 分"};
+  return null;
+}
+/* 今天已過閉館：左側改成「今天已閉館」，時段改成小字。開館中與其他日期維持原本標題 */
+function dayFace(note, head, hrs){
+  if (note && note.kind === "closed") return {shut:true, head:"今天已閉館", hours:hrs ? "今天 " + hrs : ""};
+  return {shut:false, head:head, hours:hrs || ""};
+}
+function tokyoMinutes(date){
+  const parts = new Intl.DateTimeFormat("en-GB", {timeZone:"Asia/Tokyo", hour:"2-digit", minute:"2-digit", hourCycle:"h23"}).formatToParts(date || new Date());
+  let h = +parts.find(p => p.type === "hour").value;
+  const mi = +parts.find(p => p.type === "minute").value;
+  if (h === 24) h = 0;
+  return h * 60 + mi;
+}
+
 /* ===== map ===== */
 const map = L.map("map", {zoomControl:false, zoomSnap: ILL ? 0.25 : 1, renderer: L.svg({tolerance: L.Browser.touch ? 12 : 0}), keyboard:true}).setView([37.08, 138.68], 11);
 L.control.zoom({position:"topright", zoomInTitle:"放大", zoomOutTitle:"縮小"}).addTo(map);
@@ -2546,9 +2670,17 @@ function dayTableHtml(d, di, day){
   else if (di.state === "stay"){ head = STATE_SHORT.stay; sub = "只開放入住旅客參觀，非住宿者無法參觀"; }
   else if (di.reason === "winter"){ head = "冬季開放"; sub = "日期與時間以官方公告為準"; }
   else if (canSee && !hrs && d.類型 === "戶外"){ const t = d.開放時間 && d.開放時間 !== "—" ? d.開放時間 : ""; sub = t === "白天" ? "戶外，白天隨時可看" : t; }
-  const lab = `${head}${hrs ? " " + hrs : ""}${last ? `｜最後入場 ${last}` : ""}${sub ? "，" + sub : ""}${tier ? `，停留：${tier}` : ""}`;
-  return `<div class="ttable ${di.state}" role="group" aria-label="${esc(lab)}"><div class="tt-l" aria-hidden="true"><span>${esc(head)}</span>${hrs ? `<b>${esc(hrs)}</b>` : sub ? `<em>${esc(sub)}</em>` : ""}${last && tier ? `<small class="tt-stay">停留：${esc(tier)}</small>` : ""}</div>` +
-    (last ? `<div class="tt-r" aria-hidden="true"><span>最後入場</span><b>${esc(last)}</b></div>` : tier ? `<div class="tt-r" aria-hidden="true"><span>停留</span><b>${esc(tier)}</b></div>` : "") + `</div>`;
+  const parts = hrs ? hrs.split("–") : [];
+  const note = admissionNote({on:day === tokyoToday() && di.state === "open", now:tokyoMinutes(), open:hmMin(parts[0]), last:hmMin(last), close:hmMin(parts[1])});
+  const face = dayFace(note, head, hrs);
+  head = face.head;
+  const hint = canSee ? duskHint(d.類型, last || parts[1] || "", sunsetText(day), !last && !parts[1] && /^白天/.test(String(d.開放時間 || ""))) : "";
+  const lab = `${head}${face.shut ? (face.hours ? "，" + face.hours : "") : hrs ? " " + hrs : ""}${last ? `｜最後入場 ${last}` : ""}${note ? "，" + note.text : ""}${sub ? "，" + sub : ""}${tier ? `，停留：${tier}` : ""}`;
+  const admit = note ? `<small class="admit">${esc(note.text)}</small>` : "";
+  const hoursHtml = face.shut ? (face.hours ? `<em class="tt-was">${esc(face.hours)}</em>` : "") : (hrs ? `<b>${esc(hrs)}</b>` : sub ? `<em>${esc(sub)}</em>` : "");
+  return `<div class="ttable ${di.state}${face.shut ? " shut" : ""}" role="group" aria-label="${esc(lab)}"><div class="tt-l" aria-hidden="true"><span>${esc(head)}</span>${hoursHtml}${last && tier ? `<small class="tt-stay">停留：${esc(tier)}</small>` : ""}</div>` +
+    (last ? `<div class="tt-r" aria-hidden="true"><span>最後入場</span><b>${esc(last)}</b>${admit}</div>` : tier ? `<div class="tt-r" aria-hidden="true"><span>停留</span><b>${esc(tier)}</b></div>` : "") + `</div>` +
+    (!last && note ? `<p class="admit">${esc(note.text)}</p>` : "") + (hint ? `<p class="sun-hint">${esc(hint)}</p>` : "");
 }
 /* 入場費：試算表還沒有這欄時不顯示。有內容才出現在開放時間下方 */
 function feeHtml(d){
@@ -2565,13 +2697,62 @@ function blurbHtml(d){
 }
 const IC_STAR = on => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path${on ? ' class="f"' : ""} d="M12 3.8l2.5 5.1 5.6.8-4 3.9.9 5.6-5-2.6-5 2.6.9-5.6-4-3.9 5.6-.8z"/></svg>`;
 const IC_NAV = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-6.1-6.5-11a6.5 6.5 0 0 1 13 0c0 4.9-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+const IC_JA = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M7.5 8.5h9M7.5 12h9M7.5 15.5h5.5"/></svg>';
+const jaBtn = c => `<button type="button" class="ja-btn" data-ja="${esc(c)}" aria-label="出示日文">${IC_JA}日文</button>`;
+function jaFromWork(d){
+  const got = ADDRESS_JA && String(ADDRESS_JA[d.作品編號] || "").trim();
+  const area = d.地區 === "津南" ? "新潟県中魚沼郡津南町" : "新潟県十日町市";
+  const q = gmQuery(d);
+  return {place:d.設置地點 || d.作品名稱 || "", title:d.作品名稱 || "", addr:got || area, href:q ? gmUrl(q) : ""};
+}
+let jaBack = null;
+function ensureJaCard(){
+  let el = $("jcard");
+  if (el) return el;
+  el = document.createElement("div");
+  el.id = "jcard";
+  el.hidden = true;
+  el.setAttribute("role", "dialog");
+  el.setAttribute("aria-modal", "true");
+  el.setAttribute("aria-labelledby", "jcard-place");
+  el.innerHTML = `<div class="jc-body"><p class="jc-place" id="jcard-place" lang="ja"></p><p class="jc-title" lang="ja"></p><p class="jc-addr" lang="ja"></p><p class="jc-ask" lang="ja">ここへ行きたいです。</p></div><div class="jc-acts"><a class="jc-map" target="_blank" rel="noopener">Google マップで開く</a><button type="button" class="jc-x">閉じる</button></div>`;
+  document.body.appendChild(el);
+  el.querySelector(".jc-x").onclick = () => closeJaCard();
+  return el;
+}
+function openJaCard(info, back){
+  const el = ensureJaCard();
+  el.querySelector(".jc-place").textContent = info.place || "";
+  const title = el.querySelector(".jc-title");
+  const showTitle = !!(info.title && info.title !== info.place);
+  title.hidden = !showTitle;
+  title.textContent = showTitle ? info.title : "";
+  const addr = el.querySelector(".jc-addr");
+  addr.hidden = !info.addr;
+  addr.textContent = info.addr || "";
+  const link = el.querySelector(".jc-map");
+  if (info.href){ link.hidden = false; link.href = info.href; }
+  else { link.hidden = true; link.removeAttribute("href"); }
+  el.hidden = false;
+  document.body.classList.add("ja-on");
+  jaBack = back || document.activeElement;
+  el.querySelector(".jc-x").focus();
+}
+function closeJaCard(){
+  const el = $("jcard");
+  if (!el || el.hidden) return;
+  el.hidden = true;
+  document.body.classList.remove("ja-on");
+  const back = jaBack; jaBack = null;
+  if (back && back.focus){ try { back.focus(); } catch(e){} }
+}
 const favBtn = (c, sv, cls) => `<button type="button" class="${cls} sec${sv ? " on" : ""}" data-fav="${esc(c)}" aria-pressed="${sv}" aria-label="${sv ? "從我的清單移除" : "加入我的清單"}" title="${sv ? "從我的清單移除" : "加入我的清單"}">${IC_STAR(sv)}想去</button>`;
 const navBtn = (d, cls) => d.ll ? `<a class="${cls}" href="${esc(gmUrl(gmQuery(d)))}" target="_blank" rel="noopener" aria-label="導航：在 Google 地圖開啟">${IC_NAV}導航</a>` : "";
 function popupHtml(d){
   const di = d._day || {state:"unknown", tags:[]}, day = curDay();
   const c = d.作品編號, sv = isSaved(c), nm = d.中文名 || d.作品名稱;
   const who = [d.藝術家, d.設置地點].filter(Boolean).map(esc).join("｜");
-  let h = `<div class="pp-head">${stampBadge(d)}<div class="pp-tt"><div class="pp-name">${titleInner(d, nm, "pp-nt")}</div>${who ? `<div class="pp-ja" lang="ja">${who}</div>` : ""}${areaLine(d)}</div></div>`;
+  let h = `<div class="pp-head">${stampBadge(d)}<div class="pp-tt"><div class="pp-name">${titleInner(d, nm, "pp-nt")}</div>${who ? `<div class="pp-ja" lang="ja">${who}</div>` : ""}${areaLine(d)}${jaBtn(c)}</div></div>`;
   h += dayTableHtml(d, di, day);
   h += feeHtml(d);
   const alerts = di.tags.concat(noteHits(d, day));
@@ -2883,6 +3064,7 @@ function showTab(t){
   if (useSheet() && typeof setSheet === "function" && sheetState === "peek") setSheet("half");
   if (CFG.onTab) CFG.onTab(t);
   if (typeof zoomUpdate === "function" && zoomUpdate) zoomUpdate();
+  scheduleAdmit();
 }
 let selEl = null, selRing = null;
 function selMarker(d){
@@ -2906,6 +3088,7 @@ function showDetail(d){
   selMarker(d);
   if (typeof setSheet === "function" && sheetState === "peek") setSheet("half");
   $("sheet-body").scrollTop = 0;
+  scheduleAdmit();
 }
 function renderDetail(){
   const d = BY[detailCode]; if (!d) return;
@@ -3012,6 +3195,8 @@ function render(){
   const dayTxt = `${day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）${hol}${offS ? "，會期外" : ""}：開放 ${cnt.open}，休館但戶外可看 ${cnt.view}，僅限住宿者 ${cnt.stay}，休館 ${cnt.closed}，未公布 ${cnt.unknown}${nwin ? `（含冬季開放 ${nwin}，以官方公告為準）` : ""}`;
   $("daystat").textContent = dayTxt;
   if ($("dayshow")) $("dayshow").textContent = `${day.startsWith("2026-") ? `${+day.slice(5, 7)}/${+day.slice(8)}` : day.replace(/-/g, "/")}（${WD[new Date(day + "T00:00").getDay()]}）`;
+  const sunEl = $("daysun");
+  if (sunEl){ const st = sunsetText(day); sunEl.hidden = !st; sunEl.textContent = st ? "日落 " + st : ""; }
   if ($("dcount")) $("dcount").innerHTML = `<span class="dc-o"><b>${cnt.open}</b>開放</span><span class="dc-c"><b>${cnt.closed}</b>休館</span>`;
   areasEl.classList.toggle("all", allAreas);
   syncFilterN();
@@ -3063,7 +3248,8 @@ function wxFit(){
   const brand = t.querySelector(".brand"), show = $("dayshow"), wx = $("daywx");
   const cs = getComputedStyle(t);
   const room = t.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-  const dateW = (show ? show.scrollWidth : 0) + (wx && !wx.hidden ? wx.scrollWidth + 6 : 0);
+  const sun = $("daysun");
+  const dateW = (show ? show.scrollWidth : 0) + (wx && !wx.hidden ? wx.scrollWidth + 6 : 0) + (sun && !sun.hidden ? sun.scrollWidth + 6 : 0);
   const need = (brand ? brand.offsetWidth : 0) + dateW + ms.scrollWidth + 16;
   if (need > room + 1) t.classList.add("season-below");
 }
@@ -4124,7 +4310,12 @@ $("tabs").addEventListener("keydown", e => {
   const i = bs.indexOf(document.activeElement); if (i < 0) return;
   const n = bs[(i + (e.key === "ArrowRight" ? 1 : bs.length - 1)) % bs.length]; n.focus(); n.click(); e.preventDefault();
 });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && detailCode && !e.target.closest("input,textarea,select")){ if (wcard && wcard.isOpen()) wcard.close(); else showTab(lastTab); } });
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape" || e.target.closest("input,textarea,select")) return;
+  const ja = $("jcard");
+  if (ja && !ja.hidden){ closeJaCard(); return; }
+  if (detailCode){ if (wcard && wcard.isOpen()) wcard.close(); else showTab(lastTab); }
+});
 
 /* ===== toast ===== */
 function toast(t){
@@ -4193,7 +4384,7 @@ function workCardHtml(d){
   const rows = [["地區", d.地區顯示 || ""], ["作品名稱", d.中文名 ? d.作品名稱 : ""], ["開放規則", d.開放規則], ["開放時間", d.開放時間 === "—" ? "" : d.開放時間], ["特殊條件", d.特殊條件], ["備註", d.備註], ["場所", d["官方場所（原文）"]]].filter(r => r[1]);
   const notes = (d._rule && d._rule.stayIn ? `<div class="pp-note">館內僅限住宿者，外觀可自由觀看</div>` : "") +
     (d.座標來源 === "同場館推定" ? `<div class="pp-note">位置依同場館推定，現場請再確認</div>` : "");
-  return `<div class="wc-head"><div class="wc-t">${stampBadge(d)}<div class="wc-tt"><b class="wc-name">${titleInner(d, nm, "wc-nt")}</b>${who ? `<div class="wc-who" lang="ja">${who}</div>` : ""}${areaLine(d)}</div></div>` +
+  return `<div class="wc-head"><div class="wc-t">${stampBadge(d)}<div class="wc-tt"><b class="wc-name">${titleInner(d, nm, "wc-nt")}</b>${who ? `<div class="wc-who" lang="ja">${who}</div>` : ""}${areaLine(d)}</div>${jaBtn(c)}</div>` +
     dayTableHtml(d, di, day) +
     feeHtml(d) +
     (alerts.length ? `<ul class="wc-alert">${alerts.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : "") + notes +
@@ -4239,8 +4430,9 @@ if (SHEET){
     render(d);
     if (!isOpen()){ if (sheetState !== "peek") setSheet("peek"); el.hidden = false; document.body.classList.add("wc-on"); }
     setState("peek");
+    scheduleAdmit();
   };
-  const hide = () => { if (!isOpen()) return; el.hidden = true; document.body.classList.remove("wc-on"); setSheet(sheetState); };
+  const hide = () => { if (!isOpen()) return; el.hidden = true; document.body.classList.remove("wc-on"); setSheet(sheetState); scheduleAdmit(); };
   const close = () => { if (detailCode) selMarker(null); detailCode = null; hide(); if (zoomUpdate) zoomUpdate(); };
   wcard = {open, render, hide, close, isOpen};
   const begin = y => { drag = {y0:y, h0:el.getBoundingClientRect().height, t0:performance.now(), moved:false}; };
@@ -4300,6 +4492,38 @@ if (SHEET){
   window.addEventListener("resize", () => { if (isOpen()) setState(st); });
   MQ.addEventListener("change", () => { if (!useSheet() && isOpen()) close(); });
 }
+/* 最後入場倒數：卡片開著才計時，關卡就停。對齊日本時間的下一分鐘 */
+let admitTimer = 0;
+function admitOpen(){
+  if (wcard && wcard.isOpen && wcard.isOpen()) return true;
+  const pd = $("pane-d");
+  if (detailCode && pd && pd.style.display !== "none" && !useSheet()) return true;
+  return !!(map._popup && map._popup.isOpen && map._popup.isOpen());
+}
+function refreshAdmit(){
+  if (!admitOpen()) return;
+  const scrollers = [...document.querySelectorAll("#wcard .wc-scroll, .leaflet-popup-content, #sheet-body")];
+  const tops = scrollers.map(el => el.scrollTop);
+  if (wcard && wcard.isOpen() && detailCode && BY[detailCode]) wcard.render(BY[detailCode]);
+  if (detailCode && BY[detailCode] && $("pane-d") && $("pane-d").style.display !== "none" && !(useSheet() && wcard && wcard.isOpen())) renderDetail();
+  DATA.forEach(d => { if (d.marker && d.marker.isPopupOpen && d.marker.isPopupOpen()) d.marker.setPopupContent(popupHtml(d)); });
+  scrollers.forEach((el, i) => { if (el.isConnected) el.scrollTop = tops[i]; });
+}
+function scheduleAdmit(){
+  if (admitTimer){ clearTimeout(admitTimer); admitTimer = 0; }
+  if (!admitOpen()) return;
+  const wait = 60000 - (Date.now() % 60000);
+  admitTimer = setTimeout(() => { admitTimer = 0; refreshAdmit(); scheduleAdmit(); }, wait);
+}
+map.on("popupopen", scheduleAdmit);
+map.on("popupclose", scheduleAdmit);
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-ja]");
+  if (!b || !BY[b.dataset.ja]) return;
+  e.preventDefault();
+  e.stopPropagation();
+  openJaCard(jaFromWork(BY[b.dataset.ja]), b);
+}, true);
 fitAll();
 
 /* ===== URL hash options: #date=2026-11-04&list=T025,T120&tab=list&open=T025&preset=d1031 ===== */
