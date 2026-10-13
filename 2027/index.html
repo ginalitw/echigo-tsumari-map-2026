@@ -1625,12 +1625,17 @@ body.preview-on .dcount{white-space:normal}
 /* 手機收合時，開放／休館列下方的路線膠囊。電腦不顯示 */
 .mcaps{display:none}
 @media (max-width:767.98px){
-  body.sheet-peek .mcaps:not(:empty){display:flex;flex-wrap:nowrap;gap:8px;margin:8px 12px 2px;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x;-webkit-mask-image:linear-gradient(to right,#000 0,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(to right,#000 0,#000 calc(100% - 24px),transparent)}
+  body.sheet-peek .mcaps:not(:empty){display:flex;flex-wrap:nowrap;align-items:center;gap:8px;margin:8px 12px 2px;padding:4px 0;overflow-x:auto;overscroll-behavior-x:contain;scroll-padding-inline:12px;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x;-webkit-mask-image:linear-gradient(to right,#000 0,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(to right,#000 0,#000 calc(100% - 24px),transparent)}
   body.sheet-peek .mcaps::-webkit-scrollbar{display:none}
-  .mcap{flex:0 0 auto;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-pill);background:var(--paper);color:var(--ink);font:inherit;font-size:13px;font-weight:700;line-height:1;white-space:nowrap;cursor:pointer}
-  .mcap.rain{border-color:var(--view);color:var(--view)}
-  .mcap.sel{border-color:var(--ink);background:var(--gold-bg);box-shadow:0 0 0 1px var(--ink)}
-  .mcap-drop{margin-right:3px}
+  .mcaps-hd{flex:0 0 auto;font-size:12px;color:var(--ink-soft);line-height:1;white-space:nowrap;pointer-events:none;user-select:none}
+  .mcap{position:relative;z-index:0;flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:6px 14px;border:none;border-radius:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;font-weight:600;line-height:1;white-space:nowrap;cursor:pointer}
+  .mcap::before{content:"";position:absolute;left:0;right:0;top:6px;bottom:6px;border-radius:var(--r-pill);background:var(--rice);z-index:-1}
+  .mcap.rain{color:var(--view)}
+  .mcap.rain::before{background:var(--view-bg)}
+  .mcap.sel{color:var(--snow)}
+  .mcap.sel::before{background:var(--ink)}
+  .mcap .ic-walk{width:14px;height:14px}
+  .mcap-drop{margin-right:2px}
   .mcaps-save{display:none;margin:0 12px 6px}
   body.sheet-peek .mcaps-save:not([hidden]){display:block}
   .mcaps-save .b{width:100%;min-height:44px}
@@ -2462,8 +2467,8 @@ const CAP_BASE = [
   {id:"t_first", label:"首訪"},
   {id:"t_rain", label:"雨天"},
   {id:"t_onsen", label:"泡湯"},
-  {id:"t_walk_toka", label:"🚶十日町"},
-  {id:"t_walk_matsu", label:"🚶松代"},
+  {id:"t_walk_toka", label:"十日町"},
+  {id:"t_walk_matsu", label:"松代"},
   {id:"t_wed", label:"週三"}
 ];
 function capsulePlan(opt){
@@ -2600,6 +2605,8 @@ function feeOriginal(d){
   return t;
 }
 const IC_PIN = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-6.1-6.5-11a6.5 6.5 0 0 1 13 0c0 4.9-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+const IC_WALK = '<svg class="ic ic-walk" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12.5" cy="5" r="2"/><path d="M11 9.5 8.5 14H11l1.5-4.5 3-1.5 2.5 8"/></svg>';
+const MCAP_WALK = new Set(["t_walk_toka", "t_walk_matsu"]);
 const gmLink = (q, cls) => `<a class="${cls}" href="${esc(gmUrl(q))}" target="_blank" rel="noopener" aria-label="在 Google 地圖開啟" title="在 Google 地圖開啟">${IC_PIN}</a>`;
 /* 手機浮動卡：從開放時間挑出所選月份的時段。格式看不懂、或同時有好幾段都可能，就回傳 null，不猜 */
 const HM = "\\d{1,2}:\\d{2}";
@@ -3560,11 +3567,22 @@ function renderCapsules(){
   const f = wxForDay(WX, day);
   const rain = !!(f && wxKind(f.code) && wxRain(f));
   const items = capsulePlan({rain, winter:isWinterDay(day), wednesday:new Date(day + "T00:00").getDay() === 3, preview:previewYearOn()});
-  const html = items.map(it => {
+  if (!items.length){
+    const capKey = "|" + (routePreview || "");
+    if (capHTML === capKey) return;
+    capHTML = capKey;
+    row.innerHTML = "";
+    syncRoutePreviewChrome();
+    return;
+  }
+  const btns = items.map(it => {
     const drop = it.rain ? `<span class="mcap-drop" aria-hidden="true">💧</span>` : "";
+    const walk = MCAP_WALK.has(it.id) ? IC_WALK : "";
+    const walkAria = MCAP_WALK.has(it.id) ? ` aria-label="${esc("步行路線：" + it.label)}"` : "";
     const sel = routePreview && it.kind === "preset" && it.id === routePreview ? " sel" : "";
-    return `<button type="button" class="mcap${it.rain ? " rain" : ""}${sel}" data-mcap="${esc(it.id)}">${drop}${esc(it.label)}</button>`;
+    return `<button type="button" class="mcap${it.rain ? " rain" : ""}${sel}" data-mcap="${esc(it.id)}"${walkAria}>${drop}${walk}${esc(it.label)}</button>`;
   }).join("");
+  const html = `<span class="mcaps-hd" aria-hidden="true">建議路線</span>${btns}`;
   if (row.getAttribute("aria-label") !== "建議路線") row.setAttribute("aria-label", "建議路線");
   const capKey = html + "|" + (routePreview || "");
   if (capHTML === capKey) return;
