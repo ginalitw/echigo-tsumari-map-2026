@@ -815,7 +815,7 @@ ul.lst code,.rlist code{font-size:11px;color:var(--ink-soft);margin-right:4px}
 .card .thumb{flex:none;background:var(--wash);border-radius:6px}
 .cbody{flex:1;min-width:0}
 .ctag{display:inline-block;font-size:10.5px;border-radius:6px;padding:0 5px}
-.tag-draft{background:var(--gold-bg);color:var(--stamp-ink)}.tag-off{background:var(--view-bg);color:var(--view)}
+.tag-draft{background:var(--gold-bg);color:var(--stamp-ink)}.tag-off{background:var(--view-bg);color:var(--view)}.tag-winter{background:var(--rice);color:var(--ink)}
 .ctitle{font-weight:700;font-size:13.5px;margin:2px 0}
 .cdesc{font-size:12px;color:var(--ink-soft);line-height:1.4}
 .cmeta{font-size:12px;color:var(--ink);margin-top:2px}
@@ -1623,6 +1623,28 @@ body.preview-on .dcount{white-space:normal}
   #panel .ypick{display:none}
 }
 @media (min-width:768px){#mtitle .ypick{display:none}}
+/* 手機收合時，開放／休館列下方的路線膠囊。電腦不顯示 */
+.mcaps{display:none}
+@media (max-width:767.98px){
+  body.sheet-peek .mcaps:not(:empty){display:flex;gap:8px;margin:8px 12px 2px;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x pan-y}
+  body.sheet-peek .mcaps::-webkit-scrollbar{display:none}
+  .mcap{flex:0 0 auto;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-pill);background:var(--paper);color:var(--ink);font:inherit;font-size:13px;font-weight:700;line-height:1;white-space:nowrap;cursor:pointer}
+  .mcap.rain{border-color:var(--view);color:var(--view)}
+  .mcap.sel{border-color:var(--ink);background:var(--gold-bg);box-shadow:0 0 0 1px var(--ink)}
+  .mcap-drop{margin-right:3px}
+  .mcaps-save{display:none;margin:0 12px 6px}
+  body.sheet-peek .mcaps-save:not([hidden]){display:block}
+  .mcaps-save .b{width:100%;min-height:44px}
+}
+/* 標題列放不下時由 JS 加 mt-tight；再放不下則 mt-nosun 隱藏日落字 */
+#mtitle.mt-tight{padding:0 6px 0 10px;gap:4px}
+#mtitle.mt-tight .brand{font-size:15px;line-height:22px;padding-right:6px}
+#mtitle.mt-tight .ypick{font-size:14px}
+#mtitle.mt-tight .day-show{font-size:14px}
+#mtitle.mt-tight .day-wx{font-size:13px}
+#mtitle.mt-tight .day-line{gap:4px}
+#mtitle.mt-tight .dbox{gap:4px}
+#mtitle.mt-nosun .day-sun{display:none!important}
 </style>
 </head>
 <body>
@@ -1643,6 +1665,8 @@ body.preview-on .dcount{white-space:normal}
   <div class="daterow" id="daterow"><span class="dbox" id="dbox"><label for="day">今天開不開</label><span class="day-line"><span class="day-wrap"><span class="day-show" id="dayshow" aria-hidden="true"></span><span class="day-wx" id="daywx" hidden></span><input type="date" id="day"></span><span class="day-sun" id="daysun" hidden></span></span></span><span class="dcount" id="dcount" aria-hidden="true"></span><button id="today" type="button">今天</button><button type="button" class="day-more" id="daymore" aria-expanded="false" aria-controls="daystat" title="當日統計">統計</button></div>
   <div class="dwx" id="dwx" hidden></div>
   <div id="daystat" aria-live="polite"></div>
+  <div id="mcaps" class="mcaps" role="toolbar" aria-label="建議路線"></div>
+  <div class="mcaps-save" id="mcapsave" hidden><button type="button" class="b pri" id="mcapsavebtn">存成我的行程</button></div>
   <div class="mbar" id="mbar"><button type="button" id="mfilter" aria-controls="sheet-body">篩選</button><button type="button" id="mtrip" aria-controls="sheet-body">我的行程<span class="n" id="mtripn"></span></button></div>
   <div class="tabs" id="tabs" role="tablist" aria-label="面板分頁"><button id="tab-s" class="on" role="tab" aria-selected="true" aria-controls="pane-s">搜尋</button><button id="tab-l" role="tab" aria-selected="false" aria-controls="pane-l">想去<span class="n" id="favn">0</span></button><button id="tab-r" role="tab" aria-selected="false" aria-controls="pane-r">行程<span class="n" id="routen">0</span></button><button id="tab-p" role="tab" aria-selected="false" aria-controls="pane-p">推薦路線</button></div>
   <div class="sheet-body" id="sheet-body">
@@ -2433,6 +2457,40 @@ function dayInfo(d, dateStr){
 }
 /* 積雪期：11/25～3/31（不分年） */
 function isWinterDay(dateStr){ const [, m, d] = dateStr.split("-").map(Number); const v = m * 100 + d; return v >= 1125 || v <= 331; }
+/* 手機收合面板的路線膠囊。官方模型行程不在這裡。開車三顆在積雪期隱藏。 */
+const CAP_DRIVE = new Set(["t_first", "t_onsen", "t_wed"]);
+const CAP_BASE = [
+  {id:"t_first", label:"第一次來"},
+  {id:"t_rain", label:"下雨天"},
+  {id:"t_onsen", label:"泡湯"},
+  {id:"t_walk_toka", label:"走路・十日町"},
+  {id:"t_walk_matsu", label:"走路・松代"},
+  {id:"t_wed", label:"週三有開"}
+];
+function capCut(name){
+  const s = String(name || "").trim();
+  return s.length > 6 ? s.slice(0, 6) + "…" : s;
+}
+function capsulePlan(opt){
+  opt = opt || {};
+  const trips = Array.isArray(opt.trips) ? opt.trips.filter(t => t && (t.name || t.id)) : [];
+  if (trips.length){
+    return trips.slice(0, 3).map(t => ({id:String(t.id || ""), label:capCut(t.name), kind:"trip"}))
+      .concat([{id:"more", label:"更多", kind:"more"}]);
+  }
+  let items = CAP_BASE.filter(x => !(opt.preview && x.id === "t_wed")).map(x => ({id:x.id, label:x.label, kind:"preset"}));
+  const pin = id => { const i = items.findIndex(x => x.id === id); if (i > 0) items.unshift(items.splice(i, 1)[0]); };
+  if (opt.wednesday) pin("t_wed");
+  if (opt.rain){ pin("t_rain"); items.forEach(x => { if (x.id === "t_rain") x.rain = true; }); }
+  if (opt.winter){
+    items = items.filter(x => !CAP_DRIVE.has(x.id));
+    items.unshift({id:"w_toka", label:"冬季步行", kind:"preset"});
+  }
+  items.push({id:"more", label:"更多", kind:"more"});
+  return items;
+}
+/* 預告頁是否套用膠囊的 preview 規則（與 build 時 IS_PREVIEW 相同，不是「使用者點了別的年度」） */
+function previewYearOn(){ return IS_PREVIEW; }
 const isWinterWork = d => d.冬季線 === "是" || d.冬季 === "冬季開放";
 const isOffSeason = dateStr => dateStr < SEASON[0] || dateStr > SEASON[1];
 /* RULES-END */
@@ -2508,19 +2566,38 @@ function feePrices(text){
 function feeHasAmount(text){
   return /[0-9][0-9,]*\s*(?:円|日圓)/.test(text);
 }
-function feePhrase(text, outdoor){
-  const t = String(text == null ? "" : text).trim();
+/* 【名稱｜2026/4/20まで】【名稱｜2026/4/21以降】：依日期取那一段的一般票價。對不上任何一段時用最後一段。 */
+function feeSegment(text, dateStr){
+  const re = /【[^】]*?[|｜]\s*(\d{4})\/(\d{1,2})\/(\d{1,2})\s*(まで|以降)】/g;
+  const hits = [];
+  let m;
+  while ((m = re.exec(text))) hits.push(m);
+  if (hits.length < 2) return text;
+  const segs = hits.map((h, i) => ({
+    date:`${h[1]}-${String(h[2]).padStart(2, "0")}-${String(h[3]).padStart(2, "0")}`,
+    kind:h[4],
+    body:text.slice(h.index + h[0].length, hits[i + 1] ? hits[i + 1].index : text.length)
+  }));
+  const day = /^\d{4}-\d{2}-\d{2}$/.test(dateStr || "") ? dateStr : "";
+  if (!day) return segs[segs.length - 1].body;
+  const hit = segs.find(s => s.kind === "まで" ? day <= s.date : day >= s.date);
+  return (hit || segs[segs.length - 1]).body;
+}
+function feePhrase(text, outdoor, dateStr){
+  const raw = String(text == null ? "" : text).trim();
+  const day = dateStr || (typeof curDay === "function" ? curDay() : "");
+  const t = raw ? feeSegment(raw, day) : "";
   const prices = t ? feePrices(t) : [];
   if (prices.length){
     const label = "一般 " + feeYen(prices[0]);
     return prices.length > 1 ? label + "起" : label;
   }
   if (t.startsWith("ー") || t.includes("無料")) return "免費";
-  if (outdoor && (!t || !feeHasAmount(t))) return "免費";
+  if (outdoor && (!raw || !feeHasAmount(raw))) return "免費";
   return "";
 }
-function feeShort(d){
-  return feePhrase(feeRaw(d), d.類型 === "戶外");
+function feeShort(d, dateStr){
+  return feePhrase(feeRaw(d), d.類型 === "戶外", dateStr);
 }
 function feeHtml(d){
   const label = feeShort(d);
@@ -2588,7 +2665,7 @@ const mdSlash = iso => { const p = String(iso).split("-"); return `${+p[1]}/${+p
 const stateTxt = di => di.reason === "winter" ? WINTER_OPEN_TXT : di.reason === "season" ? `不在 ${YEAR} 會期內（${mdSlash(SEASON[0])}～${mdSlash(SEASON[1])}）` : STATE_TXT[di.state];
 const stateShort = di => di.reason === "winter" ? "冬季開放" : di.reason === "season" ? "會期外" : STATE_SHORT[di.state];
 const canVisit = di => di.state === "open" || di.state === "view";  /* 只看今天可參觀：不含僅限住宿者與未公布 */
-const WINTER_WARN = "11 月底至 3 月底為越後妻有的積雪期，山區道路可能積雪結冰，不建議不熟悉雪地駕駛的旅客自駕。建議參加 NPO 越後妻有里山協働機構的官方行程，或選擇十日町站、松代農舞台的步行路線。冬季開放日與時間以官方公告為準。";
+const WINTER_WARN = "積雪期（11 月底至 3 月底）山路可能結冰，不熟雪地請勿自駕，可參加官方行程或走車站步行線。開放以官方公告為準。";
 const winterWarnHtml = () => `<div class="wwarn" role="note"><span class="wwi" aria-hidden="true">⚠</span>${esc(WINTER_WARN)}</div>`;
 const ETIQUETTE = "作品有些散落在田間、莊稼或私人倉庫，參觀時請遵守禮儀。";
 const STATES = ["open", "view", "stay", "closed", "unknown", "preview"];
@@ -2600,6 +2677,8 @@ const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } ca
 let saved = load(LS_KEY, []).filter(c => BY[c]);
 let route = load(LS_ROUTE, {name:"", stops:[], mode:"drive"});
 let routes = load(LS_ROUTES, []);
+/* 手機建議路線膠囊預覽：不寫入 trips／localStorage，直到存檔或編輯站點 */
+let routePreview = null, routePreviewSnap = null, capHTML = "";
 /* 匯入的舊格式路線交給 days.js 轉成行程，days.js 載入前先排隊 */
 const pendingRoutes = [];
 let routesImported = rs => { pendingRoutes.push(...rs); };
@@ -2694,6 +2773,53 @@ function tokyoMinutes(date){
   const mi = +parts.find(p => p.type === "minute").value;
   if (h === 24) h = 0;
   return h * 60 + mi;
+}
+function syncRoutePreviewChrome(){
+  const box = $("mcapsave"), btn = $("mcapsavebtn");
+  const on = !!routePreview && useSheet();
+  if (box) box.hidden = !on;
+  if (btn && !btn.dataset.init){ btn.dataset.init = "1"; btn.onclick = () => commitRoutePreview(); }
+}
+function clearRoutePreview(){
+  if (!routePreview) return;
+  const snap = routePreviewSnap;
+  routePreview = null;
+  routePreviewSnap = null;
+  capHTML = "";
+  tripLoading = true;
+  route = load(LS_ROUTE, {name:"", stops:[], mode:"drive"});
+  if (snap){ trip = snap.trip; editing = snap.editing; if (typeof syncTV === "function") syncTV(); }
+  tripLoading = false;
+  render();
+  syncRoutePreviewChrome();
+  renderCapsules();
+}
+function fillPresetRoute(p){
+  if (p.date){
+    const inYear = p.date.startsWith(String(YEAR) + "-") && p.date >= dayEl.min && p.date <= dayEl.max;
+    if (!IS_PREVIEW || inYear){ dayEl.value = clampDay(p.date); syncDayLabel(); }
+  }
+  route = {name:p.name, stops:withNotes(p), mode:p.mode, url:p.url || "", liffId:""};
+  const N = notesFor(p.id), nOn = N && fanUnlocked();
+  const note = $("rnote"); if (note) note.innerHTML = `<span class="ctag ${/官方/.test(p.src) ? "tag-off" : "tag-draft"}">${esc(p.src)}</span> ${esc(p.note || "")}` +
+    (nOn ? `<div class="rnotes"><span class="ctag tag-fan">越後飯實踩筆記 ${esc((N.walked || "").replace(/-/g, "/"))}</span> ${esc(N.summary || "")}${N.caveat ? `<br><span class="muted">${esc(N.caveat)}</span>` : ""}</div>` : "");
+  syncWinterBanner();
+}
+function previewPreset(id){
+  const p = PRESETS.find(x => x.id === id); if (!p) return;
+  if (routePreview === id){ clearRoutePreview(); return; }
+  if (!routePreview){
+    routePreviewSnap = {trip: typeof trip !== "undefined" ? trip : null, editing: typeof editing !== "undefined" ? editing : null};
+    trip = null; editing = null;
+    if (typeof syncTV === "function") syncTV();
+  }
+  routePreview = id;
+  capHTML = "";
+  fillPresetRoute(p);
+  render();
+  if (typeof fitRoute === "function") setTimeout(fitRoute, 320);
+  syncRoutePreviewChrome();
+  renderCapsules();
 }
 
 /* ===== map ===== */
@@ -3422,35 +3548,115 @@ function fitTools(){
   if (!useSheet() && t.getBoundingClientRect().left < p.getBoundingClientRect().right + 12) t.classList.add("short");
 }
 window.addEventListener("resize", fitTools);
-/* 天氣（weather.js）：所選日期在預報範圍內才顯示。降雨機率 ≥ 50% 時季節膠囊換成〔看室內路線〕 */
-let WX = null, WX_STALE = false;
+/* 天氣（weather.js）：所選日期在預報範圍內才顯示。降雨機率 ≥ 50% 時，電腦把季節膠囊換成〔看室內路線〕。手機膠囊列在的時候改由〔下雨天〕帶雨滴，不再另外顯示 #mrain */
+let WX = null, WX_STALE = false, WX_RAIN = false;
+function tripList(){
+  try { return Array.isArray(trips) ? trips : []; } catch (e) { return []; }
+}
+function rainChipInstead(){
+  return useSheet() && document.body.classList.contains("sheet-peek") && !tripList().length;
+}
+function syncRainCaps(){
+  const rain = WX_RAIN, chip = rain && rainChipInstead();
+  const mr = $("mrain"), ms = $("mseason"), dr = $("drain"), ds = $("dseason");
+  if (mr) mr.hidden = !rain || chip;
+  if (ms) ms.hidden = (rain && !chip) || !ms.innerHTML;
+  if (dr) dr.hidden = !rain;
+  if (ds) ds.hidden = rain || !ds.innerHTML;
+}
+function capsuleTrips(){
+  if (routePreview) return [];
+  const src = tripList();
+  if (!src.length) return [];
+  const list = src.slice();
+  let cur = null;
+  try { cur = trip; } catch (e) {}
+  if (cur){
+    const i = list.indexOf(cur);
+    if (i > 0) list.unshift(list.splice(i, 1)[0]);
+  }
+  return list.slice(0, 3).map(t => {
+    const idx = src.indexOf(t);
+    const id = (typeof t.id === "string" && t.id) ? t.id : (idx >= 0 ? `i${idx}` : "i0");
+    return {id, name: t.name};
+  });
+}
+function renderCapsules(){
+  const row = $("mcaps"); if (!row) return;
+  const day = curDay();
+  const f = wxForDay(WX, day);
+  const rain = !!(f && wxKind(f.code) && wxRain(f));
+  const items = capsulePlan({rain, winter:isWinterDay(day), wednesday:new Date(day + "T00:00").getDay() === 3, preview:previewYearOn(), trips:capsuleTrips()});
+  const html = items.map(it => {
+    const drop = it.rain ? `<span class="mcap-drop" aria-hidden="true">💧</span>` : "";
+    const attr = it.kind === "trip" ? `data-mtrip="${esc(it.id)}"` : `data-mcap="${esc(it.id)}"`;
+    const sel = routePreview && it.kind === "preset" && it.id === routePreview ? " sel" : "";
+    return `<button type="button" class="mcap${it.rain ? " rain" : ""}${sel}" ${attr}>${drop}${esc(it.label)}</button>`;
+  }).join("");
+  const label = items.some(it => it.kind === "trip") ? "我的行程" : "建議路線";
+  if (row.getAttribute("aria-label") !== label) row.setAttribute("aria-label", label);
+  const capKey = html + "|" + (routePreview || "");
+  if (capHTML === capKey) return;
+  capHTML = capKey;
+  row.innerHTML = html;
+  if (useSheet() && sheetState === "peek" && typeof setSheet === "function") setSheet("peek");
+  syncRoutePreviewChrome();
+}
+function openThemeRoutes(){
+  showTab("p");
+  const go = () => { const g = $("cgroup-theme"); if (g && g.scrollIntoView) g.scrollIntoView({block:"start"}); };
+  setTimeout(go, RM.matches ? 0 : 340);
+}
+function openTripCapsule(id){
+  if (typeof showDay !== "function" || typeof trips === "undefined") return;
+  let t = trips.find(x => x.id === id);
+  if (!t && /^i\d+$/.test(id)) t = trips[+id.slice(1)];
+  if (!t) return;
+  const k = (typeof trip !== "undefined" && trip === t && editing != null) ? editing : 0;
+  showDay(t, k, true, false);
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("#mcaps button"); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  if (b.dataset.mcap === "more"){ openThemeRoutes(); return; }
+  if (b.dataset.mtrip){ openTripCapsule(b.dataset.mtrip); return; }
+  if (b.dataset.mcap){ previewPreset(b.dataset.mcap); }
+});
 function renderWx(day){
   const f = wxForDay(WX, day), show = !!wxKind(f && f.code), rain = show && wxRain(f);
+  WX_RAIN = rain;
   const mw = $("daywx"), dw = $("dwx");
   if (mw){ mw.hidden = !show; mw.innerHTML = show ? `<span aria-hidden="true">${esc(wxShort(f))}</span><span class="vh">${esc(wxSpeak(f))}</span>` : ""; }
   if (dw){ dw.hidden = !show; dw.textContent = show ? wxLine(f, WX_STALE, WX.report, tokyoToday()) : ""; }
-  [["mseason", "mrain"], ["dseason", "drain"]].forEach(([s, r]) => {
-    const se = $(s), re = $(r); if (!se || !re) return;
-    re.hidden = !rain;
-    se.hidden = rain || !se.innerHTML;
-  });
   const m = +day.slice(5, 7), s = SEASONS.find(x => x.months.includes(m)), ms = $("mseason");
   if (ms && s) ms.dataset.short = s.name;
+  syncRainCaps();
+  renderCapsules();
   wxFit(); fitTools();
 }
-/* 手機標題列：越後飯、年度、日期、天氣留在同一列。放不下時把季節膠囊移到下一列，不藏天氣 */
+/* 手機標題列：越後飯、年度、日期、天氣留在同一列。放不下時季節膠囊移到下一列；窄螢幕再縮小字級，避免天氣伸進〔⋯〕底下 */
+function tightenTitle(){
+  const t = $("mtitle"); if (!t || !useSheet()) return;
+  t.classList.remove("mt-tight", "mt-nosun");
+  const over = () => t.scrollWidth > t.clientWidth + 1;
+  if (window.innerWidth <= 380 || over()) t.classList.add("mt-tight");
+  if (over()) t.classList.add("mt-nosun");
+}
 function wxFit(){
   const t = $("mtitle"), ms = $("mseason"); if (!t) return;
-  t.classList.remove("season-below", "wx-tight", "wx-hide");
-  if (!useSheet() || !ms || ms.hidden) return;
-  const brand = t.querySelector(".brand"), show = $("dayshow"), wx = $("daywx"), ypick = t.querySelector(".ypick");
-  const cs = getComputedStyle(t);
-  const room = t.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-  const dateW = (show ? show.scrollWidth : 0) + (wx && !wx.hidden ? wx.scrollWidth + 6 : 0);
-  const need = (brand ? brand.offsetWidth : 0) + (ypick ? ypick.offsetWidth : 0) + dateW + ms.scrollWidth + 24;
-  if (need > room + 1) t.classList.add("season-below");
+  t.classList.remove("season-below", "wx-tight", "wx-hide", "mt-tight", "mt-nosun");
+  if (useSheet() && ms && !ms.hidden){
+    const brand = t.querySelector(".brand"), show = $("dayshow"), wx = $("daywx"), ypick = t.querySelector(".ypick");
+    const cs = getComputedStyle(t);
+    const room = t.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const dateW = (show ? show.scrollWidth : 0) + (wx && !wx.hidden ? wx.scrollWidth + 6 : 0);
+    const need = (brand ? brand.offsetWidth : 0) + (ypick ? ypick.offsetWidth : 0) + dateW + ms.scrollWidth + 24;
+    if (need > room + 1) t.classList.add("season-below");
+  }
+  tightenTitle();
 }
 window.addEventListener("resize", wxFit);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => wxFit()).catch(() => {});
 MQ.addEventListener("change", () => renderWx(curDay()));
 ["mrain", "drain"].forEach(id => { const b = $(id); if (b) b.addEventListener("click", () => pickPreset("t_rain")); });
 (function(){
@@ -3682,7 +3888,7 @@ function renderRouteList(pending){
     const K = routeInfo.legs.reduce((a, l) => a + l.km, 0);
     const clock = routeClock(routeInfo.legs, st);
     const how = (TRAVEL_MODES[route.mode] && TRAVEL_MODES[route.mode].label) || (route.mode === "walk" ? "步行" : "開車");
-    const src = routeInfo.src === "osrm" ? "OSRM 路線估算" : routeInfo.src === "osrm-foot" ? "OSRM 步行路線估算" : (route.mode === "walk" ? "步行路線服務暫時連不上，改用直線距離乘 1.3、時速 4.5 公里粗估" : "路線服務暫時連不上，改用直線距離乘 1.4、時速 35 公里估算");
+    const src = routeInfo.src === "osrm" ? "路線估算" : routeInfo.src === "osrm-foot" ? "步行路線估算" : (route.mode === "walk" ? "步行路線服務暫時連不上，改用直線距離乘 1.3、時速 4.5 公里粗估" : "路線服務暫時連不上，改用直線距離乘 1.4、時速 35 公里估算");
     const warn = batteryWarn(route.mode, K);
     sum.innerHTML = `<b>共 ${n} 站，${how}約 ${fmtMin(clock.travel)}${clock.stay ? `，停留約 ${fmtMin(clock.stay)}` : ""}，總時間約 ${fmtMin(clock.total)}，${fmtKm(K)}</b><br><span class="muted">${src}。總時間是移動時間加上各站停留。</span>` +
       (warn ? `<br><span class="warn">${esc(warn)}</span>` : "") +
@@ -3977,7 +4183,7 @@ async function optimizeRoute(){
 }
 if ($("ropt")) $("ropt").onclick = optimizeRoute;
 if ($("rloop")) $("rloop").onchange = e => setLoop(e.target.checked);
-function setRoute(r, fit){ route = {name:r.name || "", stops:JSON.parse(JSON.stringify(r.stops || [])), mode:r.mode || "drive", url:r.url || "", liffId:typeof r.liffId === "string" ? r.liffId : ""}; persist(); updateRoute(fit); }
+function setRoute(r, fit){ route = {name:r.name || "", stops:JSON.parse(JSON.stringify(r.stops || [])), mode:r.mode || "drive", url:r.url || "", liffId:typeof r.liffId === "string" ? r.liffId : ""}; if (typeof routePreview === "undefined" || !routePreview) persist(); updateRoute(fit); if (typeof routePreview !== "undefined" && routePreview) syncRoutePreviewChrome(); }
 const ul = $("rlist");
 let dragI = null;
 ul.addEventListener("dragstart", e => { const li = e.target.closest("li.stop"); if (li){ dragI = +li.dataset.i; e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", dragI); li.classList.add("dragging"); } });
@@ -4104,13 +4310,24 @@ function presetFlags(p){
   return {closed, unk, miss, day, view, stay, win};
 }
 /* 卡片上的當天狀態摘要（三種卡片共用，用語與摘要列一致） */
-const flagTxt = f => IS_PREVIEW ? "待公布" : [f.closed ? `<span class="warn">${f.closed} 站休館</span>` : "", f.stay ? `<span class="warn">${f.stay} 站僅限住宿者</span>` : "", f.view ? `${f.view} 站休館但戶外可看` : "",
-  f.win ? `${f.win} 站冬季開放（以官方公告為準）` : "", f.unk ? `${f.unk} 站未公布` : "", !f.unk && !f.win ? "皆有開放資訊" : ""].filter(Boolean).join("，");
+const flagTxt = f => {
+  if (IS_PREVIEW) return "待公布";
+  const bits = [
+    f.closed ? `<span class="warn">有 ${f.closed} 站休館</span>` : "",
+    f.stay ? `<span class="warn">${f.stay} 站僅限住宿者</span>` : "",
+    f.view ? `${f.view} 站休館但戶外可看` : "",
+    f.win ? `${f.win} 站冬季開放（以官方公告為準）` : "",
+    f.unk ? `${f.unk} 站未公布` : ""
+  ].filter(Boolean);
+  return bits.length ? bits.join("，") : "全部開放";
+};
 function winterCardHtml(p){
   const n = p.stops.filter(s => s.c || s.note).length;
   const f = presetFlags(p);
-  return `<div class="card winter" data-preset="${esc(p.id)}" tabindex="0">${thumb(p)}<div class="cbody">${winterWarnHtml()}<span class="ctag tag-draft">${esc(p.src)}</span><div class="ctitle">${esc(p.name)}</div><div class="cdesc">${esc(p.note || "")}</div>` +
-    `<div class="cmeta">${n} 件作品，步行${p.est && p.est.min ? `約 ${fmtMin(p.est.min)}（OSRM 步行路線）` : ""}</div>` +
+  const snow = isWinterDay(curDay());
+  const tag = snow ? "" : ` <span class="ctag tag-winter">冬季用</span>`;
+  return `<div class="card winter" data-preset="${esc(p.id)}" tabindex="0">${thumb(p)}<div class="cbody"><span class="ctag tag-draft">${esc(p.src)}</span>${tag}<div class="ctitle">${esc(p.name)}</div><div class="cdesc">${esc(p.note || "")}</div>` +
+    `<div class="cmeta">${n} 件作品${p.est && p.est.min ? `，步行約 ${fmtMin(p.est.min)}` : ""}</div>` +
     `<div class="cflag">${f.day.slice(5).replace("-", "/")}：${flagTxt(f)}</div></div></div>`;
 }
 function modelCardHtml(p){
@@ -4165,11 +4382,21 @@ function loadFanRoute(id){
   const note = $("rnote"); if (note) note.innerHTML = `<span class="ctag tag-fan">越後飯實踩 ${esc((p.walked || "").replace(/-/g, "/"))}</span> ${esc(p.summary || "")}${p.caveat ? `<br><span class="muted">${esc(p.caveat)}</span>` : ""}`;
   if (CFG.onPreset) CFG.onPreset(p); else showTab("r");
 }
+function themePresets(){
+  const all = PRESETS.filter(p => p.kind === "theme");
+  return all.filter(p => !p.winter).concat(all.filter(p => p.winter));
+}
 function renderPresets(){
   const box = $("presetlist"); if (!box) return;
   const groups = [["主題路線", p => p.kind === "theme"], ["其他行程", p => p.date], ["官方巡迴路線", p => p.src === "官方 2024 地圖"], ["官方建議行程", p => p.kind === "model"]];
   const order = CFG.presetOrder || [0, 1, 2];
-  box.innerHTML = order.filter(gi => PRESETS.some(groups[gi][1])).map(gi => { const [t, fn] = groups[gi]; return `<div class="cgroup"><div class="cgt">${t}</div><div class="cards">${PRESETS.filter(fn).map(cardHtml).join("")}</div></div>`; }).join("");
+  box.innerHTML = order.filter(gi => PRESETS.some(groups[gi][1])).map(gi => {
+    const [t, fn] = groups[gi];
+    const list = t === "主題路線" ? themePresets() : PRESETS.filter(fn);
+    const warn = t === "主題路線" && isWinterDay(curDay()) ? winterWarnHtml() : "";
+    const id = t === "主題路線" ? ' id="cgroup-theme"' : "";
+    return `<div class="cgroup"${id}><div class="cgt">${t}</div>${warn}<div class="cards">${list.map(cardHtml).join("")}</div></div>`;
+  }).join("");
   if (FAN_ON) FAN_NOTES.forEach(N => {
     const card = box.querySelector(`[data-preset="${CSS.escape(N.attach_to)}"]`); if (!card) return;
     const locked = !fanUnlocked();
@@ -4178,15 +4405,12 @@ function renderPresets(){
   });
   if (FAN_ON && FAN_ROUTES.length) box.insertAdjacentHTML("afterbegin", `<div class="cgroup"><div class="cgt">越後飯實踩路線</div><div class="cards">${FAN_ROUTES.map(fanCardHtml).join("")}</div></div>`);
 }
-function loadPreset(id){
+function loadPreset(id, opt){
   const p = PRESETS.find(x => x.id === id); if (!p) return;
-  if (p.date){ dayEl.value = p.date; syncDayLabel(); }
-  setRoute({name:p.name, stops:withNotes(p), mode:p.mode, url:p.url}, true);
+  if (opt && opt.quiet){ previewPreset(id); return; }
+  fillPresetRoute(p);
+  setRoute({name:route.name, stops:route.stops, mode:route.mode, url:route.url}, true);
   render();
-  const N = notesFor(p.id), nOn = N && fanUnlocked();
-  const note = $("rnote"); if (note) note.innerHTML = (p.winter ? winterWarnHtml() : "") + `<span class="ctag ${/官方/.test(p.src) ? "tag-off" : "tag-draft"}">${esc(p.src)}</span> ${esc(p.note || "")}` +
-    (nOn ? `<div class="rnotes"><span class="ctag tag-fan">越後飯實踩筆記 ${esc((N.walked || "").replace(/-/g, "/"))}</span> ${esc(N.summary || "")}${N.caveat ? `<br><span class="muted">${esc(N.caveat)}</span>` : ""}</div>` : "");
-  syncWinterBanner();
   if (CFG.onPreset) CFG.onPreset(p); else showTab("r");
 }
 /* 選推薦路線前的確認：days.js 換成「取代目前行程／另存一份再載入／取消」。網址 #preset= 不經過這裡 */
@@ -4525,8 +4749,13 @@ function toast(t){
 var sheetState = "half", setSheet = null;
 if (SHEET){
   const panel = $("panel"), handle = $("sheet-handle"), root = document.documentElement;
-  /* 收合時只露出日期與〔篩選〕〔我的行程〕；分頁在半開以上才顯示，所以高度用固定的按鈕列高度算，不量隱藏中的元素 */
-  const peekH = () => { const dr = $("daterow"), ds = $("daystat"), top = ds && ds.offsetParent ? ds.offsetTop + ds.offsetHeight : dr.offsetTop + dr.offsetHeight; return top + 64 + (parseFloat(getComputedStyle(panel).paddingBottom) || 0); };
+  /* 收合時露出日期、路線膠囊與〔篩選〕〔我的行程〕；分頁在半開以上才顯示，按鈕列用固定高度，不量隱藏中的分頁 */
+  const peekH = () => {
+    const dr = $("daterow"), ds = $("daystat"), caps = $("mcaps");
+    const anchor = (caps && caps.offsetParent) ? caps : (ds && ds.offsetParent ? ds : dr);
+    const top = anchor ? anchor.offsetTop + anchor.offsetHeight : 0;
+    return top + 64 + (parseFloat(getComputedStyle(panel).paddingBottom) || 0);
+  };
   const snapH = s => { const H = window.innerHeight; return s === "peek" ? peekH() : s === "half" ? (H <= 680 ? Math.max(peekH(), Math.min(Math.round(H * 0.45), H - 300)) : Math.round(H * 0.52)) : H - 64; };
   const apply = h => { panel.style.height = h + "px"; root.style.setProperty("--sheet-h", h + "px"); };
   setSheet = function(s){
@@ -4537,6 +4766,7 @@ if (SHEET){
     if (areaRedraw){ areaRedraw(); clearTimeout(panel._art); panel._art = setTimeout(areaRedraw, 320); }
     handle.setAttribute("aria-expanded", s !== "peek");
     handle.setAttribute("aria-label", s === "full" ? "收合面板" : "展開面板");
+    if (typeof syncRainCaps === "function") syncRainCaps();
   };
   let y0 = 0, h0 = 0, t0 = 0, moved = false, dragging = false;
   handle.addEventListener("pointerdown", e => { if (!useSheet()) return; dragging = true; moved = false; y0 = e.clientY; t0 = performance.now(); h0 = panel.getBoundingClientRect().height; panel.classList.add("dragging"); handle.setPointerCapture(e.pointerId); });
@@ -4685,6 +4915,7 @@ if (SHEET){
     if (!useSheet()) return;
     const t = e.originalEvent && e.originalEvent.target;
     if (t && t.closest && t.closest("path.mk")) return;
+    if (routePreview){ clearRoutePreview(); return; }
     if (isOpen()) close(); else if (sheetState !== "peek") setSheet("peek");
   });
   window.addEventListener("resize", () => { if (isOpen()) setState(st); });
@@ -5070,6 +5301,7 @@ function onbClose(){
     document.body.classList.toggle("daystat-open", on);
     if (more) more.setAttribute("aria-expanded", on);
     if (more) more.textContent = on ? "收合" : "統計";
+    if (mob() && setSheet && sheetState === "peek") setSheet("peek");
   };
   if (more) more.onclick = e => { e.stopPropagation(); if (!mob()) return; setDayStat(!document.body.classList.contains("daystat-open")); };
   /* 路線編輯兩層 */
@@ -5097,7 +5329,7 @@ function onbClose(){
   /* 載入建議路線後回路線分頁 */
   if (typeof loadPreset === "function"){
     const orig = loadPreset;
-    loadPreset = function(id){ orig(id); if (mob()) showTab("r"); };
+    loadPreset = function(id, opt){ orig(id, opt); if (mob() && !(opt && opt.quiet)) showTab("r"); };
   }
 })();
 
@@ -5143,6 +5375,7 @@ let LS_TRIPS = "etmap_pub_trips", LS_CUR = "etmap_pub_cur", LS_TRIPED = "etmap_p
 let LS_TRIP = "etmap_pub_old", LS_TRIPV = "etmap_pub_oldview", LS_MODEL = "etmap_pub_model";
 let tripWide = () => !useSheet();
 let trips = [], trip = null, tripView = null, editing = null, tripLoading = false;
+const inRoutePreview = () => typeof routePreview !== "undefined" && routePreview;
 const MODES = ["drive", "walk", "bus", "train"];
 const newId = () => "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 function tripYearOf(t){ if (t && t.year) return +t.year; if (typeof YEARS !== "undefined" && YEARS && YEARS.legacy) return +YEARS.legacy; return null; }
@@ -5171,11 +5404,23 @@ const tripStops = t => t.days.reduce((a, D) => a + D.stops.filter(x => okLL(stop
 function findDay(r){ const k = routeKey(r); for (const t of trips){ const i = t.days.findIndex(D => dayRouteKey(t, D) === k); if (i >= 0) return [t, i]; } return null; }
 function newTrip(r, name){ const t = {id:newId(), name:uniqName(String(name || baseName(r.name) || defName()).slice(0, 40)), mode:tripMode(r.mode), ...(typeof YEAR === "undefined" ? {} : {year:YEAR}), days:[{date:curDay(), stops:cpy(r.stops || [])}]}; trips.push(t); return t; }
 function writeBack(){
-  if (tripLoading) return;
+  if (tripLoading || inRoutePreview()) return;
   if (trip && trip.days[editing]){ trip.days[editing].stops = cpy(route.stops); trip.mode = tripMode(route.mode); saveTrip(); return; }
   if (validStops(route.stops).length){ trip = newTrip(route); editing = 0; syncTV(); saveTrip(); toast(`已建立 1 天行程「${trip.name}」`); }
 }
-persist = (orig => () => { orig(); writeBack(); renderTripBox(); })(persist);
+function commitRoutePreview(){ if (inRoutePreview()) persist(); }
+persist = (orig => () => {
+  if (inRoutePreview()){
+    routePreview = null;
+    routePreviewSnap = null;
+    if (typeof syncRoutePreviewChrome === "function") syncRoutePreviewChrome();
+    if (typeof capHTML !== "undefined") capHTML = "";
+    orig(); writeBack(); renderTripBox();
+    if (typeof renderCapsules === "function") renderCapsules();
+    return;
+  }
+  orig(); writeBack(); renderTripBox();
+})(persist);
 function showDay(t, k, fit = true, setDate = true){
   if (!t || !t.days[k]) return;
   trip = t; editing = k; syncTV();
@@ -5193,7 +5438,7 @@ function replaceDay(r, fit){
   showDay(t, k, fit, false);
 }
 setRoute = (orig => (r, fit) => {
-  if (tripLoading) return orig(r, fit);
+  if (tripLoading || inRoutePreview()) return orig(r, fit);
   if (!r || !validStops(r.stops || []).length) return;
   if (presetReplace && trip && trip.days[editing]){ replaceDay(r, fit); return; }
   const hit = findDay(r); if (hit){ showDay(hit[0], hit[1], fit, false); return; }
@@ -5247,6 +5492,7 @@ function deleteTrip(t){
     if (trips.length) showDay(trips[0], 0, true, false);
     else { tripLoading = true; setRoute({name:"", stops:[], mode:route.mode}, false); tripLoading = false; } }
   saveTrip(); renderTripBox(); if (typeof renderTripView === "function") renderTripView();
+  if (typeof renderCapsules === "function") renderCapsules();
 }
 function migrateTrips(){
   const raw = k => { try { return localStorage.getItem(k); } catch(e){ return null; } };
@@ -5392,6 +5638,7 @@ function renderTripBox(){
   nm.oninput = () => paintName(false);
   nm.onchange = () => { paintName(true); renderTripBox(); };
   syncNameField();
+  if (typeof renderCapsules === "function") renderCapsules();
 }
 document.addEventListener("click", e => {
   const t = e.target.closest("[data-tday],[data-tdel],[data-tadd],[data-tsel],[data-tdelt],[data-tvshow],[data-tvclear]"); if (!t) return;
