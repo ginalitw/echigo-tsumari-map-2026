@@ -783,8 +783,12 @@ ul.lst code,.rlist code{font-size:11px;color:var(--ink-soft);margin-right:4px}
 .rlist li.leg{font-size:12px;color:var(--note);padding:2px 0 2px 28px}
 .rsum{font-size:13px;margin:8px 0 4px;line-height:1.5}
 .gbtn{display:block;text-align:center;background:var(--link);color:var(--snow);text-decoration:none;border-radius:6px;padding:6px;margin:4px 0;font-size:13px}
-.rnum span{display:flex;width:24px;height:24px;border-radius:6px;background:var(--ink);color:var(--gold);font-weight:700;font-size:13px;align-items:center;justify-content:center;border:2px solid var(--gold);box-sizing:border-box;box-shadow:var(--shadow-float)}
+.rnum span{display:flex;width:24px;min-width:24px;height:24px;border-radius:6px;background:var(--ink);color:var(--gold);font-weight:700;font-size:13px;line-height:1;align-items:center;justify-content:center;border:2px solid var(--gold);box-sizing:border-box;box-shadow:var(--shadow-float);white-space:nowrap}
+.rnum.rnum-merge span{width:auto;min-width:26px;padding:0 6px}
 .rnum.rclosed span{background:var(--ink-soft);color:var(--snow);border-color:var(--warn)}
+.rnum-picks{display:flex;flex-direction:column;gap:4px;margin:0;padding:0}
+.rnum-pick{display:block;width:100%;min-height:40px;padding:8px 10px;border:none;border-radius:8px;background:var(--wash);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.rnum-pick:hover,.rnum-pick:focus-visible{background:var(--rice);outline:2px solid var(--ink)}
 .leaflet-popup-content{font-size:13px;line-height:1.55;min-width:210px}
 .pp-head{display:flex;align-items:center;gap:6px}
 .pp-code{display:inline-block;background:var(--accent);color:var(--ink);font-weight:700;padding:0 6px;border-radius:4px;font-size:12px}
@@ -1643,8 +1647,8 @@ body.preview-on .dcount{white-space:normal}
   body.sheet-peek .mcaps-save:not([hidden]){display:block}
   .mcaps-save .b.pri{width:100%;min-height:44px;border-radius:var(--r-pill);background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:700;font-size:15px}
   .mcaps-save .b.pri:active{background:var(--gold-press);border-color:var(--gold-press)}
-  body.route-preview .leaflet-overlay-pane path.mk:not(.pin){opacity:.35}
-  body.route-preview .leaflet-marker-icon.clu.clu-dim span{opacity:.35;color:transparent;text-shadow:none}
+  body.route-preview .leaflet-marker-icon.clu{display:none!important;pointer-events:none!important}
+  .mcaps-sum{word-break:break-word}
   .wstay{margin:6px 0 0;font-size:13.5px;line-height:1.45;color:var(--ink)}
   .wfac{margin:4px 0 0;display:flex;flex-wrap:wrap;gap:6px}
   .wfac-note{margin:6px 0 0;font-size:12px;line-height:1.4}
@@ -2791,6 +2795,10 @@ function syncRoutePreviewChrome(){
   if (document.body) document.body.classList.toggle("route-preview", !!routePreview);
   syncMcapsPreviewSum();
   if (typeof zoomUpdate === "function") zoomUpdate();
+  if (typeof setSheet === "function" && useSheet() && sheetState === "peek"){
+    setSheet("peek");
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => requestAnimationFrame(() => setSheet("peek")));
+  }
 }
 function previewTravelMin(){
   if (routeInfo && routeInfo.legs && routeInfo.src !== "none") return routeInfo.legs.reduce((a, l) => a + (l && isFinite(+l.min) ? +l.min : 0), 0);
@@ -2807,7 +2815,7 @@ function mcapsPreviewSumHtml(){
   const n = route.stops.filter(s => s.c).length;
   const incl = route.mode === "walk" ? "含步行" : "含車程";
   let s = `${n} 件作品，共約 ${fmtApprox(clock.total)}，${incl} ${fmtApprox(clock.travel)}`;
-  if (clock.total > ROUTE_DAY_LONG) s += `，<span class="warn">⚠ 9 點出發會超過 17 點閉館</span>`;
+  if (clock.total > ROUTE_DAY_LONG) s += `，<span class="warn">⚠ 會超過閉館</span>`;
   return s;
 }
 function syncMcapsPreviewSum(){
@@ -2815,7 +2823,13 @@ function syncMcapsPreviewSum(){
   if (!el) return;
   const on = !!routePreview && useSheet();
   el.hidden = !on;
-  if (on) el.innerHTML = mcapsPreviewSumHtml();
+  if (on){
+    el.innerHTML = mcapsPreviewSumHtml();
+    void el.offsetHeight;
+    const saveRow = $("mcapsave");
+    if (saveRow) void saveRow.offsetHeight;
+  }
+  if (on && typeof setSheet === "function" && useSheet() && sheetState === "peek") setSheet("peek");
 }
 function clearRoutePreview(){
   if (!routePreview) return;
@@ -3843,25 +3857,120 @@ async function computeRoute(pts, mode){
   } catch(e){ return estimate(pts, mode); }
 }
 const routeLayer = L.layerGroup().addTo(map);
+const ROUTE_BADGE_MERGE_PX = 26;
+const ROUTE_BADGE_H = 24;
+const ROUTE_BADGE_MIN_W = 26;
+let routeBadgeProbe = null;
+let routeBadgeStops = null, routeBadgeHook = false;
+function measureRouteBadgeWidth(label){
+  const minW = label.includes("・") ? ROUTE_BADGE_MIN_W : 24;
+  if (!document.body) return Math.max(minW, Math.round(label.length * 8 + 16));
+  if (!routeBadgeProbe){
+    routeBadgeProbe = document.createElement("span");
+    routeBadgeProbe.className = "rnum rnum-merge";
+    routeBadgeProbe.setAttribute("aria-hidden", "true");
+    routeBadgeProbe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none";
+    routeBadgeProbe.innerHTML = "<span></span>";
+    document.body.appendChild(routeBadgeProbe);
+  }
+  const inner = routeBadgeProbe.querySelector("span");
+  inner.textContent = label;
+  const w = Math.ceil(inner.getBoundingClientRect().width);
+  return Math.max(minW, w);
+}
 function syncRouteOn(){
   const el = $("map"); if (!el) return;
   el.classList.toggle("route-on", validStops(route.stops).length > 0);
+}
+function routeBadgeClosed(s){
+  return !!(s.c && BY[s.c] && BY[s.c]._day && BY[s.c]._day.state === "closed");
+}
+function routeBadgeClick(s){
+  if (s.c && BY[s.c]) zoomTo(BY[s.c]);
+  else if (s.p && isFinite(+s.lat) && isFinite(+s.lng)) map.flyTo([+s.lat, +s.lng], Math.max(map.getZoom(), 15), anim(.4));
+}
+function openRouteBadgePick(indices){
+  const st = routeBadgeStops || [];
+  const rows = indices.map(i => {
+    const s = st[i];
+    if (!s) return "";
+    return `<button type="button" class="rnum-pick" data-ri="${i}">${i + 1}. ${esc(stopName(s))}</button>`;
+  }).join("");
+  const pop = L.popup({className:"rnum-pop", closeButton:true, maxWidth:280, autoPanPadding:[40, 40]})
+    .setLatLng(stopLL(st[indices[0]]))
+    .setContent(`<div class="rnum-picks" role="list">${rows}</div>`)
+    .openOn(map);
+  const el = pop.getElement();
+  if (el) el.querySelectorAll(".rnum-pick").forEach(btn => {
+    btn.onclick = ev => {
+      L.DomEvent.stopPropagation(ev);
+      const ri = +btn.dataset.ri;
+      if (st[ri]) routeBadgeClick(st[ri]);
+      map.closePopup(pop);
+    };
+  });
+}
+function layoutRouteBadges(){
+  routeLayer.eachLayer(l => { if (l._routeBadge) routeLayer.removeLayer(l); });
+  const st = routeBadgeStops;
+  if (!st || !st.length) return;
+  const z = map.getZoom();
+  const nodes = st.map((s, i) => {
+    const ll = stopLL(s);
+    const p = map.project(ll, z);
+    return {i, s, ll, x:p.x, y:p.y};
+  });
+  const par = nodes.map((_, i) => i);
+  const find = a => { while (par[a] !== a) { par[a] = par[par[a]]; a = par[a]; } return a; };
+  const unite = (a, b) => { par[find(b)] = find(a); };
+  for (let a = 0; a < nodes.length; a++) for (let b = a + 1; b < nodes.length; b++){
+    if (Math.hypot(nodes[a].x - nodes[b].x, nodes[a].y - nodes[b].y) < ROUTE_BADGE_MERGE_PX) unite(a, b);
+  }
+  const groups = new Map();
+  nodes.forEach((n, idx) => {
+    const r = find(idx);
+    if (!groups.has(r)) groups.set(r, []);
+    groups.get(r).push(idx);
+  });
+  groups.forEach(indices => {
+    indices.sort((a, b) => a - b);
+    const nums = indices.map(i => i + 1);
+    const label = nums.join("・");
+    const lat = indices.reduce((a, i) => a + nodes[i].ll[0], 0) / indices.length;
+    const lng = indices.reduce((a, i) => a + nodes[i].ll[1], 0) / indices.length;
+    const closed = indices.some(i => routeBadgeClosed(st[i]));
+    const merged = indices.length > 1;
+    const w = measureRouteBadgeWidth(label);
+    const m = L.marker([lat, lng], {zIndexOffset:1000, icon:L.divIcon({className:"rnum" + (closed ? " rclosed" : "") + (merged ? " rnum-merge" : ""), html:`<span>${label}</span>`, iconSize:[w, ROUTE_BADGE_H], iconAnchor:[w / 2, ROUTE_BADGE_H / 2]})});
+    m._routeBadge = true;
+    const tip = indices.length === 1 ? `${nums[0]}. ${stopName(st[indices[0]])}` : indices.map(i => `${i + 1}. ${stopName(st[i])}`).join("，");
+    m.bindTooltip(esc(tip), {direction:"top", offset:[0, -10]});
+    m.on("click", ev => {
+      L.DomEvent.stopPropagation(ev.originalEvent || ev);
+      if (indices.length === 1) routeBadgeClick(st[indices[0]]);
+      else openRouteBadgePick(indices);
+    });
+    m.addTo(routeLayer);
+  });
+}
+function ensureRouteBadgeHook(){
+  if (routeBadgeHook || !map) return;
+  routeBadgeHook = true;
+  map.on("zoomend moveend", () => { if (routeBadgeStops && routeBadgeStops.length) layoutRouteBadges(); });
 }
 function drawRoute(){
   routeLayer.clearLayers();
   syncRouteOn();
   const st = validStops(route.stops);
+  routeBadgeStops = st.length ? st : null;
   if (!st.length) return;
+  ensureRouteBadgeHook();
   const pts = st.map(stopLL);
   const line = routeInfo && routeInfo.geom ? routeInfo.geom : pts;
   const dash = !(routeInfo && routeInfo.geom);
   L.polyline(line, {color:TOK("--paper"), weight:9, opacity:.9, interactive:false}).addTo(routeLayer);
   L.polyline(line, {color:TOK("--route"), weight:5, opacity:.95, dashArray: dash ? "8 8" : null, interactive:false, className: ILL ? "rough2" : ""}).addTo(routeLayer);
-  st.forEach((s, i) => {
-    const m = L.marker(stopLL(s), {zIndexOffset:1000, icon:L.divIcon({className:"rnum" + (s.c && BY[s.c] && BY[s.c]._day && BY[s.c]._day.state === "closed" ? " rclosed" : ""), html:`<span>${i + 1}</span>`, iconSize:[24,24], iconAnchor:[12,12]})}).addTo(routeLayer);
-    m.bindTooltip(`${i + 1}. ${esc(stopName(s))}`, {direction:"top", offset:[0,-10]});
-    m.on("click", () => { if (s.c && BY[s.c]) zoomTo(BY[s.c]); });
-  });
+  layoutRouteBadges();
 }
 async function updateRoute(fit){
   const seq = ++routeSeq;
@@ -4745,6 +4854,7 @@ if (!ILL){
     cluLayer.clearLayers(); groups = [];
     const z = map.getZoom();
     DATA.forEach(d => { d._clu = false; });
+    if (routePreview) return;
     /* 全區只留地區卡，不畫數字圈。路線站點在 pins 裡，不進叢集，任何層級都單獨顯示。放大到地區卡消失才合併 */
     if (lv === "over" || z >= NOCLU_Z) return;
     const R = lv === "over" ? 72 : lv === "mid" ? 40 : 28, MIN = 2;
@@ -4799,8 +4909,7 @@ if (!ILL){
       const vc = {}; g.forEach(d => { const v = d.設置地點.replace("越後妻成", "越後妻有"); vc[v] = (vc[v] || 0) + 1; });
       const top = Object.entries(vc).sort((a, b) => b[1] - a[1])[0];
       const venue = top ? top[0] + (Object.keys(vc).length > 1 ? "等" : "") : "";
-      const hideN = !!routePreview;
-      const m = L.marker([pk.lat, pk.lng], {zIndexOffset:400, icon:L.divIcon({className:"clu" + (open ? "" : " clu-closed") + (hideN ? " clu-dim" : ""), html:`<span style="width:${size}px;height:${size}px;background:${c}">${hideN ? "" : g.length}</span>`, iconSize:[size, size], iconAnchor:[size / 2, size / 2]})});
+      const m = L.marker([pk.lat, pk.lng], {zIndexOffset:400, icon:L.divIcon({className:"clu" + (open ? "" : " clu-closed"), html:`<span style="width:${size}px;height:${size}px;background:${c}">${g.length}</span>`, iconSize:[size, size], iconAnchor:[size / 2, size / 2]})});
       m.bindTooltip(`${venue ? esc(venue) + "，" : ""}${g.length} 件，點一下放大`, {direction:"top", offset:[0, -size / 2]});
       m.on("click", () => { const b = L.latLngBounds(g.map(d => d.marker.getLatLng())); if (b.getNorthEast().equals(b.getSouthWest()) || map.getBoundsZoom(b) <= z) map.setView([pk.lat, pk.lng], Math.min(z + 2, 18)); else map.flyToBounds(b.pad(0.3), Object.assign(anim(.5), {maxZoom:18})); });
       m.addTo(cluLayer);
@@ -4818,7 +4927,10 @@ if (!ILL){
     groups.forEach(g => { const p = map.project(L.latLng(g._ll), z); boxes.push({x:p.x - g._size / 2, y:p.y - g._size / 2, w:g._size, h:g._size}); });
     DATA.forEach(d => { if (d.marker && map.hasLayer(d.marker) && !d._clu){ const p = map.project(d.marker.getLatLng(), z); boxes.push({x:p.x - 7, y:p.y - 7, w:14, h:14}); } });
     groups.forEach(g => { if (g._venue) items.push({ll:g._ll, text:`${g._venue}（${g.length}）`, off:g._size / 2 + 4, pri:1}); });
-    DATA.forEach(d => { if (d.marker && map.hasLayer(d.marker) && !d._clu) items.push({ll:d.marker.getLatLng(), text:(d.中文名 || d.作品名稱), off:10, pri:pins.has(d.作品編號) ? 0 : 2, closed:dimState(d._day.state), code:d.作品編號}); });
+    DATA.forEach(d => {
+      if (routePreview && !pins.has(d.作品編號)) return;
+      if (d.marker && map.hasLayer(d.marker) && !d._clu) items.push({ll:d.marker.getLatLng(), text:(d.中文名 || d.作品名稱), off:10, pri:pins.has(d.作品編號) ? 0 : 2, closed:dimState(d._day.state), code:d.作品編號});
+    });
     items.sort((a, b) => a.pri - b.pri);
     let n = 0;
     for (const it of items){
@@ -4863,12 +4975,10 @@ if (!ILL){
     DATA.forEach(d => {
       const el = d.marker && map.hasLayer(d.marker) && d.marker.getElement();
       if (!el) return;
-      el.classList.toggle("pin", pins.has(d.作品編號));
-      el.classList.toggle("hid", (lv === "over" && !pins.has(d.作品編號)) || !!d._clu);
-      if (d.marker && !ILL){
-        styleMarker(d);
-        if (dimPv && !pins.has(d.作品編號)) d.marker.setStyle({opacity: 0.35, fillOpacity: 0.33});
-      }
+      const offRoute = !pins.has(d.作品編號);
+      el.classList.toggle("pin", !offRoute);
+      el.classList.toggle("hid", (lv === "over" && offRoute) || !!d._clu || (dimPv && offRoute));
+      if (d.marker && !ILL) styleMarker(d);
     });
     labels(lv, pins);
   };
@@ -4909,10 +5019,23 @@ if (SHEET){
   const panel = $("panel"), handle = $("sheet-handle"), root = document.documentElement;
   /* 收合時露出日期、路線膠囊與〔篩選〕〔我的行程〕；分頁在半開以上才顯示，按鈕列用固定高度，不量隱藏中的分頁 */
   const peekH = () => {
-    const dr = $("daterow"), ds = $("daystat"), caps = $("mcaps");
-    const anchor = (caps && caps.offsetParent) ? caps : (ds && ds.offsetParent ? ds : dr);
-    const top = anchor ? anchor.offsetTop + anchor.offsetHeight : 0;
-    return top + 64 + (parseFloat(getComputedStyle(panel).paddingBottom) || 0);
+    const pad = parseFloat(getComputedStyle(panel).paddingBottom) || 0;
+    const saveRow = $("mcapsave");
+    const previewSave = saveRow && !saveRow.hidden;
+    if (previewSave) return saveRow.offsetTop + saveRow.offsetHeight + 12 + pad;
+    let top = 0;
+    ["daterow", "daystat", "mcaps", "mcaps-sum", "mcapsave"].forEach(id => {
+      const el = $(id);
+      if (!el || el.hidden || !el.offsetParent) return;
+      const b = el.offsetTop + el.offsetHeight;
+      if (b > top) top = b;
+    });
+    if (!top){
+      const dr = $("daterow"), ds = $("daystat"), caps = $("mcaps");
+      const anchor = (caps && caps.offsetParent) ? caps : (ds && ds.offsetParent ? ds : dr);
+      top = anchor ? anchor.offsetTop + anchor.offsetHeight : 0;
+    }
+    return top + 64 + pad;
   };
   const snapH = s => { const H = window.innerHeight; return s === "peek" ? peekH() : s === "half" ? (H <= 680 ? Math.max(peekH(), Math.min(Math.round(H * 0.45), H - 300)) : Math.round(H * 0.52)) : H - 64; };
   const apply = h => { panel.style.height = h + "px"; root.style.setProperty("--sheet-h", h + "px"); };
