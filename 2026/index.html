@@ -2217,6 +2217,7 @@ function wxGet(opt){
 }
 /* 大地藝術祭2026 作品地圖：共用程式（plain 與 illustrated 兩版共用） */
 const FAN_ENABLED = false;        // 第 4 階段才改 true
+const ETA_ON = false;
 const LINE_ADD_FRIEND_URL = "https://lin.ee/R12Vd62";  // Bot 加好友網址。說明卡與解鎖按鈕都直接用這個，不加參數。之後若改 LIFF 只改這裡。
 const LINE_BASIC_ID = "@800dbehr";  // 電腦版 LINE 的基本 ID。公開版說明卡寬螢幕版的搜尋 ID 與〔複製 ID〕都用這個。
 const LIFF_ID = "2011920898-CrQ02DQ7";  // 存進富搖小幫手的網址。值在 data/liff.json，建置時注入。
@@ -2840,7 +2841,7 @@ function clearRoutePreview(){
   capHTML = "";
   tripLoading = true;
   route = load(LS_ROUTE, {name:"", stops:[], mode:"drive"});
-  if (snap){ trip = snap.trip; editing = snap.editing; if (typeof syncTV === "function") syncTV(); }
+  if (snap && typeof trip !== "undefined"){ trip = snap.trip; editing = snap.editing; if (typeof syncTV === "function") syncTV(); }
   tripLoading = false;
   updateRoute(false);
   if (view && isFinite(view.lat) && isFinite(view.lng)) map.setView([view.lat, view.lng], view.zoom, anim(.5));
@@ -2869,8 +2870,7 @@ function previewPreset(id){
       editing: typeof editing !== "undefined" ? editing : null,
       map: {lat: c.lat, lng: c.lng, zoom: map.getZoom()}
     };
-    trip = null; editing = null;
-    if (typeof syncTV === "function") syncTV();
+    if (typeof trip !== "undefined"){ trip = null; editing = null; if (typeof syncTV === "function") syncTV(); }
   }
   routePreview = id;
   capHTML = "";
@@ -3860,7 +3860,7 @@ const ROUTE_BADGE_MERGE_PX = 26;
 const ROUTE_BADGE_H = 24;
 const ROUTE_BADGE_MIN_W = 26;
 let routeBadgeProbe = null;
-let routeBadgeStops = null, routeBadgeHook = false;
+let routeBadgeStops = null, routeBadgeLabels = null, routeBadgeHook = false;
 function measureRouteBadgeWidth(label){
   const minW = label.includes("・") ? ROUTE_BADGE_MIN_W : 24;
   if (!document.body) return Math.max(minW, Math.round(label.length * 8 + 16));
@@ -3890,10 +3890,12 @@ function routeBadgeClick(s){
 }
 function openRouteBadgePick(indices){
   const st = routeBadgeStops || [];
+  const labels = routeBadgeLabels || [];
   const rows = indices.map(i => {
     const s = st[i];
     if (!s) return "";
-    return `<button type="button" class="rnum-pick" data-ri="${i}">${i + 1}. ${esc(stopName(s))}</button>`;
+    const lab = labels[i] || String(i + 1);
+    return `<button type="button" class="rnum-pick" data-ri="${i}">${esc(lab)}. ${esc(stopName(s))}</button>`;
   }).join("");
   const pop = L.popup({className:"rnum-pop", closeButton:true, maxWidth:280, autoPanPadding:[40, 40]})
     .setLatLng(stopLL(st[indices[0]]))
@@ -3912,12 +3914,13 @@ function openRouteBadgePick(indices){
 function layoutRouteBadges(){
   routeLayer.eachLayer(l => { if (l._routeBadge) routeLayer.removeLayer(l); });
   const st = routeBadgeStops;
-  if (!st || !st.length) return;
+  const bl = routeBadgeLabels;
+  if (!st || !st.length || !bl) return;
   const z = map.getZoom();
   const nodes = st.map((s, i) => {
     const ll = stopLL(s);
     const p = map.project(ll, z);
-    return {i, s, ll, x:p.x, y:p.y};
+    return {i, s, ll, x:p.x, y:p.y, label: bl[i] || String(i + 1)};
   });
   const par = nodes.map((_, i) => i);
   const find = a => { while (par[a] !== a) { par[a] = par[par[a]]; a = par[a]; } return a; };
@@ -3933,7 +3936,7 @@ function layoutRouteBadges(){
   });
   groups.forEach(indices => {
     indices.sort((a, b) => a - b);
-    const nums = indices.map(i => i + 1);
+    const nums = indices.map(i => nodes[i].label);
     const label = nums.join("・");
     const lat = indices.reduce((a, i) => a + nodes[i].ll[0], 0) / indices.length;
     const lng = indices.reduce((a, i) => a + nodes[i].ll[1], 0) / indices.length;
@@ -3942,7 +3945,7 @@ function layoutRouteBadges(){
     const w = measureRouteBadgeWidth(label);
     const m = L.marker([lat, lng], {zIndexOffset:1000, icon:L.divIcon({className:"rnum" + (closed ? " rclosed" : "") + (merged ? " rnum-merge" : ""), html:`<span>${label}</span>`, iconSize:[w, ROUTE_BADGE_H], iconAnchor:[w / 2, ROUTE_BADGE_H / 2]})});
     m._routeBadge = true;
-    const tip = indices.length === 1 ? `${nums[0]}. ${stopName(st[indices[0]])}` : indices.map(i => `${i + 1}. ${stopName(st[i])}`).join("，");
+    const tip = indices.length === 1 ? `${nums[0]}. ${stopName(st[indices[0]])}` : indices.map(i => `${nodes[i].label}. ${stopName(st[i])}`).join("，");
     m.bindTooltip(esc(tip), {direction:"top", offset:[0, -10]});
     m.on("click", ev => {
       L.DomEvent.stopPropagation(ev.originalEvent || ev);
@@ -3960,11 +3963,13 @@ function ensureRouteBadgeHook(){
 function drawRoute(){
   routeLayer.clearLayers();
   syncRouteOn();
-  const st = validStops(route.stops);
-  routeBadgeStops = st.length ? st : null;
-  if (!st.length) return;
+  const plan = routeBadgePlan(route.stops);
+  const items = plan.items;
+  routeBadgeStops = items.length ? items.map(x => x.s) : null;
+  routeBadgeLabels = items.length ? items.map(x => x.label) : null;
+  if (!items.length) return;
   ensureRouteBadgeHook();
-  const pts = st.map(stopLL);
+  const pts = validStops(route.stops).map(stopLL);
   const line = routeInfo && routeInfo.geom ? routeInfo.geom : pts;
   const dash = !(routeInfo && routeInfo.geom);
   L.polyline(line, {color:TOK("--paper"), weight:9, opacity:.9, interactive:false}).addTo(routeLayer);
@@ -4002,6 +4007,149 @@ function legText(i){
 const ROUTE_STAY_CAP = 90;
 const SAME_VENUE_M = 150;
 const SAME_VENUE_ADD = 5;
+const ROUTE_END_MERGE_M = 150;
+function venueDistM(a, b){ return okLL(a) && okLL(b) ? hav(a, b) * 1000 : Infinity; }
+function stopVenueKey(s){
+  const ll = stopLL(s);
+  return okLL(ll) ? `${ll[0].toFixed(5)},${ll[1].toFixed(5)}` : "";
+}
+function routeBadgePlan(stops){
+  const st = stops || [];
+  const vs = validStops(st);
+  const stopIdx = [];
+  for (let i = 0; i < st.length; i++) if (stopLL(st[i])) stopIdx.push(i);
+  const n = vs.length;
+  const firstP = n && !vs[0].c;
+  const lastP = n > 1 && !vs[n - 1].c;
+  const mergeSE = firstP && lastP && venueDistM(stopLL(vs[0]), stopLL(vs[n - 1])) <= ROUTE_END_MERGE_M;
+  let num = 0;
+  const badgeAt = [];
+  for (let vi = 0; vi < n; vi++){
+    if (mergeSE && vi === 0){ badgeAt.push("起終"); continue; }
+    if (mergeSE && vi === n - 1 && lastP){ badgeAt.push(null); continue; }
+    if (vi === 0 && firstP && !mergeSE){ badgeAt.push("起"); continue; }
+    if (vi === n - 1 && lastP && !mergeSE){ badgeAt.push("終"); continue; }
+    badgeAt.push(String(++num));
+  }
+  const byStop = {};
+  const items = [];
+  for (let vi = 0; vi < n; vi++){
+    const si = stopIdx[vi];
+    const badge = badgeAt[vi];
+    const listLabel = badge === null ? "" : badge;
+    byStop[si] = {vi, listLabel, badge, showBadge: badge != null};
+    if (badge != null) items.push({s: vs[vi], label: badge, vi, stopIndex: si});
+  }
+  return {vs, mergeSE, items, byStop};
+}
+/* 地圖上數字編號的站數（作品與途中地點，不含起、終、起終） */
+function routeDisplayStationCount(stops){
+  const plan = routeBadgePlan(stops);
+  let n = plan.items.filter(x => /^\d+$/.test(x.label)).length;
+  if (n === 0){
+    const vs = plan.vs;
+    for (let vi = 1; vi < vs.length - 1; vi++){
+      const s = vs[vi];
+      if (s && (s.c || s.p)) n++;
+    }
+  }
+  return n;
+}
+function routeListNo(stops, i){
+  const p = routeBadgePlan(stops).byStop[i];
+  if (!p || !stopLL(stops[i])) return "?";
+  return p.listLabel === "" ? "·" : p.listLabel;
+}
+function routeStationCount(stops){
+  const st = stops || [];
+  const used = new Set();
+  let count = 0;
+  for (let i = 0; i < st.length; i++){
+    if (used.has(i)) continue;
+    const s = st[i];
+    const atStart = i === 0, atEnd = i === st.length - 1;
+    if (!s.c && (atStart || atEnd)) continue;
+    if (!s.c) continue;
+    if (s.time && st[i + 1] && st[i + 1].c && st[i + 1].time === s.time){
+      let j = i + 1;
+      while (j < st.length && st[j].c && st[j].time === s.time){ used.add(j); j++; }
+      used.add(i); count++; continue;
+    }
+    const g = routeVenueGroups(st).find(gg => gg.idxs[0] === i);
+    if (!g) continue;
+    g.idxs.forEach(ix => used.add(ix));
+    count++;
+  }
+  return count;
+}
+function venueSiteKey(s){
+  if (!s || !s.c || !BY[s.c]) return "";
+  const d = BY[s.c];
+  return String(d.設置地點 || d.中文名 || d.作品名稱 || "").trim();
+}
+function canVenueMerge(st, i, g){
+  const s = st[i], ref = st[g.idxs[0]];
+  const ll = stopLL(s), rll = stopLL(ref);
+  if (!okLL(ll) || !okLL(rll) || venueDistM(rll, ll) > SAME_VENUE_M) return false;
+  const adjacent = g.idxs.some(ix => ix === i - 1 || ix === i + 1);
+  if (adjacent) return true;
+  const sk = venueSiteKey(s), rk = venueSiteKey(ref);
+  return !!(sk && rk && sk === rk);
+}
+function routeVenueGroups(stops){
+  const st = stops || [];
+  const groups = [];
+  for (let i = 0; i < st.length; i++){
+    const s = st[i];
+    if (s && isFinite(+s.stay_min)){ groups.push({idxs: [i], custom: true}); continue; }
+    if (!s || !s.c) continue;
+    let hit = null;
+    for (const g of groups){
+      if (g.custom) continue;
+      if (canVenueMerge(st, i, g)){ hit = g; break; }
+    }
+    if (hit) hit.idxs.push(i);
+    else groups.push({idxs: [i], custom: false});
+  }
+  return groups;
+}
+function gmNavStops(stops){
+  const vs = validStops(stops);
+  const plan = routeBadgePlan(stops);
+  const out = [];
+  const seenVenue = [];
+  for (let vi = 0; vi < vs.length; vi++){
+    const s = vs[vi];
+    if (s.c){
+      const ll = stopLL(s);
+      if (okLL(ll)){
+        let dup = false;
+        for (const prev of seenVenue){
+          if (venueDistM(stopLL(prev), ll) <= SAME_VENUE_M){ dup = true; break; }
+        }
+        if (dup) continue;
+        seenVenue.push(s);
+      }
+    }
+    out.push(s);
+  }
+  return out;
+}
+function routeNavLabel(plan, vi){
+  const vs = plan.vs, n = vs.length;
+  if (vi < 0 || vi >= n) return "?";
+  if (plan.mergeSE && vi === n - 1 && !vs[n - 1].c) return "終";
+  const it = plan.items.find(x => x.vi === vi);
+  if (it) return it.label;
+  if (vi === n - 1 && !vs[n - 1].c) return "終";
+  if (vi === 0 && !vs[0].c) return "起";
+  return "?";
+}
+function gmDirNavLabels(stops, navStops){
+  const plan = routeBadgePlan(stops);
+  const vs = plan.vs;
+  return navStops.map(s => routeNavLabel(plan, vs.indexOf(s)));
+}
 function tagRouteStayMin(d){
   const m = d && d.停留分鐘;
   if (m === 15 || m === 60) return m;
@@ -4013,31 +4161,15 @@ function stopRouteStay(s){
   if (!s || !s.c) return {custom: false, min: 0};
   return {custom: false, min: tagRouteStayMin(BY[s.c])};
 }
-/* 路線停留：180 分算 90；同館 150m 內合併（最長＋其餘各 5 分）；自訂 stay_min 不套用前兩條 */
+/* 路線停留：180 分算 90；同館 150m 內合併（最長＋其餘各 5 分，可不相鄰）；自訂 stay_min 不套用前兩條 */
 function routeStayMin(stops){
-  const st = stops || [];
-  let total = 0, i = 0;
-  while (i < st.length){
-    const s = st[i];
-    if (s && isFinite(+s.stay_min)){ total += +s.stay_min; i++; continue; }
-    if (!s.c){ i++; continue; }
-    const info = stopRouteStay(s);
-    const firstLL = stopLL(s);
-    if (!okLL(firstLL)){ total += info.min; i++; continue; }
-    const group = [s];
-    let j = i + 1;
-    while (j < st.length){
-      const nx = st[j];
-      if (nx && isFinite(+nx.stay_min)) break;
-      if (!nx.c) break;
-      const nll = stopLL(nx);
-      if (!okLL(nll) || hav(firstLL, nll) * 1000 > SAME_VENUE_M) break;
-      group.push(nx); j++;
-    }
-    const mins = group.map(g => stopRouteStay(g).min);
+  const groups = routeVenueGroups(stops);
+  let total = 0;
+  for (const g of groups){
+    if (g.custom){ total += +stops[g.idxs[0]].stay_min; continue; }
+    const mins = g.idxs.map(ix => stopRouteStay(stops[ix]).min);
     const max = mins.length ? Math.max(...mins) : 0;
-    total += max + (group.length - 1) * SAME_VENUE_ADD;
-    i = j;
+    total += max + (g.idxs.length - 1) * SAME_VENUE_ADD;
   }
   return total;
 }
@@ -4103,16 +4235,17 @@ function renderRouteList(pending){
   ul.innerHTML = "";
   const st = route.stops;
   if (!st.length){ ul.innerHTML = '<li class="empty">還沒有站點。先點上面的起點，再到「搜尋」分頁按作品旁的「＋路線」，或按「選建議」載入一條再修改。</li>'; }
-  let vi = 0, closed = 0, unk = 0, nview = 0, nstay = 0, nwin = 0;
+  let vix = 0, closed = 0, unk = 0, nview = 0, nstay = 0, nwin = 0;
   renderStartChips();
   st.forEach((s, i) => {
     const ok = !!stopLL(s);
+    const listNo = routeListNo(st, i);
     if (TT(route.mode)){ /* official timetable, no leg estimates */ }
-    else if (ok && vi > 0 && routeInfo && routeInfo.src !== "none" && routeInfo.legs[vi - 1]){
+    else if (ok && vix > 0 && routeInfo && routeInfo.src !== "none" && routeInfo.legs[vix - 1]){
       const leg = document.createElement("li"); leg.className = "leg";
-      leg.textContent = legText(vi - 1);
+      leg.textContent = legText(vix - 1);
       ul.appendChild(leg);
-    } else if (ok && vi > 0 && pending && !TT(route.mode)){ const leg = document.createElement("li"); leg.className = "leg"; leg.textContent = "↓ 計算中"; ul.appendChild(leg); }
+    } else if (ok && vix > 0 && pending && !TT(route.mode)){ const leg = document.createElement("li"); leg.className = "leg"; leg.textContent = "↓ 計算中"; ul.appendChild(leg); }
     if (s.c && BY[s.c] && !s.ret){ const di = dayInfo(BY[s.c], curDay()); if (di.state === "closed") closed++; if (di.state === "unknown"){ if (di.reason === "winter") nwin++; else unk++; } if (di.state === "view") nview++; if (di.state === "stay") nstay++; }
     const li = document.createElement("li");
     li.className = "stop"; li.draggable = !useSheet() || document.body.classList.contains("redit-on"); li.dataset.i = i;
@@ -4120,18 +4253,21 @@ function renderRouteList(pending){
     const fanX = [["lunch", "午餐"], ["parking", "停車"], ["toilet", "廁所"], ["photo", "拍照"], ["warn", "注意"]].filter(([k]) => s[k]);
     const parkNote = s.c ? parkWalkLabel(s.c) : "";
     /* 站名後面不再接狀態字：狀態只放在下一行的標籤（stopStatus），避免「光之館開放」黏在一起又重複 */
-    li.innerHTML = `<span class="no">${ok ? ++vi : "?"}</span><span class="t">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${s.c && BY[s.c] && BY[s.c].中文名 && BY[s.c].中文名 !== BY[s.c].作品名稱 ? `<span class="tja" lang="ja">${esc(BY[s.c].作品名稱)}</span>` : ""}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}${s.c ? ` <code>${esc(s.c)}</code>` : ""}<br>${stopStatus(s)}` +
+    const etaLine = ETA_ON && typeof trip !== "undefined" && typeof routeEtaStopHtml === "function" ? routeEtaStopHtml(st, i) : "";
+    li.innerHTML = `<span class="no">${esc(ok ? String(listNo) : "?")}</span><span class="t">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${s.c && BY[s.c] && BY[s.c].中文名 && BY[s.c].中文名 !== BY[s.c].作品名稱 ? `<span class="tja" lang="ja">${esc(BY[s.c].作品名稱)}</span>` : ""}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}${s.c ? ` <code>${esc(s.c)}</code>` : ""}<br>${stopStatus(s)}` +
+      (etaLine ? `<div class="reta">${etaLine}</div>` : "") +
       (parkNote ? `<span class="muted">${esc(parkNote)}</span>` : "") +
       (s.stay_min != null || s.tip ? `<span class="sfan">${s.stay_min != null ? `停留約 ${esc(s.stay_min)} 分` : ""}${s.stay_min != null && s.tip ? "，" : ""}${s.tip ? esc(s.tip) : ""}</span>` : "") +
       (fanX.length ? `<details class="sdet"><summary>排程細節</summary>${fanX.map(([k, t]) => `<div><b>${t}</b>：${esc(s[k])}</div>`).join("")}</details>` : "") +
       (ll ? gmLink(stopQuery(s), "sgm") : "") + `</span>` +
-      `<span class="ud"><button data-up="${i}" title="往上" aria-label="第 ${vi} 站往上移">↑</button><button data-down="${i}" title="往下" aria-label="第 ${vi} 站往下移">↓</button><button data-del="${i}" title="移除" aria-label="移除第 ${vi} 站">✕</button></span>`;
+      `<span class="ud"><button data-up="${i}" title="往上" aria-label="第 ${listNo} 站往上移">↑</button><button data-down="${i}" title="往下" aria-label="第 ${listNo} 站往下移">↓</button><button data-del="${i}" title="移除" aria-label="移除第 ${listNo} 站">✕</button></span>`;
     li.onclick = e => { if (e.target.closest("button,a,details")) return; if (s.c && BY[s.c]) zoomTo(BY[s.c]); else if (ok) map.setView(stopLL(s), 14); };
     ul.appendChild(li);
+    if (ok) vix++;
   });
   renderRouteCheck();
   const sum = $("rsum");
-  const n = validStops(st).length;
+  const n = routeDisplayStationCount(st);
   if (TT(route.mode)){
     const tt = st.filter(s => s.time);
     sum.innerHTML = `<b>${TTL(route.mode)}時刻，共 ${n} 站${tt.length ? `，${esc(tt[0].time)} 出發，最後一站 ${esc(tt[tt.length - 1].time)}` : ""}</b><br><span class="muted">時間依官方行程表，路況可能前後變動；地圖上的線只是示意。</span>` +
@@ -4164,11 +4300,12 @@ function renderRouteList(pending){
   const lp = $("rloop"); if (lp) lp.checked = isLoop();
   const rt = $("rtools"); if (rt) rt.hidden = TT(route.mode) || validStops(st).length < 2;
   renderGmaps();
-  const rn = $("routen"); if (rn) rn.textContent = route.stops.length;
-  const mn = $("mtripn"); if (mn) mn.textContent = route.stops.length || "";
-  const dt = $("dtrip"); if (dt){ dt.textContent = `目前行程・${route.stops.length} 站`; const tt = routeTotalTxt(); if (tt) dt.textContent += "　" + tt.slice(1); }
-  const rh = $("rhead"); if (rh){ rh.hidden = !route.stops.length; $("rheadt").textContent = `目前路線 ${route.stops.length} 站${routeTotalTxt()}`; }
+  const rn = $("routen"); if (rn) rn.textContent = n;
+  const mn = $("mtripn"); if (mn) mn.textContent = n || "";
+  const dt = $("dtrip"); if (dt){ dt.textContent = `目前行程・${n} 站`; const tt = routeTotalTxt(); if (tt) dt.textContent += "　" + tt.slice(1); }
+  const rh = $("rhead"); if (rh){ rh.hidden = !route.stops.length; $("rheadt").textContent = `目前路線 ${n} 站${routeTotalTxt()}`; }
   if (routePreview) syncMcapsPreviewSum();
+  if (typeof renderRouteEtaUi === "function" && typeof trip !== "undefined") renderRouteEtaUi();
 }
 /* 路線檢查：所選日期每一站的狀態，有問題的站列在路線最上方；非開車路線附上有官方出處的末班巴士 */
 function renderRouteCheck(){
@@ -4296,22 +4433,25 @@ function openQr(preset){
 const stopQuery = s => s.c ? gmQuery(BY[s.c]) : llq(s.lat, s.lng);
 /* 導航網址：起點、中途點、終點都走 gmQuery，室內作品帶場所名稱。每段最多 10 站：起點＋8 個中途點＋終點 */
 function gmDirUrls(stops, mode){
-  const pts = stops.map(stopQuery);
+  const nav = gmNavStops(stops);
+  const labels = gmDirNavLabels(stops, nav);
+  const pts = nav.map(stopQuery);
   const out = [], MAXP = 10;
   for (let i = 0; i < pts.length - 1; i += MAXP - 1){
     const seg = pts.slice(i, i + MAXP);
+    const segLab = labels.slice(i, i + MAXP);
     if (seg.length < 2) break;
     const u = new URL("https://www.google.com/maps/dir/");
     u.searchParams.set("api", "1"); u.searchParams.set("origin", seg[0]); u.searchParams.set("destination", seg[seg.length - 1]);
     if (seg.length > 2) u.searchParams.set("waypoints", seg.slice(1, -1).join("|"));
     u.searchParams.set("travelmode", mode === "walk" ? "walking" : "driving");
-    out.push({url:u.toString(), from:i + 1, to:i + seg.length});
+    out.push({url:u.toString(), from:segLab[0], to:segLab[segLab.length - 1]});
   }
   return out;
 }
 function gmapsUrls(){
   const st = validStops(route.stops); if (st.length < 2) return [];
-  return gmDirUrls(st, route.mode);
+  return gmDirUrls(route.stops, route.mode);
 }
 /* ===== KML 匯出（Google My Maps） ===== */
 const xesc = s => String(s == null ? "" : s).replace(/[<>&'"]/g, c => ({"<":"&lt;",">":"&gt;","&":"&amp;","'":"&apos;","\"":"&quot;"}[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
@@ -5655,8 +5795,8 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || location.
    2026 公開版維持 etmap_pub_*。其他年度與飯團版由 bootTrips 依年度換 key。 */
 let LS_TRIPS = "etmap_pub_trips", LS_CUR = "etmap_pub_cur", LS_TRIPED = "etmap_pub_edit", LS_BAK = "etmap_pub_bak";
 let LS_TRIP = "etmap_pub_old", LS_TRIPV = "etmap_pub_oldview", LS_MODEL = "etmap_pub_model";
-let tripWide = () => !useSheet();
-let trips = [], trip = null, tripView = null, editing = null, tripLoading = false;
+var tripWide = () => !useSheet();
+var trips = [], trip = null, tripView = null, editing = null, tripLoading = false;
 const inRoutePreview = () => typeof routePreview !== "undefined" && routePreview;
 const MODES = ["drive", "walk", "bus", "train"];
 const newId = () => "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -5848,7 +5988,7 @@ function decodeTrip(it, name){
   return days.length ? cleanTrip({name:name || "分享的行程", mode:CH_MODE[parts[1]] || "drive", days}) : null;
 }
 renderRouteList = (orig => pending => { orig(pending);
-  const rt = $("rheadt"); if (rt && trip && editing != null) rt.textContent = `第 ${editing + 1} 天 ${route.stops.length} 站${routeTotalTxt()}`;
+  const rt = $("rheadt"); if (rt && trip && editing != null) rt.textContent = `第 ${editing + 1} 天 ${typeof routeDisplayStationCount === "function" ? routeDisplayStationCount(route.stops) : route.stops.length} 站${routeTotalTxt()}`;
 })(renderRouteList);
 function renderDayHead(){
   const box = $("fanday"); if (!box) return;
