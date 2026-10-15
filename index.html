@@ -2792,6 +2792,9 @@ function feeOriginal(d){
   return t;
 }
 const IC_PIN = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-6.1-6.5-11a6.5 6.5 0 0 1 13 0c0 4.9-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+/* 公開版：#preset= 是飯團專屬路線時提示到 LINE 專頁。成品只放 id 的雜湊數字（build 時填入），不放 id 本身 */
+const FAN_PRESET_HASH = [1368695019, 1976792233, 2829755257, 3402899675, 275266104];
+const presetHash = s => { let h = 5381; for (const ch of String(s)) h = (h * 33 + ch.charCodeAt(0)) >>> 0; return h; };
 const MCAP_WALK = new Set(["t_walk_toka", "t_walk_matsu"]);
 const gmLink = (q, cls) => `<a class="${cls}" href="${esc(gmUrl(q))}" target="_blank" rel="noopener" aria-label="在 Google 地圖開啟" title="在 Google 地圖開啟">${IC_PIN}</a>`;
 /* 手機浮動卡：從開放時間挑出所選月份的時段。格式看不懂、或同時有好幾段都可能，就回傳 null，不猜 */
@@ -5736,7 +5739,14 @@ const shareOpen = !!(H.get("r") || H.get("it") || H.get("preset"));
 const bootRoute = shareOpen && !!(sharedRoute || validStops(route.stops).length);
 updateRoute(bootRoute);
 const tabMap = {list:"l", route:"r", presets:"p", search:"s"};
-if (H.get("preset")) loadPreset(H.get("preset"));
+if (H.get("preset")){
+  const pid = H.get("preset");
+  if (PRESETS.some(p => p.id === pid)) loadPreset(pid);
+  else {
+    toast(FAN_PRESET_HASH.includes(presetHash(pid)) ? "這條路線在越後飯 LINE 專頁" : "找不到這條路線");
+    if (PRESETS.some(p => p.id === "t_first")) previewPreset("t_first");
+  }
+}
 if (H.get("tab")) showTab(tabMap[H.get("tab")] || H.get("tab"));
 if (sharedRoute){ showTab("r"); if (!bootRoute) updateRoute(true); toast(`已載入分享的路線「${sharedRoute.name}」，也存進「我的行程」`); }
 if (H.get("open") && BY[H.get("open")]) zoomTo(BY[H.get("open")]);
