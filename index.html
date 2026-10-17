@@ -1094,6 +1094,9 @@ path.area{transition:fill-opacity .25s ease;cursor:default}
 #map.route-on .leaflet-marker-icon.rnum{z-index:1000}
 .wlabel{pointer-events:none}
 .wlabel.wl-go{pointer-events:auto;cursor:pointer}
+.wlabel.wl-go span{position:relative}
+.wlabel.wl-go span::before{content:"";position:absolute;top:50%;left:0;width:100%;min-width:44px;height:44px;transform:translateY(-50%)}
+.wlabel.wl-go.wl-l span::before{left:auto;right:0}
 .wlabel span{display:inline-block;white-space:nowrap;font-size:12px;line-height:17px;color:var(--ink);background:var(--label-bg);border-radius:4px;padding:0 5px}
 .wlabel.wl-closed span{color:var(--ink-soft)}
 .landmark b{font-weight:600}
@@ -1242,7 +1245,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
   #mtitle{left:calc(12px + env(safe-area-inset-left));right:calc(72px + env(safe-area-inset-right));height:52px;padding:0 var(--sp-2) 0 var(--sp-4);gap:var(--sp-2);border-radius:var(--r-pill);font-size:15px;white-space:nowrap}
   #mtitle .brand{flex:none;font-size:var(--fs-m);line-height:24px;padding-right:var(--sp-3);border-right:1px solid var(--line)}
   #mtitle .mt-name{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  #mtitle #mdslot{flex:1 1 auto;display:flex;justify-content:center;align-items:center;min-width:max-content}
+  #mtitle #mdslot{flex:1 1 auto;display:flex;justify-content:flex-start;align-items:center;min-width:max-content}
   #mtitle .dbox{position:static;flex:none;flex-direction:row;align-items:center;padding:0;gap:6px}
   #mtitle .dbox label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   #mtitle .day-wrap{position:relative;flex:none;height:auto;min-width:max-content}
@@ -1648,6 +1651,8 @@ body.preview-on .dcount{white-space:normal}
   /* 年度選單往下展開時要蓋過下雨膠囊。ypick-open 是沒有 :has() 時的同一層 */
   #mtitle:has(.ypick[open]),#mtitle.ypick-open{z-index:2200}
   #mtitle .ypick{position:relative;z-index:2;flex:none;font-size:15px;font-weight:700}
+  /* 日期緊接在年度後面，分隔線和「越後飯｜」相同 */
+  #mtitle .ypick{line-height:24px;padding-right:var(--sp-3);border-right:1px solid var(--line)}
   #mtitle .ypick-menu{z-index:3}
   #mtitle .ypick-name{display:none}
   #mtitle .ypick summary{display:block;overflow:visible;text-overflow:clip;white-space:nowrap}
@@ -1692,7 +1697,7 @@ body.preview-on .dcount{white-space:normal}
 /* 標題列放不下時由 JS 加 mt-tight；再放不下則 mt-nosun 隱藏日落字 */
 #mtitle.mt-tight{padding:0 6px 0 10px;gap:4px}
 #mtitle.mt-tight .brand{font-size:15px;line-height:22px;padding-right:6px}
-#mtitle.mt-tight .ypick{font-size:14px}
+#mtitle.mt-tight .ypick{font-size:14px;line-height:22px;padding-right:6px}
 #mtitle.mt-tight .day-show{font-size:14px}
 #mtitle.mt-tight .day-wx{font-size:13px}
 #mtitle.mt-tight .day-line{gap:4px}
@@ -3923,13 +3928,10 @@ function fitTools(){
   t.classList.remove("short");
   if (!useSheet() && t.getBoundingClientRect().left < p.getBoundingClientRect().right + 12) t.classList.add("short");
 }
-function syncMopen(cnt){
-  if (!useSheet()) return;
-  let el = $("mopen");
-  const slot = $("mdslot");
-  if (!slot) return;
-  if (!el){ el = document.createElement("span"); el.id = "mopen"; el.className = "mopen"; slot.appendChild(el); }
-  el.textContent = IS_PREVIEW ? "" : `・${cnt.open} 開放`;
+/* 手機標頭不放開放數（電腦版 #dcount 照舊），舊的 #mopen 若還在就拿掉 */
+function syncMopen(){
+  const el = $("mopen");
+  if (el) el.remove();
 }
 function syncBackToday(){
   const slot = $("mdslot");
@@ -4591,10 +4593,46 @@ let fitRouteT = 0;
 function fitRoute(){
   const st = validStops(route.stops); if (!st.length) return;
   const b = L.latLngBounds(st.map(stopLL)).pad(0.08);
-  const P = Object.assign({maxZoom: 15}, pads());
+  const P = Object.assign({maxZoom: 15}, fabPads(b, pads(), 15));
   /* 手機面板：fly 動畫會讓 SVG circleMarker 跟著 zoom-anim 放大成巨大色塊 */
   if (useSheet() || RM.matches) map.fitBounds(b, Object.assign({animate: false}, P));
   else map.flyToBounds(b, Object.assign(anim(.8), P));
+}
+/* 地圖上看得到的定位鈕（手機 #mlocate，電腦依寬度可能是 #mlocate 或 #locate），取當下的位置與尺寸 */
+function mapFabRect(){
+  const mr = map.getContainer().getBoundingClientRect();
+  for (const id of ["mlocate", "locate"]){
+    const b = $(id);
+    if (!b || b.hidden || !b.getClientRects().length) continue;
+    const cs = getComputedStyle(b);
+    if (cs.display === "none" || cs.visibility === "hidden") continue;
+    const r = b.getBoundingClientRect();
+    if (r.width && r.height && r.right > mr.left && r.left < mr.right && r.bottom > mr.top && r.top < mr.bottom) return {r, mr};
+  }
+  return null;
+}
+/* 縮放到路線時，按鈕外加 8px 的範圍也當成留白：按鈕靠哪個角，就試著從那一側的橫向或直向讓開，取縮放較大的那個 */
+function fabPads(b, P, maxZ){
+  const f = mapFabRect(); if (!f) return P;
+  const {r, mr} = f, G = 8;
+  const [l, t] = P.paddingTopLeft, [rt, bt] = P.paddingBottomRight;
+  const cx = (r.left + r.right) / 2 - mr.left, cy = (r.top + r.bottom) / 2 - mr.top;
+  const opts = [
+    cx > mr.width / 2
+      ? {paddingTopLeft:[l, t], paddingBottomRight:[Math.max(rt, Math.ceil(mr.right - r.left + G)), bt]}
+      : {paddingTopLeft:[Math.max(l, Math.ceil(r.right - mr.left + G)), t], paddingBottomRight:[rt, bt]},
+    cy > mr.height / 2
+      ? {paddingTopLeft:[l, t], paddingBottomRight:[rt, Math.max(bt, Math.ceil(mr.bottom - r.top + G))]}
+      : {paddingTopLeft:[l, Math.max(t, Math.ceil(r.bottom - mr.top + G))], paddingBottomRight:[rt, bt]},
+  ];
+  const zOf = o => {
+    const pad = L.point(o.paddingTopLeft).add(o.paddingBottomRight), sz = map.getSize();
+    if (pad.x >= sz.x - 40 || pad.y >= sz.y - 40) return -Infinity;
+    return Math.min(maxZ, map.getBoundsZoom(b, false, pad));
+  };
+  const z0 = zOf(opts[0]), z1 = zOf(opts[1]);
+  if (z0 === -Infinity && z1 === -Infinity) return P;
+  return z1 > z0 ? opts[1] : opts[0];
 }
 function scheduleFitRoute(){
   clearTimeout(fitRouteT);
@@ -5481,23 +5519,37 @@ if (!ILL){
       let box = {x:p.x + it.off, y:p.y - h / 2, w, h}, side = "r";
       if (hit(box)){ box = {x:p.x - it.off - w, y:p.y - h / 2, w, h}; side = "l"; if (hit(box)) continue; }
       boxes.push(box);
-      /* 只有滑鼠細指標能點名稱開卡。叢集數字圈不走這裡 */
-      const fine = !!(it.code && HOVER_MQ.matches);
-      const m = L.marker(ll, {interactive:fine, keyboard:false, bubblingMouseEvents:true, icon:L.divIcon({className:"wlabel" + (it.closed ? " wl-closed" : "") + (fine ? " wl-go" : ""), html:`<span>${esc(t)}</span>`, iconSize:[w, h], iconAnchor: side === "r" ? [-it.off, h / 2] : [w + it.off, h / 2]})});
-      if (fine){
-        let sx = 0, sy = 0;
-        m.on("mousedown", e => { const ev = e.originalEvent || {}; sx = ev.clientX || 0; sy = ev.clientY || 0; });
-        m.on("click", e => {
-          const ev = e.originalEvent || {};
-          const dist = Math.hypot((ev.clientX || 0) - sx, (ev.clientY || 0) - sy);
-          const drag = map.dragging && map.dragging.moved && map.dragging.moved();
-          if (dist > 10 || drag) return;
-          const d = BY[it.code]; if (d) zoomTo(d);
-        });
-      }
+      /* 作品名稱滑鼠與觸控都能點開卡；聚落名稱與叢集數字圈不走這裡。點擊範圍由 ::before 往外擴，往遠離圓點的那一側 */
+      const go = !!it.code;
+      const m = L.marker(ll, {interactive:go, keyboard:false, bubblingMouseEvents:true, icon:L.divIcon({className:"wlabel" + (it.closed ? " wl-closed" : "") + (go ? " wl-go wl-" + side : ""), html:`<span>${esc(t)}</span>`, iconSize:[w, h], iconAnchor: side === "r" ? [-it.off, h / 2] : [w + it.off, h / 2]})});
+      if (go){ m._wl = it.code; m.on("click", e => wlTap(e, it.code)); }
       m.addTo(lblLayer);
       n++;
     }
+  }
+  /* 按下的位置用 pointerdown 記（滑鼠、觸控都有），放開時移動超過 10px 或地圖拖曳過就不算點 */
+  let wlDown = null;
+  map.getContainer().addEventListener("pointerdown", e => { wlDown = {x:e.clientX, y:e.clientY}; }, true);
+  function wlTap(e, code){
+    const ev = e.originalEvent || {};
+    const x = ev.clientX || 0, y = ev.clientY || 0;
+    const drag = map.dragging && map.dragging.moved && map.dragging.moved();
+    if (!wlDown || Math.hypot(x - wlDown.x, y - wlDown.y) > 10 || drag) return;
+    /* 擴大的範圍蓋到圓點時，照點圓點原本的行為 */
+    const mr = map.getContainer().getBoundingClientRect(), pt = L.point(x - mr.left, y - mr.top);
+    const dot = DATA.find(d => {
+      if (!d.marker || d._clu || !map.hasLayer(d.marker)) return false;
+      const el = d.marker.getElement();
+      if (el && el.classList.contains("hid")) return false;
+      return map.latLngToContainerPoint(d.marker.getLatLng()).distanceTo(pt) <= 10;
+    });
+    if (dot){ dot.marker.fire("click", {latlng:dot.marker.getLatLng(), originalEvent:ev}); return; }
+    /* 相鄰標籤的擴大範圍重疊時，開字離手指最近的那件 */
+    const gap = l => { const s = l.getElement() && l.getElement().querySelector("span"); if (!s) return Infinity; const r = s.getBoundingClientRect(); return Math.hypot(Math.max(r.left - x, 0, x - r.right), Math.max(r.top - y, 0, y - r.bottom)); };
+    let best = code, bd = Infinity;
+    lblLayer.eachLayer(l => { if (l._wl === code) bd = Math.min(bd, gap(l)); });
+    lblLayer.eachLayer(l => { if (!l._wl || l._wl === code) return; const g = gap(l); if (g < bd){ bd = g; best = l._wl; } });
+    const d = BY[best]; if (d) zoomTo(d);
   }
   zoomUpdate = function(){
     const lv = level(), pins = pinnedSet();
@@ -5735,7 +5787,7 @@ if (SHEET){
   map.on("click", e => {
     if (!useSheet()) return;
     const t = e.originalEvent && e.originalEvent.target;
-    if (t && t.closest && t.closest("path.mk")) return;
+    if (t && t.closest && t.closest("path.mk,.wlabel.wl-go")) return;
     if (routePreview){ clearRoutePreview(); return; }
     if (isOpen()) close(); else if (sheetState !== "peek") setSheet("peek");
   });
