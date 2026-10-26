@@ -1838,6 +1838,9 @@ body:not(.redit-on) .rt-menu #rkml:not([hidden]){display:block!important}
 .rlist .sn{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .rlist .sl1 .st{flex:none;margin:0}
 .rlist .sl1 code{flex:none;margin:0}
+.rlist .sl1 .btime{flex:none;font-variant-numeric:tabular-nums}
+.rlist li.rlock{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;margin:0 0 6px;border-radius:8px;background:var(--alert-bg);border:1px solid var(--alert-line);color:var(--alert-ink);font-size:13px;list-style:none}
+.rlist li.rlock .b{flex:none}
 body:not(.redit-on) .rlist .sl1 code,body:not(.redit-on) .rlist .tja{display:none}
 .rlist .tja{display:block;font-size:var(--fs-xs);color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rlist .sgm{flex:none;width:36px;height:36px;min-width:36px;min-height:36px;margin:0;border-radius:8px}
@@ -3052,8 +3055,10 @@ function mcapsPreviewSumHtml(){
   const clock = previewRouteClock();
   const n = route.stops.filter(s => s.c).length;
   const incl = route.mode === "walk" ? "含步行" : "含車程";
+  const sim = routeTiming();
   let s = `${n} 件作品，共約 ${fmtApprox(clock.total)}，${incl} ${fmtApprox(clock.travel)}`;
-  if (clock.total > ROUTE_DAY_LONG) s += `，<span class="warn">⚠ 會超過閉館</span>`;
+  if (route.locked) s += `，${esc(routeLockHead(sim))}`;
+  if (routeEndLate(sim)) s += `，<span class="warn">⚠ 會超過閉館</span>`;
   return s;
 }
 /* 預覽建議路線時的站名行：號碼直接用 routeBadgePlan（與地圖徽章同一套，含起終合併），作品用簡稱，車站等地點用原名 */
@@ -3138,7 +3143,7 @@ function fillPresetRoute(p){
     const inYear = p.date.startsWith(String(YEAR) + "-") && p.date >= dayEl.min && p.date <= dayEl.max;
     if (!IS_PREVIEW || inYear){ dayEl.value = clampDay(p.date); syncDayLabel(); }
   }
-  route = {name:p.name, stops:withNotes(p), mode:p.mode, url:p.url || "", liffId:""};
+  route = Object.assign({name:p.name, stops:withNotes(p), mode:p.mode, url:p.url || "", liffId:""}, routeLockMeta({locked:true, kind:p.kind || (p.src === "官方 2024 地圖" ? "tour" : ""), presetId:p.id, depart:p.depart}));
   const N = notesFor(p.id), nOn = N && fanUnlocked();
   const note = $("rnote"); if (note) note.innerHTML = `<span class="ctag ${/官方/.test(p.src) ? "tag-off" : "tag-draft"}">${esc(p.src)}</span> ${esc(p.note || "")}` +
     (nOn ? `<div class="rnotes"><span class="ctag tag-fan">越後飯實踩筆記 ${esc((N.walked || "").replace(/-/g, "/"))}</span> ${esc(N.summary || "")}${N.caveat ? `<br><span class="muted">${esc(N.caveat)}</span>` : ""}</div>` : "");
@@ -4364,15 +4369,30 @@ async function updateRoute(fit){
   if (st.length < 2) { renderRouteList(); return; }
   const info = await computeRoute(st.map(stopLL), route.mode);
   if (seq !== routeSeq) return;
-  routeInfo = info;
+  routeInfo = walkShortLegs(info, st, route.mode);
   drawRoute(); renderRouteList(); if (typeof zoomUpdate === "function") zoomUpdate();
+}
+/* 開車路線裡相鄰兩站很近（路線距離 WALK_LEG_M 公尺內，沒有路線距離才看直線，例如同一聚落）：這段改成步行，時間用每分鐘 WALK_M_PER_MIN 公尺算，時間計算也用步行時間 */
+const WALK_LEG_M = 700;
+const WALK_M_PER_MIN = 80;
+function walkShortLegs(info, st, mode){
+  if (!info || !info.legs || (mode || "drive") !== "drive") return info;
+  const legs = info.legs.map((l, i) => {
+    const a = st[i] && stopLL(st[i]), b = st[i + 1] && stopLL(st[i + 1]);
+    if (!l || !a || !b) return l;
+    const line = hav(a, b) * 1000, road = l.km != null && isFinite(+l.km) ? +l.km * 1000 : Infinity;
+    if (line < 60 || (road === Infinity ? line : road) > WALK_LEG_M) return l;
+    const m = road === Infinity ? line * 1.3 : road;
+    return {km: m / 1000, min: m / WALK_M_PER_MIN, walk: true};
+  });
+  return Object.assign({}, info, {legs});
 }
 /* 每段只顯示目前選的交通方式。估算的部分標「直線估算」。停車場步行不放在這裡。 */
 function legLine(mode, leg, est, samePlace){
   if (samePlace) return "↓ 同一場館";
   if (!leg) return "";
   const cfg = TRAVEL_MODES[mode] || TRAVEL_MODES.drive;
-  const how = cfg.label || "開車";
+  const how = leg.walk ? "步行" : (cfg.label || "開車");
   const time = leg.min == null ? "" : `${how} ${leg.min > 180 && mode === "walk" ? "3 小時以上" : fmtMin(leg.min)}${est ? "（直線估算）" : ""}`;
   return `↓ ${time || "計算中"}${leg.km != null ? `，${fmtKm(leg.km)}` : ""}`;
 }
@@ -4568,14 +4588,24 @@ function routeStayPlan(stops){
   }
   return at;
 }
-/* legs：相鄰有座標站點之間的分鐘數（長度＝有座標站數－1） */
+/* 官方建議行程每站有官方時間（time）：有座標的站至少兩站有時間、格式正確且不倒退，才當成官方時間 */
+function routeOfficialTimes(stops){
+  const ts = (stops || []).filter(s => s && s.time && stopLL(s)).map(s => hm2m(s.time));
+  if (ts.length < 2 || ts.some(x => x == null)) return null;
+  return ts.every((x, i) => !i || x >= ts[i - 1]) ? ts : null;
+}
+const hhmm = m => { m = Math.round(m); return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
+/* legs：相鄰有座標站點之間的分鐘數（長度＝有座標站數－1）。
+   官方時間的站直接用官方時間當抵達時刻，不累加前面的模擬；結束時間是最後一站的官方時間 */
 function routeSimulate(stops, legs, day, depart){
-  const st = stops || [], stayAt = routeStayPlan(st), out = [];
-  let t = hm2m(depart) != null ? hm2m(depart) : 10 * 60, k = -1;
+  const st = stops || [], stayAt = routeStayPlan(st), out = [], off = !!routeOfficialTimes(st);
+  let t = hm2m(depart) != null ? hm2m(depart) : 10 * 60, k = -1, lastOff = null, lastWorkOff = null;
   st.forEach((s, i) => {
     if (!stopLL(s)) return;
     if (k >= 0) t += Math.max(0, +((legs || [])[k]) || 0);
     k++;
+    const ot = off && s.time ? hm2m(s.time) : null;
+    if (ot != null){ t = ot; lastOff = ot; if (s.c) lastWorkOff = ot; } else lastOff = null;
     const row = {i, arrive:t, wait:0, issue:null};
     const d = s.c && BY[s.c];
     if (d && !s.ret){
@@ -4594,10 +4624,15 @@ function routeSimulate(stops, legs, day, depart){
     row.leave = t;
     out.push(row);
   });
-  return {rows:out, end:t, depart:depart || "10:00"};
+  if (off && lastOff != null) return {rows:out, end:lastOff, depart:depart || "10:00", official:true, closeAt:lastWorkOff};
+  return {rows:out, end:t, depart:depart || "10:00", official:false, closeAt:t};
 }
-/* 行程分頁用：公開版、飯團版固定 10:00 出發；私人版（ETA_ON）用這天設定的出發時刻。只回傳提醒，不顯示每站幾點 */
+/* 行程分頁用：路線有出發時刻（建議路線 depart）先用；官方建議行程用第一站官方時間；
+   其餘公開版、飯團版固定 10:00 出發，私人版（ETA_ON）用這天設定的出發時刻。只回傳提醒，不顯示每站幾點 */
 function routeTimingDepart(){
+  if (route && route.depart && hm2m(route.depart) != null) return route.depart;
+  const off = route ? routeOfficialTimes(route.stops) : null;
+  if (off) return hhmm(off[0]);
   if (ETA_ON && typeof trip !== "undefined" && trip && editing != null && trip.days[editing]) return trip.days[editing].depart || "09:00";
   return "10:00";
 }
@@ -4610,25 +4645,41 @@ function routeTimingTag(sim, i){
   if (!r || !r.issue || r.issue.kind === "closed") return "";
   return `<span class="st st-closedr rtw">${esc(r.issue.text)}</span>`;
 }
+/* 17 點閉館提醒：看實際結束時刻。官方時間看最後一件作品的官方時間（回車站、交流道不算） */
+function routeEndLate(sim){
+  return !!sim && sim.closeAt != null && sim.closeAt > ROUTE_END_WARN;
+}
+function routeEndWarnText(sim){
+  if (!routeEndLate(sim)) return "";
+  const dep = hm2m(sim.depart) != null ? hhmm(hm2m(sim.depart)) : sim.depart;
+  return sim.official ? `⚠ 依官方時間 ${dep} 出發會到 ${hhmm(sim.closeAt)}，超過 17 點閉館` : `⚠ ${dep} 出發估算會到 ${hhmm(sim.closeAt)}，超過 17 點閉館`;
+}
 function routeTimingEndHtml(sim){
-  if (!sim || sim.end <= ROUTE_END_WARN) return "";
-  return `，<span class="warn">以 ${esc(sim.depart)} 出發估算會到 ${m2hm(sim.end)}</span>`;
+  const t = routeEndWarnText(sim);
+  return t ? `，<span class="warn">${esc(t)}</span>` : "";
+}
+/* 鎖定路線標題：官方時間寫「出發／結束」，其餘用模擬結束時間並標明估算 */
+function routeLockHead(sim){
+  const off = routeOfficialTimes(route.stops);
+  if (off) return `出發 ${hhmm(off[0])}／結束 ${hhmm(off[off.length - 1])}`;
+  const dep = routeTimingDepart(), d = hm2m(dep) != null ? hhmm(hm2m(dep)) : dep;
+  return sim ? `出發 ${d}／結束約 ${hhmm(sim.end)}（估算）` : `出發 ${d}`;
 }
 function routeClock(legs, stops){
   const travel = (legs || []).reduce((a, l) => a + (l && isFinite(+l.min) ? +l.min : 0), 0);
   const stay = routeStayMin(stops);
   return {travel, stay, total: travel + stay};
 }
-const ROUTE_DAY_LONG = 8 * 60;
-const ROUTE_CLOSE_WARN = "⚠ 9 點出發會超過 17 點閉館";
-function routeTimeSummary(mode, clock, html){
+/* sim（routeSimulate 結果）有給才判斷 17 點閉館：用實際出發與結束時刻，不再用總時數 */
+function routeTimeSummary(mode, clock, html, sim){
   const asHtml = html !== false;
   const move = mode === "walk" ? "步行" : "車程";
   const incl = mode === "walk" ? "含步行" : "含車程";
   let s = clock.stay > 0
     ? `共約 ${fmtApprox(clock.total)}（${incl} ${fmtApprox(clock.travel)}）`
     : `${move}約 ${fmtApprox(clock.travel)}`;
-  if (clock.total > ROUTE_DAY_LONG) s += asHtml ? `，<span class="warn">${ROUTE_CLOSE_WARN}</span>` : `，${ROUTE_CLOSE_WARN}`;
+  const w = routeEndWarnText(sim);
+  if (w) s += asHtml ? `，<span class="warn">${esc(w)}</span>` : `，${w}`;
   return s;
 }
 /* 作品若有「停車場步行」（分鐘），只寫在該站備註，不計入站間移動，也不計入總時間 */
@@ -4705,10 +4756,24 @@ function stopStatus(s){
   const cls = di.state === "closed" ? "st st-closedr" : "st st-" + di.state;
   return `<span class="${cls}">${stateShort(di)}</span>` + (di.tags.length ? `<span class="st st-unknown">${esc(di.tags.join("，"))}</span>` : "");
 }
-function routeTotalTxt(){
+function routeTotalTxt(sim){
   if (TT(route.mode) || validStops(route.stops).length < 2 || !routeInfo || routeInfo.src === "none") return "";
   const k = routeClock(routeInfo.legs, route.stops);
-  return `，${routeTimeSummary(route.mode, k, false)}`;
+  return `，${routeTimeSummary(route.mode, k, false, sim)}`;
+}
+/* 官方行程、巡迴路線與主題路線載入後先鎖定：不能加站、排序、刪除，存到我的路線才變成可編輯的副本 */
+const routeLockLabel = () => route.kind === "theme" ? "建議路線" : "官方路線";
+function routeLockedSay(){
+  if (!route.locked) return false;
+  toast(`${routeLockLabel()}不可編輯，請先存到我的路線`);
+  return true;
+}
+function unlockRoute(){
+  if (!route.locked) return;
+  route.locked = false;
+  if (routePreview && typeof commitRoutePreview === "function") commitRoutePreview(); else persist();
+  updateRoute(false);
+  toast("已存到我的路線，可以編輯了");
 }
 function renderRouteList(pending){
   const ul = $("rlist"); if (!ul) return;
@@ -4716,6 +4781,8 @@ function renderRouteList(pending){
   $("rmode").value = route.mode || "drive";
   ul.innerHTML = "";
   const st = route.stops;
+  const locked = !!route.locked && st.length > 0;
+  if (locked) ul.insertAdjacentHTML("beforeend", `<li class="rlock"><span>${esc(routeLockLabel())}不可編輯</span><button type="button" class="b pri" data-unlock>存到我的路線</button></li>`);
   if (!st.length){ ul.innerHTML = '<li class="empty">還沒有站點。先點上面的起點，再到「搜尋」分頁按作品旁的「＋路線」，或按「選建議」載入一條再修改。</li>'; }
   let vix = 0, closed = 0, unk = 0, nview = 0, nstay = 0, nwin = 0;
   renderStartChips();
@@ -4731,20 +4798,20 @@ function renderRouteList(pending){
     } else if (ok && vix > 0 && pending && !TT(route.mode)){ const leg = document.createElement("li"); leg.className = "leg"; leg.textContent = "↓ 計算中"; ul.appendChild(leg); }
     if (s.c && BY[s.c] && !s.ret){ const di = dayInfo(BY[s.c], curDay()); if (di.state === "closed") closed++; if (di.state === "unknown"){ if (di.reason === "winter") nwin++; else unk++; } if (di.state === "view") nview++; if (di.state === "stay") nstay++; }
     const li = document.createElement("li");
-    li.className = "stop"; li.draggable = !useSheet() || document.body.classList.contains("redit-on"); li.dataset.i = i;
+    li.className = "stop"; li.draggable = !locked && (!useSheet() || document.body.classList.contains("redit-on")); li.dataset.i = i;
     const ll = ok && okLL(stopLL(s)) ? stopLL(s) : null;
     const fanX = [["lunch", "午餐"], ["parking", "停車"], ["toilet", "廁所"], ["photo", "拍照"], ["warn", "注意"]].filter(([k]) => s[k]);
     const parkNote = s.c ? parkWalkLabel(s.c) : "";
     /* 站名後面不再接狀態字：狀態只放在下一行的標籤（stopStatus），避免「光之館開放」黏在一起又重複 */
-    const etaLine = ETA_ON && typeof trip !== "undefined" && typeof routeEtaStopHtml === "function" ? routeEtaStopHtml(st, i) : "";
+    const etaLine = !locked && ETA_ON && typeof trip !== "undefined" && typeof routeEtaStopHtml === "function" ? routeEtaStopHtml(st, i) : "";
     /* 版面重排：每站一行（站名截斷＋狀態＋地圖鈕）；日文名與編號只在編輯時顯示 */
-    li.innerHTML = `<span class="no">${esc(ok ? String(listNo) : "?")}</span><span class="t"><span class="sl1"><span class="sn" title="${esc(stopName(s))}">${s.time ? `<b class="btime">${esc(s.time)}</b> ` : ""}${esc(stopName(s))}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}</span>${stopStatus(s)}${routeTimingTag(sim, i)}${s.c ? `<code>${esc(s.c)}</code>` : ""}</span>${s.c && BY[s.c] && BY[s.c].中文名 && BY[s.c].中文名 !== BY[s.c].作品名稱 ? `<span class="tja" lang="ja">${esc(BY[s.c].作品名稱)}</span>` : ""}` +
+    li.innerHTML = `<span class="no">${esc(ok ? String(listNo) : "?")}</span><span class="t"><span class="sl1">${s.time && !locked ? `<b class="btime">${esc(s.time)}</b>` : ""}<span class="sn" title="${esc(stopName(s))}">${esc(stopName(s))}${s.tnote ? `<span class="muted">（${esc(s.tnote)}）</span>` : ""}</span>${stopStatus(s)}${routeTimingTag(sim, i)}${s.c ? `<code>${esc(s.c)}</code>` : ""}</span>${s.c && BY[s.c] && BY[s.c].中文名 && BY[s.c].中文名 !== BY[s.c].作品名稱 ? `<span class="tja" lang="ja">${esc(BY[s.c].作品名稱)}</span>` : ""}` +
       (etaLine ? `<div class="reta">${etaLine}</div>` : "") +
       (parkNote ? `<span class="muted">${esc(parkNote)}</span>` : "") +
       (s.stay_min != null || s.tip ? `<span class="sfan">${s.stay_min != null ? `停留約 ${esc(s.stay_min)} 分` : ""}${s.stay_min != null && s.tip ? "，" : ""}${s.tip ? esc(s.tip) : ""}</span>` : "") +
       (fanX.length ? `<details class="sdet"><summary>排程細節</summary>${fanX.map(([k, t]) => `<div><b>${t}</b>：${esc(s[k])}</div>`).join("")}</details>` : "") +
-      `</span>` + (ll ? gmLink(stopQuery(s), "sgm") : "") +
-      `<span class="ud"><button data-up="${i}" title="往上" aria-label="第 ${listNo} 站往上移">↑</button><button data-down="${i}" title="往下" aria-label="第 ${listNo} 站往下移">↓</button><button data-del="${i}" title="移除" aria-label="移除第 ${listNo} 站">✕</button></span>`;
+      `</span>` + (ll ? gmLink(stopQuery(s), "sgm") : "") + (locked ? "" :
+      `<span class="ud"><button data-up="${i}" title="往上" aria-label="第 ${listNo} 站往上移">↑</button><button data-down="${i}" title="往下" aria-label="第 ${listNo} 站往下移">↓</button><button data-del="${i}" title="移除" aria-label="移除第 ${listNo} 站">✕</button></span>`);
     li.onclick = e => { if (e.target.closest("button,a,details")) return; if (s.c && BY[s.c]) zoomTo(BY[s.c]); else if (ok) map.setView(stopLL(s), 14); };
     ul.appendChild(li);
     if (ok) vix++;
@@ -4769,7 +4836,7 @@ function renderRouteList(pending){
     const clock = routeClock(routeInfo.legs, st);
     const src = routeInfo.src === "osrm" ? "路線估算" : routeInfo.src === "osrm-foot" ? "步行路線估算" : (route.mode === "walk" ? "步行路線服務暫時連不上，改用直線距離乘 1.3、時速 4.5 公里粗估" : "路線服務暫時連不上，改用直線距離乘 1.4、時速 35 公里估算");
     const warn = batteryWarn(route.mode, K);
-    sum.innerHTML = `<b>共 ${n} 站，${routeTimeSummary(route.mode, clock, true)}，${fmtKm(K)}</b><br><span class="muted">${src}。總時間是移動時間加上各站建議停留，停留為概估。</span>` +
+    sum.innerHTML = `<b>共 ${n} 站，${routeTimeSummary(route.mode, clock, true, sim)}，${fmtKm(K)}</b><br><span class="muted">${src}。總時間是移動時間加上各站建議停留，停留為概估。</span>` +
       (warn ? `<br><span class="warn">${esc(warn)}</span>` : "") +
       (closed ? `<br><span class="warn">有 ${closed} 站在 ${curDay().replace(/-/g, "/")} 休館</span>` : "") + (unk ? `<br><span class="muted">${unk} 站尚未公布開放資訊</span>` : "") + (nstay ? `<br><span class="warn">${nstay} 站僅限住宿者</span>` : "") + (nview ? `<br><span class="muted">${nview} 站休館但戶外可看</span>` : "") + (nwin ? `<br><span class="muted">${nwin} 站冬季開放，日期與時間以官方公告為準</span>` : "") +
       (route.url ? `<br><a href="${esc(route.url)}" target="_blank" rel="noopener">官方行程頁</a>` : "");
@@ -4778,7 +4845,7 @@ function renderRouteList(pending){
   if (mini){
     if (TT(route.mode) && n >= 2){ const tt = route.stops.filter(s => s.time); mini.innerHTML = `<b>${esc(route.name)}</b>，${n} 站，${TTL(route.mode)} ${tt.length ? esc(tt[0].time) + "～" + esc(tt[tt.length - 1].time) : ""}`; mini.style.display = ""; }
     else if (n >= 2 && routeInfo && routeInfo.src === "none"){ mini.innerHTML = `<b>${esc(route.name || "我的路線")}</b>，${n} 站，步行`; mini.style.display = ""; }
-    else if (n >= 2 && routeInfo){ const clock = routeClock(routeInfo.legs, route.stops); mini.innerHTML = `<b>${esc(route.name || "我的路線")}</b>，${n} 站，${routeTimeSummary(route.mode, clock, true)}${routeInfo.src === "est" ? "（估算）" : ""}${closed ? `，<span class="warn">${closed} 站休館</span>` : ""}`; mini.style.display = ""; }
+    else if (n >= 2 && routeInfo){ const clock = routeClock(routeInfo.legs, route.stops); mini.innerHTML = `<b>${esc(route.name || "我的路線")}</b>，${n} 站，${routeTimeSummary(route.mode, clock, true, sim)}${routeInfo.src === "est" ? "（估算）" : ""}${closed ? `，<span class="warn">${closed} 站休館</span>` : ""}`; mini.style.display = ""; }
     else mini.style.display = "none";
   }
   const lp = $("rloop"); if (lp) lp.checked = isLoop();
@@ -4786,8 +4853,8 @@ function renderRouteList(pending){
   renderGmaps();
   const rn = $("routen"); if (rn) rn.textContent = n;
   const mn = $("mtripn"); if (mn) mn.textContent = n || "";
-  const dt = $("dtrip"); if (dt){ dt.textContent = `目前行程・${n} 站`; const tt = routeTotalTxt(); if (tt) dt.textContent += "　" + tt.slice(1); }
-  const rh = $("rhead"); if (rh){ rh.hidden = !route.stops.length; const tt = $("rtitle"); if (tt) tt.textContent = route.name || "我的路線"; $("rheadt").innerHTML = `${esc(n + " 站" + routeTotalTxt())}${routeTimingEndHtml(sim)}`; }
+  const dt = $("dtrip"); if (dt){ dt.textContent = `目前行程・${n} 站`; const tt = routeTotalTxt(sim); if (tt) dt.textContent += "　" + tt.slice(1); }
+  const rh = $("rhead"); if (rh){ rh.hidden = !route.stops.length; const tt = $("rtitle"); if (tt) tt.textContent = route.name || "我的路線"; $("rheadt").innerHTML = `${locked ? esc(routeLockHead(sim)) + "，" : ""}${esc(n + " 站" + routeTotalTxt())}${routeTimingEndHtml(sim)}`; }
   const pr = $("pane-r"); if (pr) pr.classList.toggle("r-empty", !route.stops.length);
   if (routePreview) syncMcapsPreviewSum();
   if (typeof renderRouteEtaUi === "function" && typeof trip !== "undefined") renderRouteEtaUi();
@@ -4997,6 +5064,7 @@ function placeTake(){
 window.addEventListener("resize", placeTake);
 MQ.addEventListener("change", placeTake);
 function addStop(s){
+  if (routeLockedSay()) return;
   /* 回到起點開著時，新站點加在回程那一站前面 */
   if (isLoop()) route.stops.splice(route.stops.length - 1, 0, s); else route.stops.push(s);
   persist(); updateRoute(false); bumpTrip();
@@ -5015,13 +5083,14 @@ function renderStartChips(){
 }
 /* 設定起點：第一站是地點（車站）就換掉，否則插在最前面；回到起點開著時回程站跟著換 */
 function setStart(n){
-  if (!PLACES[n]) return;
+  if (!PLACES[n] || routeLockedSay()) return;
   const loop = isLoop(), st = route.stops, s = placeStop(n);
   if (st.length && !st[0].c) st[0] = s; else st.unshift(s);
   if (loop) st[st.length - 1] = Object.assign(placeStop(n), {ret:true, tnote:"回到起點"});
   persist(); updateRoute(st.length > 1);
 }
 function setLoop(on){
+  if (routeLockedSay()){ const lp = $("rloop"); if (lp) lp.checked = isLoop(); return; }
   const st = route.stops;
   if (on && !isLoop() && st.length >= 2) st.push(Object.assign(JSON.parse(JSON.stringify(st[0])), {ret:true, tnote:"回到起點"}));
   if (!on && isLoop()) st.pop();
@@ -5054,6 +5123,7 @@ function orderStops(M, n, loop){
   return o;
 }
 async function optimizeRoute(){
+  if (routeLockedSay()) return;
   const loop = isLoop(), all = route.stops.slice(), ret = loop ? all.pop() : null;
   const first = all[0];
   if (!first || !okLL(stopLL(first))){ toast("請先設定有位置的起點"); return; }
@@ -5070,12 +5140,14 @@ async function optimizeRoute(){
 }
 if ($("ropt")) $("ropt").onclick = optimizeRoute;
 if ($("rloop")) $("rloop").onchange = e => setLoop(e.target.checked);
-function setRoute(r, fit){ route = {name:r.name || "", stops:JSON.parse(JSON.stringify(r.stops || [])), mode:r.mode || "drive", url:r.url || "", liffId:typeof r.liffId === "string" ? r.liffId : ""}; if (typeof routePreview === "undefined" || !routePreview) persist(); updateRoute(fit); if (typeof routePreview !== "undefined" && routePreview) syncRoutePreviewChrome(); }
+/* 鎖定與出發時刻跟著路線走；舊存檔沒有 locked 就是可編輯 */
+function routeLockMeta(r){ return Object.assign(r && r.locked === true ? {locked:true, kind:r.kind || "", presetId:r.presetId || ""} : {}, r && typeof r.depart === "string" && /^\d{1,2}:\d{2}$/.test(r.depart) ? {depart:r.depart} : {}); }
+function setRoute(r, fit){ route = Object.assign({name:r.name || "", stops:JSON.parse(JSON.stringify(r.stops || [])), mode:r.mode || "drive", url:r.url || "", liffId:typeof r.liffId === "string" ? r.liffId : ""}, routeLockMeta(r)); if (typeof routePreview === "undefined" || !routePreview) persist(); updateRoute(fit); if (typeof routePreview !== "undefined" && routePreview) syncRoutePreviewChrome(); }
 const ul = $("rlist");
 let dragI = null;
-ul.addEventListener("dragstart", e => { const li = e.target.closest("li.stop"); if (li){ dragI = +li.dataset.i; e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", dragI); li.classList.add("dragging"); } });
+ul.addEventListener("dragstart", e => { const li = e.target.closest("li.stop"); if (li && route.locked){ e.preventDefault(); routeLockedSay(); return; } if (li){ dragI = +li.dataset.i; e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", dragI); li.classList.add("dragging"); } });
 ul.addEventListener("dragover", e => { if (dragI != null){ e.preventDefault(); } });
-ul.addEventListener("drop", e => { e.preventDefault(); const li = e.target.closest("li.stop"); if (li == null || dragI == null) return;
+ul.addEventListener("drop", e => { e.preventDefault(); const li = e.target.closest("li.stop"); if (li == null || dragI == null) return; if (routeLockedSay()){ dragI = null; return; }
   const to = +li.dataset.i; const [s] = route.stops.splice(dragI, 1); route.stops.splice(to, 0, s); dragI = null; persist(); updateRoute(false); });
 ul.addEventListener("dragend", () => { dragI = null; });
 function itineraryDate(){
@@ -5306,7 +5378,7 @@ function loadPreset(id, opt){
   const p = PRESETS.find(x => x.id === id); if (!p) return;
   if (opt && opt.quiet){ previewPreset(id); return; }
   fillPresetRoute(p);
-  setRoute({name:route.name, stops:route.stops, mode:route.mode, url:route.url}, true);
+  setRoute({name:route.name, stops:route.stops, mode:route.mode, url:route.url, locked:route.locked, kind:route.kind, presetId:route.presetId, depart:route.depart}, true);
   render();
   if (CFG.onPreset) CFG.onPreset(p); else showTab("r");
 }
@@ -5334,15 +5406,17 @@ document.addEventListener("click", e => {
   if (op && BY[op.dataset.open]){ e.preventDefault(); e.stopPropagation(); zoomTo(BY[op.dataset.open]); return; }
   const sc = e.target.closest("[data-start]");
   if (sc){ e.stopPropagation(); setStart(sc.dataset.start); return; }
+  const ulk = e.target.closest("[data-unlock]");
+  if (ulk){ e.stopPropagation(); unlockRoute(); return; }
   const a = e.target.closest("[data-addroute]");
-  if (a){ e.preventDefault(); e.stopPropagation(); addStop({c:a.dataset.addroute});
+  if (a){ e.preventDefault(); e.stopPropagation(); if (routeLockedSay()) return; addStop({c:a.dataset.addroute});
     if (a.classList.contains("addr")){ a.textContent = "已加入"; a.disabled = true; a.removeAttribute("data-addroute"); toast(`已加入路線，共 ${route.stops.length} 站`); }
     else if (a.classList.contains("hv-add")){ hoverOff(); toast(`已加入路線，共 ${route.stops.length} 站`); }
     else if (a.classList.contains("wc-route") || a.classList.contains("pp-route")){ a.innerHTML = '<span aria-hidden="true">✓</span>路線'; a.setAttribute("aria-label", "已在路線"); a.disabled = true; a.removeAttribute("data-addroute"); toast(`已加入路線，共 ${route.stops.length} 站`); }
     else a.textContent = "已加入路線";
     return; }
   const b = e.target.closest("[data-up],[data-down],[data-del]");
-  if (b){ e.stopPropagation(); const st = route.stops;
+  if (b){ e.stopPropagation(); if (routeLockedSay()) return; const st = route.stops;
     if (b.dataset.up != null){ const i = +b.dataset.up; if (i > 0) [st[i - 1], st[i]] = [st[i], st[i - 1]]; }
     else if (b.dataset.down != null){ const i = +b.dataset.down; if (i < st.length - 1) [st[i + 1], st[i]] = [st[i], st[i + 1]]; }
     else st.splice(+b.dataset.del, 1);
@@ -6352,7 +6426,9 @@ function tripDayOk(date, year){
   const cfg = YEARS.years[String(year)], range = cfg.status === "preview" ? cfg.season : cfg.dateRange;
   return date >= range[0] && date <= range[1];
 }
-const cleanTrip = t => t && Array.isArray(t.days) ? {id:typeof t.id === "string" && t.id ? t.id : newId(), name:String(t.name || "我的行程").slice(0, 40), mode:MODES.includes(t.mode) ? t.mode : "drive", ...(t.from === "shared" ? {from:"shared"} : {}), ...(tripYearOf(t) ? {year:tripYearOf(t)} : {}), days:t.days.filter(d => d && /^\d{4}-\d{2}-\d{2}$/.test(d.date) && Array.isArray(d.stops)).map(d => ({date:d.date, stops:d.stops.filter(s => s && (s.c ? BY[s.c] : okLL(stopLL(s))))}))} : null;
+/* 鎖定（建議路線、官方行程）與出發時刻存在每一天；規則在 app.js 的 routeLockMeta */
+const dayLockMeta = r => typeof routeLockMeta === "function" ? routeLockMeta(r) : {};
+const cleanTrip = t => t && Array.isArray(t.days) ? {id:typeof t.id === "string" && t.id ? t.id : newId(), name:String(t.name || "我的行程").slice(0, 40), mode:MODES.includes(t.mode) ? t.mode : "drive", ...(t.from === "shared" ? {from:"shared"} : {}), ...(tripYearOf(t) ? {year:tripYearOf(t)} : {}), days:t.days.filter(d => d && /^\d{4}-\d{2}-\d{2}$/.test(d.date) && Array.isArray(d.stops)).map(d => Object.assign({date:d.date, stops:d.stops.filter(s => s && (s.c ? BY[s.c] : okLL(stopLL(s))))}, dayLockMeta(d)))} : null;
 /* let：私人版可包一層同步到 Firestore；公開版／飯團版行為不變 */
 let saveTrip = () => { store(LS_TRIPS, trips); store(LS_CUR, trip ? trip.id : null); store(LS_TRIPED, trip ? editing : null); };
 const dayLbl = v => `${v.slice(5).replace("-", "/")}（${WD[new Date(v + "T00:00").getDay()]}）`;
@@ -6369,15 +6445,17 @@ const uniqName = n => { let x = n, i = 2; while (trips.some(t => t.name === x)) 
 const syncTV = () => { tripView = trip && trip.from === "shared" ? trip : null; };
 const tripStops = t => t.days.reduce((a, D) => a + D.stops.filter(x => okLL(stopLL(x))).length, 0);
 function findDay(r){ const k = routeKey(r); for (const t of trips){ const i = t.days.findIndex(D => dayRouteKey(t, D) === k); if (i >= 0) return [t, i]; } return null; }
-function newTrip(r, name){ const t = {id:newId(), name:uniqName(String(name || baseName(r.name) || defName()).slice(0, 40)), mode:tripMode(r.mode), ...(typeof YEAR === "undefined" ? {} : {year:YEAR}), days:[{date:curDay(), stops:cpy(r.stops || [])}]}; trips.push(t); return t; }
+function newTrip(r, name){ const t = {id:newId(), name:uniqName(String(name || baseName(r.name) || defName()).slice(0, 40)), mode:tripMode(r.mode), ...(typeof YEAR === "undefined" ? {} : {year:YEAR}), days:[Object.assign({date:curDay(), stops:cpy(r.stops || [])}, dayLockMeta(r))]}; trips.push(t); return t; }
 function writeBack(){
   if (tripLoading || inRoutePreview()) return;
-  if (trip && trip.days[editing]){ trip.days[editing].stops = cpy(route.stops); trip.mode = tripMode(route.mode); saveTrip(); return; }
+  if (trip && trip.days[editing]){ const D = trip.days[editing]; D.stops = cpy(route.stops); trip.mode = tripMode(route.mode); if (!route.locked){ delete D.locked; delete D.kind; delete D.presetId; } saveTrip(); return; }
   if (validStops(route.stops).length){ trip = newTrip(route); editing = 0; syncTV(); saveTrip(); toast(`已建立 1 天行程「${trip.name}」`); }
 }
 function commitRoutePreview(){ if (inRoutePreview()) persist(); }
 persist = (orig => () => {
   if (inRoutePreview()){
+    /* 存成我的行程：存下來的是可編輯的副本 */
+    route.locked = false;
     routePreview = null;
     routePreviewSnap = null;
     if (typeof syncRoutePreviewChrome === "function") syncRoutePreviewChrome();
@@ -6391,7 +6469,7 @@ persist = (orig => () => {
 function showDay(t, k, fit = true, setDate = true){
   if (!t || !t.days[k]) return;
   trip = t; editing = k; syncTV();
-  tripLoading = true; setRoute({name:baseName(t.name) || t.name, stops:t.days[k].stops, mode:t.mode}, fit); tripLoading = false;
+  tripLoading = true; setRoute(Object.assign({name:baseName(t.name) || t.name, stops:t.days[k].stops, mode:t.mode}, dayLockMeta(t.days[k])), fit); tripLoading = false;
   saveTrip();
   const D = t.days[k]; if (setDate && D.date >= dayEl.min && D.date <= dayEl.max && dayEl.value !== D.date){ dayEl.value = D.date; dayEl.dispatchEvent(new Event("change", {bubbles:true})); }
   renderTripBox(); if (typeof renderTripView === "function") renderTripView();
@@ -6400,7 +6478,7 @@ function showDay(t, k, fit = true, setDate = true){
 let presetReplace = false;
 function replaceDay(r, fit){
   const t = trip, k = editing;
-  t.days[k].stops = cpy(r.stops); t.mode = tripMode(r.mode);
+  const D = t.days[k]; D.stops = cpy(r.stops); delete D.locked; delete D.kind; delete D.presetId; Object.assign(D, dayLockMeta(r)); t.mode = tripMode(r.mode);
   if (t.days.length === 1){ const n = String(baseName(r.name) || defName()).slice(0, 40); let x = n, i = 2; while (trips.some(o => o !== t && o.name === x)) x = `${n}（${i++}）`; t.name = x; }
   showDay(t, k, fit, false);
 }
@@ -6484,7 +6562,7 @@ function migrateTrips(){
   } else if (!trip && trips.length){ trip = trips[0]; editing = 0; }
   if (trip) route.name = baseName(trip.name) || trip.name;
   syncTV(); saveTrip(); store(LS_MODEL, 3);
-  if (trip && trip.days[editing] && dayRouteKey(trip, trip.days[editing]) !== routeKey(route)){ tripLoading = true; setRoute({name:baseName(trip.name) || trip.name, stops:trip.days[editing].stops, mode:trip.mode}, false); tripLoading = false; }
+  if (trip && trip.days[editing] && dayRouteKey(trip, trip.days[editing]) !== routeKey(route)){ tripLoading = true; setRoute(Object.assign({name:baseName(trip.name) || trip.name, stops:trip.days[editing].stops, mode:trip.mode}, dayLockMeta(trip.days[editing])), false); tripLoading = false; }
   routesImported = rs => { routesToTrips(rs); saveTrip(); renderTripBox(); };
 }
 /* 舊版「已儲存的路線」每條轉成 1 天行程，站點與交通方式相同的已在行程裡就略過。原資料不刪，匯出格式照舊 */
