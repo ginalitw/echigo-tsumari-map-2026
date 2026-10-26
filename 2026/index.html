@@ -1085,8 +1085,11 @@ path.area{transition:fill-opacity .25s ease;cursor:default}
 .ac-box button:hover{background:var(--wash)}
 .ac-box button:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
 .area-count,.clu,.wlabel{animation:fadein .25s ease}
+.area-count.area-faded{opacity:.5;animation:none}
+.area-faded .ac-box{box-shadow:none}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 .clu span{display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--snow);font-size:13px;font-weight:700;border:2px solid var(--paper);box-shadow:var(--shadow-float);box-sizing:border-box;text-shadow:0 0 2px var(--hairline)}
+.clu.clu-cap span{width:auto;padding:0 10px;border-radius:13px;white-space:nowrap}
 .clu.clu-closed span{background:var(--ink-soft)!important;opacity:1}
 .clu span{opacity:1}
 #map.route-on .rnum{opacity:1}
@@ -2519,6 +2522,19 @@ const AREA_REPS = {
   "松之山":[["Y052", "最後的教室"], ["Y019", "KYORORO"]],
   "津南":[["M001", "龍現代美術館"], ["M028", "跨越國境・山"]],
 };
+/* 叢集膠囊上的設置地點短名：特殊的寫在這裡，其餘取「」內文字、空白後的英文名或「/」前面，超過 6 字用「…」 */
+const CLU_VENUE_SHORT = {"越後松之山 「森の学校」キョロロ":"キョロロ", "アケヤマ －秋山郷立大赤沢小学校－":"アケヤマ", "越後妻有文化ホール 段十ろう":"段十ろう"};
+function cluVenueShort(v){
+  v = String(v || "").replace("越後妻成", "越後妻有").trim();
+  let t = CLU_VENUE_SHORT[v];
+  if (!t){
+    const q = v.match(/「([^」]+)」/), sp = v.split(/\s+/), last = sp[sp.length - 1];
+    if (q) t = q[1];
+    else if (sp.length > 1 && /^[A-Za-z0-9]+$/.test(last)) t = last;
+    else t = v.split(/[\/／]/)[0].trim() || v;
+  }
+  return t.length > 6 ? t.slice(0, 6) + "…" : t;
+}
 const COLORS = {"十日町":"#E4572E","川西":"#2E86AB","中里":"#3BB273","松代":"#7768AE","松之山":"#D81E5B","津南":"#F18F01"};
 /* 地區小標籤：底色是地區色混 85% 白，字是地區色混 50% 黑，六區對比都在 6.7:1 以上 */
 const mixHex = (h, to, k) => "#" + [1, 3, 5].map(i => { const a = parseInt(h.slice(i, i + 2), 16), b = parseInt(to.slice(i, i + 2), 16); return Math.round(a + (b - a) * k).toString(16).padStart(2, "0"); }).join("");
@@ -4206,7 +4222,7 @@ const ROUTE_BADGE_MIN_W = 26;
 let routeBadgeProbe = null;
 let routeBadgeStops = null, routeBadgeLabels = null, routeBadgeHook = false;
 function measureRouteBadgeWidth(label){
-  const minW = label.includes("・") ? ROUTE_BADGE_MIN_W : 24;
+  const minW = /[・～]/.test(label) ? ROUTE_BADGE_MIN_W : 24;
   if (!document.body) return Math.max(minW, Math.round(label.length * 8 + 16));
   if (!routeBadgeProbe){
     routeBadgeProbe = document.createElement("span");
@@ -4220,6 +4236,23 @@ function measureRouteBadgeWidth(label){
   inner.textContent = label;
   const w = Math.ceil(inner.getBoundingClientRect().width);
   return Math.max(minW, w);
+}
+/* 合併的站號徽章文字：連續三站以上寫成「1～10」，兩站寫「1・2」；「起」「起終」放最前面、「終」放最後面 */
+function badgeRangeText(labels){
+  const head = [], tail = [], other = [], nums = [];
+  (labels || []).forEach(l => {
+    const t = String(l);
+    if (t === "起" || t === "起終") head.push(t);
+    else if (t === "終") tail.push(t);
+    else if (/^\d+$/.test(t)) nums.push(+t);
+    else other.push(t);
+  });
+  nums.sort((a, b) => a - b);
+  const runs = [];
+  nums.forEach(n => { const r = runs[runs.length - 1]; if (r && n === r[1] + 1) r[1] = n; else if (!r || n !== r[1]) runs.push([n, n]); });
+  const mid = [];
+  runs.forEach(([a, b]) => { if (b - a >= 2) mid.push(`${a}～${b}`); else if (b > a) mid.push(String(a), String(b)); else mid.push(String(a)); });
+  return head.concat(mid, other, tail).join("・");
 }
 function syncRouteOn(){
   const el = $("map"); if (!el) return;
@@ -4281,7 +4314,7 @@ function layoutRouteBadges(){
   groups.forEach(indices => {
     indices.sort((a, b) => a - b);
     const nums = indices.map(i => nodes[i].label);
-    const label = nums.join("・");
+    const label = badgeRangeText(nums);
     const lat = indices.reduce((a, i) => a + nodes[i].ll[0], 0) / indices.length;
     const lng = indices.reduce((a, i) => a + nodes[i].ll[1], 0) / indices.length;
     const closed = indices.some(i => routeBadgeClosed(st[i]));
@@ -4608,6 +4641,11 @@ function batteryWarn(mode, km){
   const cfg = TRAVEL_MODES[mode];
   if (!cfg || cfg.maxKm == null || !(+km > +cfg.maxKm)) return "";
   return cfg.rangeWarn || "可能超過電池續航";
+}
+/* 第一次打開時的視野：網址帶 z（分享的視野）就照網址；有存好的行程就看整條路線一次；都沒有就看全區。之後不再自動縮放 */
+function initialViewMode(o){
+  if (o && o.hasZ) return "url";
+  return o && o.stopCount > 0 ? "route" : "default";
 }
 let fitRouteT = 0;
 function fitRoute(){
@@ -5371,20 +5409,24 @@ if (!ILL){
   const AREA_OFFS = [[0,0],[0,-30],[0,30],[-40,0],[40,0],[-40,-30],[40,-30],[-40,30],[40,30],[0,-50],[0,50],[-55,0],[55,0],[-55,-50],[55,-50],[-55,50],[55,50],[0,-70],[0,70],[-70,0],[70,0],[-70,-70],[70,-70],[-70,70],[70,70]];
   /* 等瀏覽器畫完這一幀再量標籤尺寸，避免強制重排 */
   let areaPend = 0;
+  /* 區域標籤的樣子：沒有行程照舊；有存行程時淡淡顯示、只留區名與件數、壓在站號徽章下面；預覽建議路線時不顯示 */
+  const areaMode = () => validStops(route.stops).length > 0 ? (routePreview ? "" : "faded") : (document.body.classList.contains("route-view") ? "" : "full");
   function drawAreaLabels(){
     if (areaPend) return;
-    areaPend = requestAnimationFrame(() => setTimeout(() => { areaPend = 0; if (level() === "over" && !document.body.classList.contains("route-view")) drawAreaNow(); }, 0));
+    areaPend = requestAnimationFrame(() => setTimeout(() => { areaPend = 0; if (level() === "over" && areaMode()) drawAreaNow(); }, 0));
   }
   /* 先試三行標籤（區名＋兩件代表作品）；只要有標籤重疊或超出可見地圖就退回只顯示區名與件數。
      手機面板半開或全開時一律只顯示區名與件數，縮放 8 以下也不顯示代表作品。 */
   function drawAreaNow(){
-    if (document.body.classList.contains("route-view") || validStops(route.stops).length > 0){ areaLbl.clearLayers(); return; }
+    const mode = areaMode();
+    if (!mode){ areaLbl.clearLayers(); return; }
     const I = insets(), sz = map.getSize(), mr = map.getContainer().getBoundingClientRect();
+    if (mode === "faded"){ placeAreaLabels(false, I, sz, mr, true); return; }
     const sheetOpen = useSheet() && sheetState !== "peek";
     if (map.getZoom() >= 9 && !sheetOpen && placeAreaLabels(true, I, sz, mr)) return;
     placeAreaLabels(false, I, sz, mr);
   }
-  function placeAreaLabels(showReps, I, sz, mr){
+  function placeAreaLabels(showReps, I, sz, mr, faded){
     areaLbl.clearLayers();
     const cnt = {};
     DATA.forEach(d => { if (d.marker && map.hasLayer(d.marker)) cnt[d.地區] = (cnt[d.地區] || 0) + 1; });
@@ -5397,7 +5439,7 @@ if (!ILL){
       for (let k = 0; k < 4 && pp.some(q => Math.abs(q.x - p.x) < 52 && Math.abs(q.y - p.y) < 22); k++) p = p.add([0, 26]);
       const reps = showReps ? (AREA_REPS[a] || []).filter(r => BY[r[0]] && BY[r[0]].marker) : [];
       const repHtml = reps.map(([c, t]) => { const d = BY[c]; return `<button type="button" class="ac-rep" data-rep="${esc(c)}" aria-label="${esc(t)}，${esc(d.中文名 || d.作品名稱)}，開啟作品">${esc(t)}</button>`; }).join("");
-      const m = L.marker(map.unproject(p, z), {keyboard:false, zIndexOffset:2000, icon:L.divIcon({className:"area-count", html:`<div class="ac-box" style="border-color:${COLORS[a]}"><button type="button" class="ac-area" aria-label="${esc(a)} ${cnt[a]} 件，放大到此區">${esc(a)} <b>${cnt[a]}</b></button>${repHtml}</div>`, iconSize:null, iconAnchor:[0, 0]})})
+      const m = L.marker(map.unproject(p, z), {keyboard:false, zIndexOffset:faded ? -1000 : 2000, icon:L.divIcon({className:"area-count" + (faded ? " area-faded" : ""), html:`<div class="ac-box" style="border-color:${COLORS[a]}"><button type="button" class="ac-area" aria-label="${esc(a)} ${cnt[a]} 件，放大到此區">${esc(a)} <b>${cnt[a]}</b></button>${repHtml}</div>`, iconSize:null, iconAnchor:[0, 0]})})
         .on("click", e => {
           const t = e.originalEvent && e.originalEvent.target.closest && e.originalEvent.target.closest("[data-rep]");
           if (t && BY[t.dataset.rep]) zoomTo(BY[t.dataset.rep]);
@@ -5448,6 +5490,21 @@ if (!ILL){
     });
   }
   let groups = [];
+  const CLU_CAP_H = 26;
+  let cluProbe = null;
+  function measureCluCap(text){
+    if (!cluProbe){
+      cluProbe = document.createElement("div");
+      cluProbe.className = "clu clu-cap";
+      cluProbe.setAttribute("aria-hidden", "true");
+      cluProbe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none";
+      cluProbe.innerHTML = "<span></span>";
+      document.body.appendChild(cluProbe);
+    }
+    const inner = cluProbe.firstChild;
+    inner.textContent = text;
+    return Math.max(CLU_CAP_H, Math.ceil(inner.getBoundingClientRect().width));
+  }
   function cluster(lv, pins){
     cluLayer.clearLayers(); groups = [];
     const z = map.getZoom();
@@ -5475,25 +5532,29 @@ if (!ILL){
       seeds.push(g);
     });
     const sizeOf = n => Math.min(34, 20 + Math.round(Math.sqrt(n) * 3));
-    let packs = seeds.map(g => {
-      const lat = g.reduce((a, d) => a + d.marker.getLatLng().lat, 0) / g.length;
-      const lng = g.reduce((a, d) => a + d.marker.getLatLng().lng, 0) / g.length;
+    /* 三件以上畫成「主要設置地點 件數」膠囊，兩件仍是數字圈；寬度用實際量到的 */
+    const packOf = (g, lat, lng) => {
       const p = map.project([lat, lng], z);
-      return {g, lat, lng, x:p.x, y:p.y, size:sizeOf(g.length)};
-    });
-    /* 圓心比兩圓半徑和還近就合併，數字圈不要半透明疊在一起 */
+      const vc = {}; g.forEach(d => { const v = d.設置地點.replace("越後妻成", "越後妻有"); vc[v] = (vc[v] || 0) + 1; });
+      const top = Object.entries(vc).sort((a, b) => b[1] - a[1])[0];
+      const venue = top ? top[0] + (Object.keys(vc).length > 1 ? "等" : "") : "";
+      const cap = g.length > 2 && top ? `${cluVenueShort(top[0])} ${g.length}` : "";
+      const size = sizeOf(g.length);
+      const w = cap ? measureCluCap(cap) : size, h = cap ? CLU_CAP_H : size;
+      return {g, lat, lng, x:p.x, y:p.y, size, w, h, venue, cap};
+    };
+    const center = g => [g.reduce((a, d) => a + d.marker.getLatLng().lat, 0) / g.length, g.reduce((a, d) => a + d.marker.getLatLng().lng, 0) / g.length];
+    let packs = seeds.map(g => packOf(g, ...center(g)));
+    /* 兩個膠囊（或數字圈）的外框相距不到 6px 就合併，不要半透明疊在一起 */
     let again = true;
     while (again){
       again = false;
       for (let i = 0; i < packs.length && !again; i++) for (let j = i + 1; j < packs.length; j++){
         const A = packs[i], B = packs[j];
-        if (Math.hypot(A.x - B.x, A.y - B.y) >= (A.size + B.size) / 2 + 6) continue;
+        if (Math.abs(A.x - B.x) >= (A.w + B.w) / 2 + 6 || Math.abs(A.y - B.y) >= (A.h + B.h) / 2 + 6) continue;
         const g = A.g.concat(B.g);
-        const lat = g.reduce((a, d) => a + d.marker.getLatLng().lat, 0) / g.length;
-        const lng = g.reduce((a, d) => a + d.marker.getLatLng().lng, 0) / g.length;
-        const p = map.project([lat, lng], z);
         packs.splice(j, 1);
-        packs[i] = {g, lat, lng, x:p.x, y:p.y, size:sizeOf(g.length)};
+        packs[i] = packOf(g, ...center(g));
         again = true; break;
       }
     }
@@ -5503,16 +5564,14 @@ if (!ILL){
       groups.push(g);
       const area = g[0].地區, c = COLORS[area] || "#888";
       const open = g.some(d => !dimState(d._day.state));
-      const size = pk.size;
-      const vc = {}; g.forEach(d => { const v = d.設置地點.replace("越後妻成", "越後妻有"); vc[v] = (vc[v] || 0) + 1; });
-      const top = Object.entries(vc).sort((a, b) => b[1] - a[1])[0];
-      const venue = top ? top[0] + (Object.keys(vc).length > 1 ? "等" : "") : "";
-      const m = L.marker([pk.lat, pk.lng], {zIndexOffset:400, icon:L.divIcon({className:"clu" + (open ? "" : " clu-closed"), html:`<span style="width:${size}px;height:${size}px;background:${c}">${g.length}</span>`, iconSize:[size, size], iconAnchor:[size / 2, size / 2]})});
-      m.bindTooltip(`${venue ? esc(venue) + "，" : ""}${g.length} 件，點一下放大`, {direction:"top", offset:[0, -size / 2]});
+      const size = pk.size, venue = pk.venue, w = pk.w, h = pk.h;
+      const html = pk.cap ? `<span style="height:${h}px;background:${c}">${esc(pk.cap)}</span>` : `<span style="width:${size}px;height:${size}px;background:${c}">${g.length}</span>`;
+      const m = L.marker([pk.lat, pk.lng], {zIndexOffset:400, icon:L.divIcon({className:"clu" + (pk.cap ? " clu-cap" : "") + (open ? "" : " clu-closed"), html, iconSize:[w, h], iconAnchor:[w / 2, h / 2]})});
+      m.bindTooltip(`${venue ? esc(venue) + "，" : ""}${g.length} 件，點一下放大`, {direction:"top", offset:[0, -h / 2]});
       m.on("click", () => { const b = L.latLngBounds(g.map(d => d.marker.getLatLng())); if (b.getNorthEast().equals(b.getSouthWest()) || map.getBoundsZoom(b) <= z) map.setView([pk.lat, pk.lng], Math.min(z + 2, 18)); else map.flyToBounds(b.pad(0.3), Object.assign(anim(.5), {maxZoom:18})); });
       m.addTo(cluLayer);
-      if (lv === "close" && venue) g._venue = venue;
-      g._ll = [pk.lat, pk.lng]; g._size = size;
+      if (lv === "close" && venue && !pk.cap) g._venue = venue;
+      g._ll = [pk.lat, pk.lng]; g._size = size; g._w = w; g._h = h;
     });
     keepClustersOffCards();
   }
@@ -5522,7 +5581,7 @@ if (!ILL){
     const view = map.getBounds().pad(0.05), z = map.getZoom(), boxes = [];
     const hit = b => boxes.some(o => b.x < o.x + o.w && b.x + b.w > o.x && b.y < o.y + o.h && b.y + b.h > o.y);
     const items = [];
-    groups.forEach(g => { const p = map.project(L.latLng(g._ll), z); boxes.push({x:p.x - g._size / 2, y:p.y - g._size / 2, w:g._size, h:g._size}); });
+    groups.forEach(g => { const p = map.project(L.latLng(g._ll), z); boxes.push({x:p.x - g._w / 2, y:p.y - g._h / 2, w:g._w, h:g._h}); });
     DATA.forEach(d => { if (d.marker && map.hasLayer(d.marker) && !d._clu){ const p = map.project(d.marker.getLatLng(), z); boxes.push({x:p.x - 7, y:p.y - 7, w:14, h:14}); } });
     groups.forEach(g => { if (g._venue) items.push({ll:g._ll, text:`${g._venue}（${g.length}）`, off:g._size / 2 + 4, pri:1}); });
     DATA.forEach(d => {
@@ -5581,7 +5640,7 @@ if (!ILL){
     const hasRoute = validStops(route.stops).length > 0;
     const routeView = hasRoute || (tb === "l" && saved.length > 0);
     document.body.classList.toggle("route-view", routeView);
-    if (lv === "over" && !routeView) drawAreaLabels(); else areaLbl.clearLayers();
+    if (lv === "over" && areaMode()) drawAreaLabels(); else areaLbl.clearLayers();
     cluster(lv, pins);
     const dimPv = !!routePreview;
     DATA.forEach(d => {
@@ -5598,7 +5657,7 @@ if (!ILL){
   let tmr = null;
   map.on("zoomend", () => zoomUpdate());
   let atm = null;
-  const redrawArea = () => { clearTimeout(atm); atm = setTimeout(() => { if (level() === "over" && !document.body.classList.contains("route-view")) drawAreaLabels(); }, 60); };
+  const redrawArea = () => { clearTimeout(atm); atm = setTimeout(() => { if (level() === "over" && areaMode()) drawAreaLabels(); }, 60); };
   map.on("resize", redrawArea);
   areaRedraw = redrawArea;
   map.on("moveend", () => { if (level() === "over") redrawArea(); clearTimeout(tmr); tmr = setTimeout(() => { if (level() === "close"){ const pins = pinnedSet(); labels("close", pins); } }, 80); });
@@ -5877,9 +5936,11 @@ if (H.get("r")){
 window.addEventListener("hashchange", () => { const h = new URLSearchParams(location.hash.slice(1)); if (h.get("r") || h.get("it")) location.reload(); });
 if (/^\d{4}-\d{2}-\d{2}$/.test(H.get("rd") || "") && H.get("rd") >= dayEl.min && H.get("rd") <= dayEl.max){ dayEl.value = H.get("rd"); syncDayLabel(); }
 render();
-/* 平常有存好的行程先看全區，按〔看整條路線〕才縮放。分享參數（#r=、#it=、#preset=）維持對到路線 */
+/* 有存好的行程時第一次打開就看整條路線（只縮放這一次）。分享參數（#r=、#it=、#preset=）維持對到路線；網址帶 z 時照網址的視野 */
 const shareOpen = !!(H.get("r") || H.get("it") || H.get("preset"));
-const bootRoute = shareOpen && !!(sharedRoute || validStops(route.stops).length);
+const hasZ = /^\d+(\.\d+)?$/.test(H.get("z") || "");
+const bootView = initialViewMode({hasZ, stopCount:validStops(route.stops).length});
+const bootRoute = bootView !== "url" && (shareOpen ? !!(sharedRoute || validStops(route.stops).length) : bootView === "route");
 updateRoute(bootRoute);
 const tabMap = {list:"l", route:"r", presets:"p", search:"s"};
 if (H.get("preset")){
@@ -5891,10 +5952,10 @@ if (H.get("preset")){
   }
 }
 if (H.get("tab")) showTab(tabMap[H.get("tab")] || H.get("tab"));
-if (sharedRoute){ showTab("r"); if (!bootRoute) updateRoute(true); toast(`已載入分享的路線「${sharedRoute.name}」，也存進「我的行程」`); }
+if (sharedRoute){ showTab("r"); if (!bootRoute && !hasZ) updateRoute(true); toast(`已載入分享的路線「${sharedRoute.name}」，也存進「我的行程」`); }
 if (H.get("open") && BY[H.get("open")]) zoomTo(BY[H.get("open")]);
 if (H.get("q")){ q.value = H.get("q"); render(); }
-if (/^\d+(\.\d+)?$/.test(H.get("z") || "")) map.setView(H.get("c") ? H.get("c").split(",").map(Number) : map.getCenter(), +H.get("z"), {animate:false});
+if (hasZ){ clearTimeout(fitRouteT); map.setView(H.get("c") ? H.get("c").split(",").map(Number) : map.getCenter(), +H.get("z"), {animate:false}); }
 CFG.map = map;
 if (FAN_ON) fanRoutesP().then(r => { r = IS_PREVIEW ? [] : (Array.isArray(r) ? r : []);
   FAN_ROUTES = r.filter(x => (x.tier || "fan") === "fan"); FAN_NOTES = r.filter(x => x.tier === "notes" && PRESETS.some(p => p.id === x.attach_to)); renderPresets(); });
