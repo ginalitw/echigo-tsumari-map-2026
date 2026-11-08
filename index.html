@@ -906,8 +906,9 @@ ul.lst li.grp:hover{background:none}
 /* 授權條件：不裁切、不調色。外框跟照片同寬，水平置中 */
 .pp-photos.card,.pp-photos.pop{display:flex;flex-direction:column;align-items:center}
 .pp-photo{margin:0;width:fit-content;max-width:100%;text-align:center}
-.pp-photo a{display:inline-block;width:fit-content;max-width:100%;background:transparent;line-height:0}
+.pp-shot{position:relative;display:inline-block;width:fit-content;max-width:100%;background:transparent;line-height:0}
 .pp-photo img{display:block;width:auto;max-width:100%;height:auto;object-fit:contain}
+.pp-ext{position:absolute;right:4px;bottom:4px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:var(--scrim);color:#fff;font-size:12px;line-height:1;pointer-events:none}
 .pp-photo figcaption{font-size:11px;line-height:1.35;color:var(--ink-soft);margin-top:2px;text-align:center}
 .pp-photos.card img{max-height:120px}
 .pp-photos.pop img{max-height:160px}
@@ -1540,11 +1541,6 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 .pp-head{display:flex;align-items:center;gap:var(--sp-3);padding-right:var(--sp-4)}
 .pp-tt{min-width:0}
 .leaflet-popup-content .pp-name{font-size:var(--fs-l);line-height:1.3;margin:0}
-a.wt-link{color:inherit;text-decoration:none;cursor:pointer}
-.leaflet-container a.wt-link{color:inherit}
-.wc-name a.wt-link{display:inline-flex;align-items:baseline;gap:2px;max-width:100%;min-width:0}
-.pp-name a.wt-link{display:inline}
-.wt-ext{flex:none;margin-left:2px;font-size:.72em;font-weight:400;line-height:1;color:var(--ink-soft)}
 .warea{margin:2px 0 0;font-size:var(--fs-xs);line-height:1.45;color:var(--ink-soft)}
 .leaflet-popup-content .pp-ja{font-size:var(--fs-xs);margin:2px 0 0}
 .leaflet-popup-content .ttable b{font-size:20px}
@@ -3312,7 +3308,7 @@ function previewPreset(id){
 }
 
 /* 作品照片存在本站 /photos/（官網檔案的原始位元組）。延遲載入，失敗就拿掉照片。
-   越後妻有 NPO：不裁切、不調色。卡片裡的照片高度有上限，點了開 _m.jpg 大圖。
+   越後妻有 NPO：不裁切、不調色。卡片裡的照片高度有上限，點了連官網作品頁。沒有官網連結就不包連結。
    照片下只寫 Photo by 攝影者。「作品照片 ©大地藝術祭執行委員會提供」每張卡只標一次，放在連結下面。沒有照片就不標。 */
 const PHOTO_CREDIT = "作品照片 ©大地藝術祭執行委員會提供";
 function photoHtml(d, where){
@@ -3322,7 +3318,11 @@ function photoHtml(d, where){
   const cap = shot ? `<figcaption>Photo by ${esc(shot)}</figcaption>` : "";
   const wide = where === "pop";
   const fit = wide ? "" : ` onload="if(window.wcard&&wcard.refit)wcard.refit()"`;
-  return `<div class="pp-photos${wide ? " pop" : " card"}"><figure class="pp-photo"><a href="${u(p.m)}" target="_blank" rel="noopener" aria-label="${nm} 的大圖"><img src="${u(p.s)}" alt="${nm} 的作品照片" loading="lazy" decoding="async"${fit} onerror="this.closest('.pp-photos').remove()"></a>${cap}</figure></div>`;
+  const img = `<img src="${u(p.s)}" alt="${nm} 的作品照片" loading="lazy" decoding="async"${fit} onerror="this.closest('.pp-photos').remove()">`;
+  const box = d.官網連結
+    ? `<a class="pp-shot" href="${esc(d.官網連結)}" target="_blank" rel="noopener" aria-label="${nm} 官網作品頁">${img}<span class="pp-ext" aria-hidden="true">↗</span></a>`
+    : `<span class="pp-shot">${img}</span>`;
+  return `<div class="pp-photos${wide ? " pop" : " card"}"><figure class="pp-photo">${box}${cap}</figure></div>`;
 }
 function feeSection(d){
   if (typeof IS_PREVIEW !== "undefined" && IS_PREVIEW) return "";
@@ -3495,31 +3495,11 @@ function kindOf(d){
 }
 const KIND_TXT = {museum:"室內場館", outdoor:"戶外作品", onsen:"溫泉", station:"車站作品"};
 /* ===== popups and markers ===== */
-/* 作品名稱本身才是官網連結，後面加小 ↗。拖曳把手、紀念章、日文副標不放進連結 */
+/* 作品名稱是純文字。官網從照片，或詳細資訊的「官網作品頁」進去 */
 function titleInner(d, nm, cls){
   const ja = d.中文名 ? "" : ' lang="ja"';
-  const tx = `<span class="${cls}"${ja}>${esc(nm)}</span>`;
-  if (!d.官網連結) return tx;
-  return `<a class="wt-link" href="${esc(d.官網連結)}" target="_blank" rel="noopener">${tx}<span class="wt-ext" aria-hidden="true">↗</span></a>`;
+  return `<span class="${cls}"${ja}>${esc(nm)}</span>`;
 }
-/* 手機拖曳面板時，pointerdown 到 click 移動超過 10px 就不要打開連結 */
-(() => {
-  let down = null;
-  document.addEventListener("pointerdown", e => {
-    const a = e.target.closest && e.target.closest("a.wt-link");
-    down = a ? {x:e.clientX, y:e.clientY, a, cancel:false} : null;
-  }, true);
-  document.addEventListener("pointermove", e => {
-    if (!down) return;
-    if (Math.hypot(e.clientX - down.x, e.clientY - down.y) > 10) down.cancel = true;
-  }, true);
-  document.addEventListener("click", e => {
-    const a = e.target.closest && e.target.closest("a.wt-link");
-    if (!a || !down || down.a !== a){ down = null; return; }
-    if (down.cancel || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 10){ e.preventDefault(); e.stopPropagation(); }
-    down = null;
-  }, true);
-})();
 const areaLine = d => d.地區顯示 ? `<div class="warea">${esc(d.地區顯示)}</div>` : "";
 /* 卡片元件：紀念章編號、開放時刻表、一句話介紹、按鈕。手機作品卡與電腦浮動視窗共用 */
 /* 停留時間分級：飯團版由 fan.js 從 visit_time 帶入；公開版沒有這份資料，回傳空字串就不顯示 */
