@@ -1360,7 +1360,7 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 .about h2{font-size:14px;margin:0 0 4px;color:var(--ink);font-weight:600}
 .about p{margin:0 0 6px}
 .about a{color:var(--ink)}
-/* 多日行程：公開版與飯團版共用。蓋章、實踩路線不在這裡。 */
+/* 多日行程：公開版與飯團版共用。實踩路線不在這裡。 */
 .fanbox{background:var(--wash);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:13px;line-height:1.55}
 .fan-mnote{font-size:12.5px;color:var(--ink-soft);background:var(--wash);border-radius:8px;padding:6px 10px;margin-bottom:10px;line-height:1.5}
 #fantrip:empty{display:none}
@@ -6018,7 +6018,7 @@ function workCardHtml(d){
   const c = d.作品編號, day = curDay(), di = d._day || dayInfo(d, day), nm = d.中文名 || d.作品名稱, sv = isSaved(c);
   const who = [d.藝術家, d.設置地點].filter(Boolean).map(esc).join("｜");
   const alerts = di.tags.concat(noteHits(d, day));
-  /* 飯團版的蓋章鈕已經是金色，導航改用次要樣式，一張卡只有一個主要動作 */
+  /* 目前沒有打卡鈕，導航是卡片的主要動作；有打卡鈕時導航才改用次要樣式 */
   const chk = cardCheckin(d);
   const acts = chk + favBtn(c, sv, "wc-btn") +
     (!d.marker ? "" : inRoute(c) ? `<button type="button" class="wc-btn sec wc-route" disabled aria-label="已在行程"><span aria-hidden="true">✓</span>已在行程</button>`
@@ -6365,7 +6365,7 @@ let ONB_CARDS = () => {
     {icon:"star", t:"看順眼就收起來", x:["喜歡的作品按 ☆ 放進清單，再排成一條路線，開車、走路、搭巴士都幫你算時間。要排好幾天的話，用電腦或平板會順手很多。"]}
   ];
   if (hasPreviewYear()) cards.push({icon:"year", t:"2027 三年展，先偷看", x:["左上角可以切換年度。明年是三年一次的大祭，新作品預計 1 月公布，現在先放常設作品讓你暖身。"]});
-  cards.push({icon:"friend", t:"要不要一起當飯團？", x:["加入富搖小幫手，就能打開飯團專頁：到現場蓋章集點，還看得到阿飯的現場筆記。追過了，才帶你去。"], href:onbJoinHref(), primary:"加入富搖小幫手", secondary:"先逛逛", deskLine:true});
+  cards.push({icon:"friend", t:"要不要一起當飯團？", x:["加入富搖小幫手，就能打開飯團專頁：看阿飯走過的路線和現場筆記。追過了，才帶你去。"], href:onbJoinHref(), primary:"加入富搖小幫手", secondary:"先逛逛", deskLine:true});
   return cards;
 };
 const onbSkip = !!(H.get("r") || H.get("it") || H.get("list") || H.get("open") || H.get("preset"));
@@ -6384,7 +6384,7 @@ function copyLineId(btn){
 function onbDeskLineHtml(){
   return `<figure class="onb-qrfig"><div class="onb-qr" aria-live="polite"><span class="muted">產生 QR 碼中…</span></div><figcaption>用手機掃描</figcaption></figure>` +
     `<p class="onb-idline">用電腦版 LINE：搜尋 ID ${esc(LINE_BASIC_ID)}<button type="button" class="onb-copy" data-onbcopy="1">複製 ID</button></p>` +
-    `<p class="onb-note">飯團專頁要在手機 LINE 裡打開，到現場蓋章最方便。</p>`;
+    `<p class="onb-note">飯團專頁要在手機 LINE 裡打開。</p>`;
 }
 function onbPaintFriendQr(card){
   const url = onbJoinHref();
@@ -6598,7 +6598,7 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || location.
   document.addEventListener("keydown", function esc(e){ if (e.key !== "Escape" || !m.isConnected) return; m.remove(); document.removeEventListener("keydown", esc, true); }, true);
   document.body.appendChild(m); m.querySelector(".qrm-x").focus();
 })();
-/* 多日行程：公開版與飯團版共用。蓋章、實踩路線、打卡圖不在這裡。
+/* 多日行程：公開版與飯團版共用。實踩路線、打卡圖不在這裡。
    2026 公開版維持 etmap_pub_*。其他年度與飯團版由 bootTrips 依年度換 key。 */
 let LS_TRIPS = "etmap_pub_trips", LS_CUR = "etmap_pub_cur", LS_TRIPED = "etmap_pub_edit", LS_BAK = "etmap_pub_bak";
 let LS_TRIP = "etmap_pub_old", LS_TRIPV = "etmap_pub_oldview", LS_MODEL = "etmap_pub_model";
