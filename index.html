@@ -1772,6 +1772,10 @@ ul.lst .tja{display:block;min-width:0;overflow:hidden;white-space:nowrap;text-ov
 #rtake .rt-pri{flex:1 1 auto;width:auto;min-width:0;min-height:40px;padding:0 var(--sp-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #rtake .rt-sec{flex:none;min-height:40px;padding:0 var(--sp-3);white-space:nowrap;list-style:none}
 #rtake #rgmap{display:contents}
+/* 路線按鈕字數變多：地圖鈕吃剩下的寬度、必要時折成兩行，存進富搖小幫手維持完整 */
+#rtake .rt-pri{flex:0 0 auto}
+#rtake #rgmap>.rt-gm,#rtake #rgmap>.rt-gmd{flex:1 1 auto;min-width:0}
+#rtake #rgmap .rt-gm{width:100%;white-space:normal;font-size:13px;line-height:1.2;padding:0 var(--sp-2)}
 #rtake #rgmap:empty{display:none}
 .rt-more,.rt-gmd{position:relative;flex:none}
 .rt-more>summary::-webkit-details-marker,.rt-gmd>summary::-webkit-details-marker{display:none}
@@ -2999,7 +3003,7 @@ const OFFICIAL_URL = "https://www.echigo-tsumari.jp/zh-tw/";
 const OFFICIAL_LINK = `<a href="${OFFICIAL_URL}" target="_blank" rel="noopener">大地藝術祭官網</a>`;
 const UNOFFICIAL_HTML = `這是越後飯 ECHIGO FAN 自製的非官方地圖，與大地藝術祭主辦單位無關。開放時間、票價與交通以${OFFICIAL_LINK}為準。`;
 const MCAP_WALK = new Set(["t_walk_toka", "t_walk_matsu"]);
-const gmLink = (q, cls) => `<a class="${cls}" href="${esc(gmUrl(q))}" target="_blank" rel="noopener" aria-label="在 Google 地圖開啟" title="在 Google 地圖開啟">${IC_PIN}</a>`;
+const gmLink = (q, cls, label = "在 Google 地圖開啟") => `<a class="${cls}" href="${esc(gmUrl(q))}" target="_blank" rel="noopener" aria-label="${esc(label)}" title="${esc(label)}">${IC_PIN}</a>`;
 /* 手機浮動卡：從開放時間挑出所選月份的時段（範圍可寫 – 或 ～）。格式看不懂、或同時有好幾段都可能，就回傳 null，不猜 */
 const HM = "\\d{1,2}:\\d{2}";
 const inMonths = (m, a, b) => a <= b ? m >= a && m <= b : m >= a || m <= b;
@@ -4993,7 +4997,7 @@ function renderRouteList(pending){
       (parkNote ? `<span class="muted">${esc(parkNote)}</span>` : "") +
       (s.stay_min != null || s.tip ? `<span class="sfan">${s.stay_min != null ? `停留約 ${esc(s.stay_min)} 分` : ""}${s.stay_min != null && s.tip ? "，" : ""}${s.tip ? esc(s.tip) : ""}</span>` : "") +
       (fanX.length ? `<details class="sdet"><summary>排程細節</summary>${fanX.map(([k, t]) => `<div><b>${t}</b>：${esc(s[k])}</div>`).join("")}</details>` : "") +
-      `</span>` + (ll ? gmLink(stopQuery(s), "sgm") : "") + (locked ? "" :
+      `</span>` + (ll ? gmLink(stopQuery(s), "sgm", `導航：第 ${listNo} 站 ${stopName(s)}`) : "") + (locked ? "" :
       `<span class="ud"><button data-up="${i}" title="往上" aria-label="第 ${listNo} 站往上移">↑</button><button data-down="${i}" title="往下" aria-label="第 ${listNo} 站往下移">↓</button><button data-del="${i}" title="移除" aria-label="移除第 ${listNo} 站">✕</button></span>`);
     li.onclick = e => { if (e.target.closest("button,a,details")) return; if (s.c && BY[s.c]) zoomTo(BY[s.c]); else if (ok) map.setView(stopLL(s), 14); };
     ul.appendChild(li);
@@ -5186,6 +5190,9 @@ function gmDirUrls(stops, mode){
   }
   return out;
 }
+/* 全程連結只串目前這一天（route.stops 就是正在看的那天）。看的是今天用「今日路線」，其他天用「這天路線」 */
+const gmDayIsToday = () => curDay() === tokyoToday();
+const gmBtnText = () => gmDayIsToday() ? "用 Google 地圖開今日路線" : "開這天路線";
 function gmapsUrls(){
   const st = validStops(route.stops); if (st.length < 2) return [];
   return gmDirUrls(route.stops, route.mode);
@@ -5221,8 +5228,8 @@ function renderGmaps(){
   const box = $("rgmap"); if (!box) return;
   const urls = TT(route.mode) ? [] : gmapsUrls();
   /* 底部工具列：一段直接開；多段時點開小選單列出各段 */
-  box.innerHTML = urls.length === 1 ? `<a class="rt-sec rt-gm" href="${esc(urls[0].url)}" target="_blank" rel="noopener" aria-label="用 Google 地圖開啟">Google 地圖</a>`
-    : urls.length ? `<details class="rt-gmd"><summary class="rt-sec rt-gm" aria-label="用 Google 地圖開啟，共 ${urls.length} 段">Google 地圖 ▾</summary><div class="rt-menu">${urls.map((u, k) => `<a href="${esc(u.url)}" target="_blank" rel="noopener">第 ${k + 1} 段：第 ${u.from}～${u.to} 站</a>`).join("")}</div></details>` : "";
+  box.innerHTML = urls.length === 1 ? `<a class="rt-sec rt-gm" href="${esc(urls[0].url)}" target="_blank" rel="noopener" aria-label="${gmBtnText()}">${gmBtnText()}</a>`
+    : urls.length ? `<details class="rt-gmd"><summary class="rt-sec rt-gm" aria-label="${gmBtnText()}，共 ${urls.length} 段">${gmBtnText()} ▾</summary><div class="rt-menu">${urls.map((u, k) => `<a href="${esc(u.url)}" target="_blank" rel="noopener">第 ${k + 1} 段：第 ${u.from}～${u.to} 站</a>`).join("")}</div></details>` : "";
   const gn = $("rgnote"); if (gn) gn.hidden = !urls.some(u => u.to - u.from - 1 > 3);
   placeTake();
 }
