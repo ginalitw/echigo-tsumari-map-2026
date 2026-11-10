@@ -901,6 +901,40 @@ ul.lst li.grp:hover{background:none}
 .pp-fee th,.pp-fee td{padding:3px 4px;border-bottom:1px solid var(--line);vertical-align:baseline;font-weight:400}
 .pp-fee th:first-child,.pp-fee td:first-child,.pp-fee thead th:first-child{text-align:left;width:46%;overflow-wrap:anywhere}
 .pp-fee th:not(:first-child),.pp-fee td:not(:first-child){text-align:right;white-space:nowrap}
+.vn-back{display:inline-flex;align-items:center;min-height:32px;margin:0 0 4px;padding:0;border:none;background:none;font:inherit;font-size:13px;font-weight:700;color:var(--ac,#7768AE);cursor:pointer}
+.vn-backnote{margin:0 0 6px;font-size:12px;line-height:1.4;color:var(--ink-soft)}
+.vn-top{display:flex;gap:12px;align-items:flex-start}
+.vn-badge{flex:none;width:64px;height:64px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;line-height:1.15}
+.vn-badge small{font-size:11px;font-weight:700}
+.vn-badge b{font-size:14px;font-weight:700}
+.vn-ti{min-width:0}
+.vn-name{display:block;font-size:20px;line-height:1.3}
+.vn-sub{margin:2px 0 6px;font-size:12.5px;line-height:1.45;color:var(--ink-soft)}
+.vn-kind{display:inline-flex}
+.vn-notes{margin:8px 0 0;padding-left:1.2em;font-size:13px;line-height:1.5}
+.vn-feenote{margin:2px 0 0;font-size:12.5px;line-height:1.45;color:var(--ink-soft)}
+.vn-foot{display:flex;width:100%;justify-content:space-between;margin-top:12px;min-height:40px;padding:0;border:none;background:none;font:inherit;font-size:13px;color:var(--ink-soft);cursor:pointer}
+.vn-fullhead{display:none;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
+#wcard[data-state="full"][data-kind="venue"] .vn-fullhead{display:flex}
+#wcard[data-state="full"][data-kind="venue"] .wc-head{display:none}
+.vn-fullhead b{font-size:17px;line-height:1.35}
+.vn-x{width:32px;height:32px;border:none;background:none;font-size:22px;line-height:1;color:var(--ink-soft);cursor:pointer}
+.vn-group{margin:0 0 12px}
+.vn-group header{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin:0 0 4px}
+.vn-group header b{font-size:14px}
+.vn-group header span{flex:none;font-size:12px;color:var(--ink-soft);text-align:right}
+.vn-group ul{list-style:none;margin:0;padding:0}
+.vn-row{display:flex;align-items:center;gap:8px;width:100%;min-height:56px;padding:4px 0;border:none;border-bottom:1px solid var(--line);background:none;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.vn-ph,.vn-empty{flex:none;width:64px;height:48px;border-radius:6px;box-sizing:border-box}
+.vn-ph{overflow:hidden;background:var(--ink);display:flex;align-items:center;justify-content:center}
+.vn-ph img{width:64px;height:48px;object-fit:contain;display:block}
+.vn-empty{background:var(--rice);color:var(--ink-soft);font-size:11px;line-height:1.2;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px}
+.vn-tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.vn-tx b{font-size:14px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vn-tx small{font-size:12px;line-height:1.3;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vn-go{flex:none;color:var(--ink-soft);font-size:18px}
+.vn-more{display:inline-flex;align-items:center;min-height:36px;margin:4px 0 0;padding:0;border:none;background:none;font:inherit;font-size:13px;color:var(--ink);cursor:pointer}
+.vn-credit{margin:12px 0 4px;text-align:center;font-size:11px;color:var(--ink-soft)}
 .pp-photos{margin:6px 0 2px}
 /* 授權條件：不裁切、不調色。外框跟照片同寬，水平置中 */
 .pp-photos.card,.pp-photos.pop{display:flex;flex-direction:column;align-items:center}
@@ -1117,7 +1151,9 @@ path.area{transition:fill-opacity .25s ease;cursor:default}
 .area-faded .ac-box{box-shadow:none}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 .clu span{display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--snow);font-size:13px;font-weight:700;border:2px solid var(--paper);box-shadow:var(--shadow-float);box-sizing:border-box;text-shadow:0 0 2px var(--hairline)}
-.clu.clu-cap span{width:auto;padding:0 10px;border-radius:13px;white-space:nowrap}
+.clu.clu-cap span{width:auto;padding:0 4px 0 10px;border-radius:13px;white-space:nowrap;gap:6px}
+.clu.clu-cap b{font-weight:700}
+.clu.clu-cap i{font-style:normal;font-weight:700;font-size:12px;line-height:18px;min-width:18px;padding:0 5px;border-radius:9px;background:rgba(255,255,255,.88);color:#3A3733;text-shadow:none}
 .clu.clu-closed span{background:var(--ink-soft)!important;opacity:1}
 .clu span{opacity:1}
 #map.route-on .rnum{opacity:1}
@@ -1544,6 +1580,9 @@ a.onb-next{display:inline-flex;align-items:center;justify-content:center;box-siz
 .leaflet-popup-content .pp-ja{font-size:var(--fs-xs);margin:2px 0 0}
 .leaflet-popup-content .ttable b{font-size:20px}
 .leaflet-popup-content .blurb{margin:0 0 var(--sp-1)}
+/* 電腦據點彈窗：票價說明緊貼入場費（Leaflet 的 p 預設 1.3em 會把它推開），按鈕列和作品清單之間留跟作品彈窗一樣的區塊間距 */
+.leaflet-popup-content .vn-feenote{margin:2px 0 0;line-height:1.4}
+.leaflet-popup-content .vn-list{margin-top:var(--sp-3)}
 .pp-foot{display:flex;flex-wrap:wrap;align-items:flex-start;gap:0 var(--sp-4);margin-top:var(--sp-3);padding-top:var(--sp-1);border-top:1px solid var(--line)}
 .pp-foot details[open]{flex-basis:100%}
 .pp-foot summary{display:inline-flex;align-items:center;min-height:36px;list-style:none;cursor:pointer;font-size:var(--fs-s);color:var(--ink-soft)}
@@ -2541,8 +2580,8 @@ const PHOTOS = {"A003": {"m": "/photos/A003_m.jpg", "page": "https://www.echigo-
 /* 季節提醒（data/season.json）與一句話介紹（data/blurbs.json），建置時注入 */
 const SEASONS = [{"key": "spring", "name": "春", "months": [3, 4, 5], "text": ""}, {"key": "summer", "name": "夏", "months": [6, 7, 8], "text": ""}, {"key": "autumn", "name": "秋", "months": [9, 10, 11], "text": "秋・紅葉季　清津峽全日預約"}, {"key": "winter", "name": "冬", "months": [12, 1, 2], "text": ""}];
 const BLURBS = {"K005": "詹姆斯・特瑞爾的屋子，屋頂能打開看天空，還可以住一晚。"};
-/* 據點表（data/venues.json，scripts/build_venues.py 產生）：v＝作品據點（n 名稱、a 地區、s 停留分鐘、w 作品、walk 步行路線），x＝自然景點 */
-const VENUES = {"v": {"V001": {"n": "MonET（越後妻有里山現代美術館）", "a": "十日町", "s": 60, "w": ["T025", "T221", "T222", "T457", "T466", "T226", "T230", "T280", "T411", "T412", "T413", "T414", "T415", "T416", "T419", "T471", "T352", "T026", "T027", "T304", "T305", "T469", "T028", "T421", "T467", "T468", "T461", "T317"]}, "V002": {"n": "Winter Circlet", "a": "十日町", "s": 15, "w": ["T320"]}, "V003": {"n": "十日町產業文化館 IKOTE", "a": "十日町", "s": 60, "w": ["T309"]}, "V004": {"n": "越後妻有文化ホール 段十ろう", "a": "十日町", "s": 15, "w": ["T388", "T390"]}, "V005": {"n": "赤倉", "a": "十日町", "s": 15, "w": ["T207"]}, "V006": {"n": "Ommane kaze", "a": "十日町", "s": 15, "w": ["T074"]}, "V007": {"n": "大沢山トンネル周辺", "a": "十日町", "s": 15, "w": ["T154", "T076", "T323"]}, "V008": {"n": "產土神之家", "a": "十日町", "s": 60, "w": ["T120", "T121", "T122", "T123", "T124", "T134"]}, "V009": {"n": "神明水辺公園", "a": "十日町", "s": 15, "w": ["T020", "T021", "T112"]}, "V010": {"n": "下条茅葺塔", "a": "十日町", "s": 15, "w": ["T253"]}, "V011": {"n": "魚板屋臉", "a": "十日町", "s": 15, "w": ["T139"]}, "V012": {"n": "大地的記憶", "a": "十日町", "s": 15, "w": ["T268"]}, "V013": {"n": "MAN: ROCK Ⅴ", "a": "十日町", "s": 15, "w": ["T450"]}, "V014": {"n": "repetitive objects", "a": "十日町", "s": 15, "w": ["T351"]}, "V015": {"n": "另一處奇妙點", "a": "十日町", "s": 60, "w": ["T214"]}, "V016": {"n": "瀝青停車場", "a": "十日町", "s": 15, "w": ["T067"]}, "V017": {"n": "繪本與樹木果實美術館", "a": "十日町", "s": 60, "w": ["T173", "T451", "T470"]}, "V018": {"n": "天地之間", "a": "川西", "s": 15, "w": ["K019"]}, "V019": {"n": "邊界神話", "a": "川西", "s": 15, "w": ["K033"]}, "V020": {"n": "passage", "a": "川西", "s": 15, "w": ["K034"]}, "V021": {"n": "光之館", "a": "川西", "s": 60, "w": ["K005"]}, "V022": {"n": "節黑城跡・芝部廣場一帶", "a": "川西", "s": 15, "w": ["K002", "K003", "K022", "K004", "K023", "K007", "K012", "K013", "K014", "K008", "K009", "K010", "K011"], "walk": 1}, "V023": {"n": "記憶的痕跡與明日之森", "a": "川西", "s": 15, "w": ["K107"]}, "V024": {"n": "清津倉庫美術館", "a": "中里", "s": 60, "w": ["N072", "N082", "N088", "N089"]}, "V025": {"n": "清津峽溪谷隧道", "a": "中里", "s": 60, "w": ["N079"]}, "V026": {"n": "白羽毛", "a": "中里", "s": 15, "w": ["N071", "N017"]}, "V027": {"n": "中里稻草人庭園", "a": "中里", "s": 15, "w": ["N012"]}, "V028": {"n": "為了無數失去之窗", "a": "中里", "s": 15, "w": ["N028"]}, "V029": {"n": "清津川新聞中心", "a": "中里", "s": 15, "w": ["N058"]}, "V030": {"n": "POTEMKIN", "a": "中里", "s": 15, "w": ["N019"]}, "V031": {"n": "蛇道", "a": "中里", "s": 15, "w": ["N021"]}, "V032": {"n": "克雪人", "a": "中里", "s": 15, "w": ["N009"]}, "V033": {"n": "向北至日本 (74°33’2”）", "a": "中里", "s": 15, "w": ["N010"]}, "V034": {"n": "Mion 中里一帶", "a": "中里", "s": 15, "w": ["N001", "N002", "N003", "N004", "N006", "N005"]}, "V035": {"n": "與遠方相遇的地方", "a": "中里", "s": 15, "w": ["N046"]}, "V036": {"n": "松代「農舞台」", "a": "松代", "s": 120, "w": ["D053", "D054", "D055", "D057", "D362", "D363", "D364", "D380", "D058", "D218", "D001", "D389", "D351", "D155", "D125", "D311", "D060", "D061", "D247", "D392", "D365", "D366"]}, "V037": {"n": "松代城山步道", "a": "松代", "s": 60, "w": ["D063", "D064", "D248", "D015", "D002", "D184", "D003", "D004", "D005", "D006", "D353", "D007", "D008", "D010", "D011", "D012", "D013", "D014", "D068", "D186", "D312", "D402", "D066", "D067", "D016", "D070", "D393"], "walk": 1}, "V038": {"n": "松代城", "a": "松代", "s": 60, "w": ["D377", "D378", "D379"]}, "V039": {"n": "回來的紅色丁字褲少年", "a": "松代", "s": 15, "w": ["D194"]}, "V040": {"n": "創作庭院", "a": "松代", "s": 15, "w": ["D099"]}, "V041": {"n": "商店街", "a": "松代", "s": 15, "w": ["D317", "D046"]}, "V042": {"n": "黃金遊戲場", "a": "松代", "s": 60, "w": ["D320"]}, "V043": {"n": "犬伏", "a": "松代", "s": 15, "w": ["D048", "D047", "D129", "D101"]}, "V044": {"n": "奴奈川校園", "a": "松代", "s": 120, "w": ["D331", "D332", "D334", "D348", "D397", "D398", "D399", "D400", "D338"]}, "V045": {"n": "五百筆", "a": "松代", "s": 60, "w": ["D344"]}, "V046": {"n": "與自然文化相遇的公園", "a": "松代", "s": 15, "w": ["D106"]}, "V047": {"n": "脫皮之家", "a": "松代", "s": 15, "w": ["D143"]}, "V048": {"n": "BUNAGA池植物公園「母親樹的空中庭園」", "a": "松代", "s": 15, "w": ["D104"]}, "V049": {"n": "樂暮D.I.Y.之家 iju", "a": "松代", "s": 60, "w": ["D385"]}, "V050": {"n": "梯田階梯", "a": "松代", "s": 15, "w": ["D346"]}, "V051": {"n": "芝峠温泉", "a": "松代", "s": 15, "w": ["D050", "D051"]}, "V052": {"n": "妻有檔案中心", "a": "松代", "s": 15, "w": ["D387"]}, "V053": {"n": "Mountain", "a": "松代", "s": 15, "w": ["D132"]}, "V054": {"n": "森之學校 KYORORO＋美人林", "a": "松之山", "s": 60, "w": ["Y019", "Y021", "Y020", "Y041", "Y022", "Y110", "Y023", "Y025"], "notes": ["美人林停 KYORORO 停車場，走過去就到", "親子行程可排 2 小時，一般約 1 小時", "KYORORO 的觀景塔（煙囪）是作品，爬上去約 160 階，量力而行", "穿好走、耐泥巴的鞋", "可能有熊出沒"]}, "V055": {"n": "最後の教室", "a": "松之山", "s": 60, "w": ["Y052", "Y101"]}, "V056": {"n": "家之記憶", "a": "松之山", "s": 60, "w": ["Y072"]}, "V057": {"n": "星星的誕生", "a": "松之山", "s": 15, "w": ["Y029"]}, "V058": {"n": "松之山温泉入口駐車場", "a": "松之山", "s": 15, "w": ["Y011", "Y012"]}, "V059": {"n": "黑色標誌", "a": "松之山", "s": 15, "w": ["Y106"]}, "V060": {"n": "掃天帶土（そうてんたいち）−天水越之塔−", "a": "松之山", "s": 15, "w": ["Y068"]}, "V061": {"n": "大厳寺高原", "a": "松之山", "s": 15, "w": ["Y002", "Y003", "Y005", "Y006", "Y065"]}, "V062": {"n": "夢之家", "a": "松之山", "s": 15, "w": ["Y013"]}, "V063": {"n": "オーストラリア・ハウス", "a": "松之山", "s": 15, "w": ["Y082", "Y083", "Y107"]}, "V064": {"n": "Step in Plan", "a": "松之山", "s": 15, "w": ["Y026"]}, "V065": {"n": "三省ハウス", "a": "松之山", "s": 15, "w": ["Y122", "Y109", "Y027", "Y045"]}, "V066": {"n": "上鄉 Clove 座", "a": "津南", "s": 60, "w": ["M052", "M057", "M063", "M083", "M090", "M064", "M065"]}, "V067": {"n": "穿越時空之旅", "a": "津南", "s": 15, "w": ["M026"]}, "V068": {"n": "喜鵲之家", "a": "津南", "s": 15, "w": ["M011"]}, "V069": {"n": "マウンテンパーク津南", "a": "津南", "s": 15, "w": ["M001", "M002", "M003", "M005", "M024"]}, "V070": {"n": "跨越國境・山", "a": "津南", "s": 15, "w": ["M028"]}, "V071": {"n": "記憶－記錄，足瀧的人們", "a": "津南", "s": 15, "w": ["M019"]}, "V072": {"n": "妻有雙六", "a": "津南", "s": 15, "w": ["M076"]}, "V073": {"n": "Akeyama（秋山鄉大赤澤小學校）", "a": "津南", "s": 60, "w": ["M092", "M091", "M074", "M093", "M094", "M095", "M097"]}}, "x": {"X001": {"n": "星峠棚田", "a": "松代", "s": 20, "lat": null, "lng": null, "q": "星峠の棚田", "notes": ["產業道路，路窄，要會車", "穿好走、耐泥巴的鞋", "可能有熊出沒", "冬季不除雪，停車場與觀景台不能用", "觀景台目前只開一處，另一處整修中"]}, "X003": {"n": "見玉公園", "a": "津南", "s": 60, "lat": 36.9565787, "lng": 138.6626443, "q": "見玉公園 駐車場 津南町", "notes": ["好停車", "有公廁", "園區不大，走一圈約 1 小時"]}}};
+/* 據點表（data/venues.json，scripts/build_venues.py 產生）：v＝作品據點（n 中文名、ja 日文設置地點、a 地區、s 停留分鐘、w 作品、lat／lng、f 入場費覆寫、fn 票價說明、walk 步行路線），x＝自然景點 */
+const VENUES = {"v": {"V001": {"n": "MonET（越後妻有里山現代美術館）", "ja": "越後妻有里山現代美術館 MonET", "a": "十日町", "s": 60, "w": ["T025", "T221", "T222", "T457", "T466", "T226", "T230", "T280", "T411", "T412", "T413", "T414", "T415", "T416", "T419", "T471", "T352", "T026", "T027", "T304", "T305", "T469", "T028", "T421", "T467", "T468", "T461", "T317"], "lat": 37.138863, "lng": 138.760303, "nav": "越後妻有里山現代美術館 MonET"}, "V002": {"n": "Winter Circlet", "ja": "十日町駅西口", "a": "十日町", "s": 15, "w": ["T320"], "lat": 37.135228, "lng": 138.75625}, "V003": {"n": "十日町產業文化館 IKOTE", "ja": "市街地/產業發信館", "a": "十日町", "s": 60, "w": ["T309"], "lat": 37.135702, "lng": 138.761469}, "V004": {"n": "越後妻有文化會館", "ja": "越後妻有文化ホール 段十ろう", "a": "十日町", "s": 15, "w": ["T388", "T390"], "lat": 37.128043, "lng": 138.758574, "nav": "越後妻有文化ホール 段十ろう", "sn": "文化會館"}, "V005": {"n": "赤倉", "ja": "赤倉小前", "a": "十日町", "s": 15, "w": ["T207"], "lat": 37.103481, "lng": 138.823283}, "V006": {"n": "Ommane kaze", "ja": "妻有神社", "a": "十日町", "s": 15, "w": ["T074"], "lat": 37.118246, "lng": 138.753467}, "V007": {"n": "大澤山隧道周邊", "ja": "大沢山トンネル周辺", "a": "十日町", "s": 15, "w": ["T154", "T076", "T323"], "lat": 37.0404, "lng": 138.776834, "nav": "37.040673,138.776207", "sn": "大澤山隧道"}, "V008": {"n": "產土神之家", "ja": "うぶすなの家", "a": "十日町", "s": 60, "w": ["T120", "T121", "T122", "T123", "T124", "T134"], "lat": 37.204054, "lng": 138.822645, "nav": "うぶすなの家"}, "V009": {"n": "神明水邊公園", "ja": "神明水辺公園", "a": "十日町", "s": 15, "w": ["T020", "T021", "T112"], "lat": 37.202954, "lng": 138.786372, "nav": "37.203088,138.786479"}, "V010": {"n": "下条茅葺塔", "ja": "下条駅", "a": "十日町", "s": 15, "w": ["T253"], "lat": 37.198267, "lng": 138.779938}, "V011": {"n": "魚板屋臉", "ja": "各家のかまぼこ倉庫", "a": "十日町", "s": 15, "w": ["T139"], "lat": 37.157176, "lng": 138.827805}, "V012": {"n": "大地的記憶", "ja": "枯木又分校", "a": "十日町", "s": 15, "w": ["T268"], "lat": 37.131177, "lng": 138.851689}, "V013": {"n": "MAN: ROCK Ⅴ", "ja": "笹山高龍神社", "a": "十日町", "s": 15, "w": ["T450"], "lat": 37.160361, "lng": 138.782378}, "V014": {"n": "repetitive objects", "ja": "魚沼中条駅", "a": "十日町", "s": 15, "w": ["T351"], "lat": 37.159676, "lng": 138.772408}, "V015": {"n": "另一處奇妙點", "ja": "二ツ屋", "a": "十日町", "s": 60, "w": ["T214"], "lat": 37.072712, "lng": 138.7768}, "V016": {"n": "瀝青停車場", "ja": "妻原大橋", "a": "十日町", "s": 15, "w": ["T067"], "lat": 37.148903, "lng": 138.750742}, "V017": {"n": "繪本與樹木果實美術館", "ja": "絵本と木の実の美術館", "a": "十日町", "s": 60, "w": ["T173", "T451", "T470"], "lat": 37.112428, "lng": 138.693523, "nav": "鉢&田島征三 絵本と木の実の美術館"}, "V018": {"n": "天地之間", "ja": "仁田", "a": "川西", "s": 15, "w": ["K019"], "lat": 37.206323, "lng": 138.746183}, "V019": {"n": "邊界神話", "ja": "上野", "a": "川西", "s": 15, "w": ["K033"], "lat": 37.17971, "lng": 138.748888}, "V020": {"n": "passage", "ja": "霜条", "a": "川西", "s": 15, "w": ["K034"], "lat": 37.173226, "lng": 138.745017}, "V021": {"n": "光之館", "ja": "ナカゴ", "a": "川西", "s": 60, "w": ["K005"], "lat": 37.189139, "lng": 138.729804}, "V022": {"n": "節黑城跡・芝部廣場一帶", "ja": "ナカゴ/芝部広場周辺", "a": "川西", "s": 15, "w": ["K002", "K003", "K022", "K004", "K023", "K007", "K012", "K013", "K014", "K008", "K009", "K010", "K011"], "lat": 37.192546, "lng": 138.731703, "nav": "37.187202,138.731978", "walk": 1}, "V023": {"n": "記憶的痕跡與明日之森", "ja": "千手神社", "a": "川西", "s": 15, "w": ["K107"], "lat": 37.161215, "lng": 138.742522}, "V024": {"n": "清津倉庫美術館", "ja": "清津倉庫美術館", "a": "中里", "s": 60, "w": ["N072", "N082", "N088", "N089"], "lat": 36.987297, "lng": 138.74028, "nav": "清津倉庫美術館 SoKo"}, "V025": {"n": "清津峽溪谷隧道", "ja": "清津峡トンネル", "a": "中里", "s": 60, "w": ["N079"], "lat": 36.972648, "lng": 138.751295}, "V026": {"n": "白羽毛", "ja": "白羽毛", "a": "中里", "s": 15, "w": ["N071", "N017"], "lat": 37.018465, "lng": 138.71769, "nav": "37.018497,138.717633"}, "V027": {"n": "中里稻草人庭園", "ja": "東田尻", "a": "中里", "s": 15, "w": ["N012"], "lat": 37.001705, "lng": 138.725122}, "V028": {"n": "為了無數失去之窗", "ja": "桔梗原", "a": "中里", "s": 15, "w": ["N028"], "lat": 37.032664, "lng": 138.698887}, "V029": {"n": "清津川新聞中心", "ja": "芋川", "a": "中里", "s": 15, "w": ["N058"], "lat": 37.03041, "lng": 138.696759}, "V030": {"n": "POTEMKIN", "ja": "倉俣", "a": "中里", "s": 15, "w": ["N019"], "lat": 37.018117, "lng": 138.706239}, "V031": {"n": "蛇道", "ja": "田代", "a": "中里", "s": 15, "w": ["N021"], "lat": 36.971992, "lng": 138.710654}, "V032": {"n": "克雪人", "ja": "Uモール", "a": "中里", "s": 15, "w": ["N009"], "lat": 37.050962, "lng": 138.695707}, "V033": {"n": "向北至日本 (74°33’2”）", "ja": "中里中学校", "a": "中里", "s": 15, "w": ["N010"], "lat": 37.043973, "lng": 138.694377}, "V034": {"n": "中里一帶", "ja": "ミオン中里", "a": "中里", "s": 15, "w": ["N001", "N002", "N003", "N004", "N006", "N005"], "lat": 37.067283, "lng": 138.706158, "nav": "37.068011,138.708571"}, "V035": {"n": "與遠方相遇的地方", "ja": "小原", "a": "中里", "s": 15, "w": ["N046"], "lat": 37.064878, "lng": 138.694831}, "V036": {"n": "松代「農舞台」", "ja": "まつだい「農舞台」", "a": "松代", "s": 120, "w": ["D053", "D054", "D055", "D057", "D362", "D363", "D364", "D380", "D058", "D218", "D001", "D389", "D351", "D155", "D125", "D311", "D060", "D061", "D247", "D392", "D365", "D366"], "lat": 37.131336, "lng": 138.614785, "nav": "まつだい農舞台", "f": "一般 1,200円（フィールドミュージアム券）", "ff": "2026-04-25", "ft": "2026-11-08", "fn": "農舞台 600円、郷土資料館 400円"}, "V037": {"n": "松代城山步道", "ja": "城山", "a": "松代", "s": 60, "w": ["D063", "D064", "D248", "D015", "D002", "D184", "D003", "D004", "D005", "D006", "D353", "D007", "D008", "D010", "D011", "D012", "D013", "D014", "D068", "D186", "D312", "D402", "D066", "D067", "D016", "D070", "D393"], "lat": 37.129696, "lng": 138.615482, "nav": "まつだい農舞台", "walk": 1}, "V038": {"n": "松代城", "ja": "松代城", "a": "松代", "s": 60, "w": ["D377", "D378", "D379"], "lat": 37.125021, "lng": 138.613733, "nav": "松代城 十日町"}, "V039": {"n": "回來的紅色丁字褲少年", "ja": "小荒戸", "a": "松代", "s": 15, "w": ["D194"], "lat": 37.131957, "lng": 138.621622}, "V040": {"n": "創作庭院", "ja": "商店街/高校前", "a": "松代", "s": 15, "w": ["D099"], "lat": 37.134186, "lng": 138.618173}, "V041": {"n": "商店街", "ja": "商店街", "a": "松代", "s": 15, "w": ["D317", "D046"], "lat": 37.136067, "lng": 138.615222, "nav": "37.132339,138.607155"}, "V042": {"n": "黃金遊戲場", "ja": "商店街／関谷邸", "a": "松代", "s": 60, "w": ["D320"], "lat": 37.135068, "lng": 138.610003}, "V043": {"n": "犬伏", "ja": "犬伏", "a": "松代", "s": 15, "w": ["D048", "D047", "D129", "D101"], "lat": 37.136266, "lng": 138.654805, "nav": "37.135598,138.654278"}, "V044": {"n": "奴奈川校園", "ja": "奴奈川キャンパス", "a": "松代", "s": 120, "w": ["D331", "D332", "D334", "D348", "D397", "D398", "D399", "D400", "D338"], "lat": 37.116359, "lng": 138.567542, "nav": "奴奈川キャンパス"}, "V045": {"n": "五百筆", "ja": "華園（中国ハウス）", "a": "松代", "s": 60, "w": ["D344"], "lat": 37.11823, "lng": 138.56573}, "V046": {"n": "與自然文化相遇的公園", "ja": "ダム公園", "a": "松代", "s": 15, "w": ["D106"], "lat": 37.107478, "lng": 138.560271}, "V047": {"n": "脫皮之家", "ja": "脱皮する家", "a": "松代", "s": 15, "w": ["D143"], "lat": 37.122782, "lng": 138.533804}, "V048": {"n": "BUNAGA池植物公園「母親樹的空中庭園」", "ja": "ぶなが池", "a": "松代", "s": 15, "w": ["D104"], "lat": 37.139118, "lng": 138.568851}, "V049": {"n": "樂暮D.I.Y.之家 iju", "ja": "田野倉", "a": "松代", "s": 60, "w": ["D385"], "lat": 37.148536, "lng": 138.584988}, "V050": {"n": "梯田階梯", "ja": "田野倉公園", "a": "松代", "s": 15, "w": ["D346"], "lat": 37.145689, "lng": 138.59157}, "V051": {"n": "芝峠溫泉", "ja": "芝峠温泉", "a": "松代", "s": 15, "w": ["D050", "D051"], "lat": 37.151809, "lng": 138.618133, "nav": "37.152250,138.618732"}, "V052": {"n": "妻有檔案中心", "ja": "清水ミュージアム", "a": "松代", "s": 15, "w": ["D387"], "lat": 37.162009, "lng": 138.628902}, "V053": {"n": "Mountain", "ja": "桐山", "a": "松代", "s": 15, "w": ["D132"], "lat": 37.166148, "lng": 138.640441}, "V054": {"n": "森之學校＋美人林", "ja": "越後松之山 「森の学校」キョロロ", "a": "松之山", "s": 60, "w": ["Y019", "Y021", "Y020", "Y041", "Y022", "Y110", "Y023", "Y025"], "lat": 37.099734, "lng": 138.617296, "nav": "森の学校キョロロ", "sn": "森之學校", "notes": ["美人林停 KYORORO 停車場，走過去就到", "親子行程可排 2 小時，一般約 1 小時", "KYORORO 的觀景塔（煙囪）是作品，爬上去約 160 階，量力而行", "穿好走、耐泥巴的鞋", "可能有熊出沒"]}, "V055": {"n": "最後的教室", "ja": "最後の教室", "a": "松之山", "s": 60, "w": ["Y052", "Y101"], "lat": 37.068478, "lng": 138.632718, "nav": "最後の教室 十日町"}, "V056": {"n": "家之記憶", "ja": "下鰕池", "a": "松之山", "s": 60, "w": ["Y072"], "lat": 37.076852, "lng": 138.63674}, "V057": {"n": "星星的誕生", "ja": "松之山学園", "a": "松之山", "s": 15, "w": ["Y029"], "lat": 37.087859, "lng": 138.60261}, "V058": {"n": "松之山溫泉入口停車場", "ja": "松之山温泉入口駐車場", "a": "松之山", "s": 15, "w": ["Y011", "Y012"], "lat": 37.065813, "lng": 138.602866, "nav": "37.065997,138.602983", "sn": "松之山溫泉入口"}, "V059": {"n": "黑色標誌", "ja": "松之山温泉街奥", "a": "松之山", "s": 15, "w": ["Y106"], "lat": 37.063425, "lng": 138.597029}, "V060": {"n": "掃天帶土（そうてんたいち）−天水越之塔−", "ja": "天水越", "a": "松之山", "s": 15, "w": ["Y068"], "lat": 37.051947, "lng": 138.586166}, "V061": {"n": "大嚴寺高原", "ja": "大厳寺高原", "a": "松之山", "s": 15, "w": ["Y002", "Y003", "Y005", "Y006", "Y065"], "lat": 37.039831, "lng": 138.563108, "nav": "37.038779,138.560485"}, "V062": {"n": "夢之家", "ja": "湯本", "a": "松之山", "s": 15, "w": ["Y013"], "lat": 37.065115, "lng": 138.594008}, "V063": {"n": "澳洲之家", "ja": "オーストラリア・ハウス", "a": "松之山", "s": 15, "w": ["Y082", "Y083", "Y107"], "lat": 37.057935, "lng": 138.556143, "nav": "オーストラリア・ハウス"}, "V064": {"n": "Step in Plan", "ja": "交差点", "a": "松之山", "s": 15, "w": ["Y026"], "lat": 37.121395, "lng": 138.590178}, "V065": {"n": "三省之家", "ja": "三省ハウス", "a": "松之山", "s": 15, "w": ["Y122", "Y109", "Y027", "Y045"], "lat": 37.103101, "lng": 138.594423, "nav": "三省ハウス"}, "V066": {"n": "上鄉劇場館", "ja": "上郷クローブ座", "a": "津南", "s": 60, "w": ["M052", "M057", "M063", "M083", "M090", "M064", "M065"], "lat": 36.99181, "lng": 138.588111, "nav": "上郷クローブ座"}, "V067": {"n": "穿越時空之旅", "ja": "上野公民館", "a": "津南", "s": 15, "w": ["M026"], "lat": 37.010374, "lng": 138.615725}, "V068": {"n": "喜鵲之家", "ja": "上野", "a": "津南", "s": 15, "w": ["M011"], "lat": 37.011158, "lng": 138.617452}, "V069": {"n": "津南山岳公園", "ja": "マウンテンパーク津南", "a": "津南", "s": 15, "w": ["M001", "M002", "M003", "M005", "M024"], "lat": 37.025858, "lng": 138.616125, "nav": "37.023854,138.618665"}, "V070": {"n": "跨越國境・山", "ja": "穴山", "a": "津南", "s": 15, "w": ["M028"], "lat": 36.999275, "lng": 138.60678}, "V071": {"n": "記憶－記錄，足瀧的人們", "ja": "足滝", "a": "津南", "s": 15, "w": ["M019"], "lat": 36.994468, "lng": 138.608325}, "V072": {"n": "妻有雙六", "ja": "かたくりの宿", "a": "津南", "s": 15, "w": ["M076"], "lat": 36.919099, "lng": 138.637117}, "V073": {"n": "秋山鄉大赤澤小學校", "ja": "アケヤマ －秋山郷立大赤沢小学校－", "a": "津南", "s": 60, "w": ["M092", "M091", "M074", "M093", "M094", "M095", "M097"], "lat": 36.882183, "lng": 138.638691, "nav": "アケヤマ 秋山郷立大赤沢小学校", "sn": "大赤澤小學校"}}, "x": {"X001": {"n": "星峠棚田", "a": "松代", "s": 20, "lat": null, "lng": null, "q": "星峠の棚田", "notes": ["產業道路，路窄，要會車", "穿好走、耐泥巴的鞋", "可能有熊出沒", "冬季不除雪，停車場與觀景台不能用", "觀景台目前只開一處，另一處整修中"]}, "X003": {"n": "見玉公園", "a": "津南", "s": 60, "lat": 36.9565787, "lng": 138.6626443, "q": "見玉公園 駐車場 津南町", "notes": ["好停車", "有公廁", "園區不大，走一圈約 1 小時"]}}};
 const VENUE_OF = {};
 for (const [vid, v] of Object.entries(VENUES.v)) for (const c of v.w) VENUE_OF[c] = vid;
 const ADDRESS_JA = {"D001": "新潟県十日町市松代", "D002": "新潟県十日町市松代", "D003": "新潟県十日町市松代", "D004": "新潟県十日町市松代", "D005": "新潟県十日町市松代", "D006": "新潟県十日町市松代", "D007": "新潟県十日町市松代", "D008": "新潟県十日町市松代", "D010": "新潟県十日町市松代", "D011": "新潟県十日町市松代", "D012": "新潟県十日町市松代", "D013": "新潟県十日町市松代", "D014": "新潟県十日町市松代", "D015": "新潟県十日町市松代", "D016": "新潟県十日町市松代", "D046": "新潟県十日町市太平", "D047": "新潟県十日町市犬伏", "D048": "新潟県十日町市犬伏", "D050": "新潟県十日町市蓬平", "D051": "新潟県十日町市蓬平", "D053": "新潟県十日町市松代", "D054": "新潟県十日町市松代", "D055": "新潟県十日町市松代", "D057": "新潟県十日町市松代", "D058": "新潟県十日町市松代", "D060": "新潟県十日町市松代", "D061": "新潟県十日町市松代", "D063": "新潟県十日町市松代", "D064": "新潟県十日町市松代", "D066": "新潟県十日町市松代", "D067": "新潟県十日町市松代", "D068": "新潟県十日町市松代", "D070": "新潟県十日町市松代", "D099": "新潟県十日町市松代", "D101": "新潟県十日町市犬伏", "D104": "新潟県十日町市小池", "D106": "新潟県十日町市室野", "D125": "新潟県十日町市松代", "D129": "新潟県十日町市犬伏", "D132": "新潟県十日町市清水", "D143": "新潟県十日町市峠", "D155": "新潟県十日町市松代", "D184": "新潟県十日町市松代", "D186": "新潟県十日町市松代", "D194": "新潟県十日町市小荒戸", "D218": "新潟県十日町市松代", "D247": "新潟県十日町市松代", "D248": "新潟県十日町市松代", "D311": "新潟県十日町市松代", "D312": "新潟県十日町市松代", "D317": "新潟県十日町市松代", "D320": "新潟県十日町市松代", "D331": "新潟県十日町市室野", "D332": "新潟県十日町市室野", "D334": "新潟県十日町市室野", "D338": "新潟県十日町市室野", "D344": "新潟県十日町市室野", "D346": "新潟県十日町市田野倉", "D348": "新潟県十日町市室野", "D351": "新潟県十日町市松代", "D353": "新潟県十日町市松代", "D362": "新潟県十日町市松代", "D363": "新潟県十日町市松代", "D364": "新潟県十日町市松代", "D365": "新潟県十日町市松代", "D366": "新潟県十日町市松代", "D377": "新潟県十日町市松代", "D378": "新潟県十日町市松代", "D379": "新潟県十日町市松代", "D380": "新潟県十日町市松代", "D385": "新潟県十日町市田野倉", "D387": "新潟県十日町市清水", "D389": "新潟県十日町市松代", "D392": "新潟県十日町市松代", "D393": "新潟県十日町市松代", "D397": "新潟県十日町市室野", "D398": "新潟県十日町市室野", "D399": "新潟県十日町市室野", "D400": "新潟県十日町市室野", "D402": "新潟県十日町市松代", "K002": "新潟県十日町市上野甲", "K003": "新潟県十日町市上野甲", "K004": "新潟県十日町市上野甲", "K005": "新潟県十日町市上野甲", "K007": "新潟県十日町市新町新田", "K008": "新潟県十日町市新町新田", "K009": "新潟県十日町市新町新田", "K010": "新潟県十日町市新町新田", "K011": "新潟県十日町市新町新田", "K012": "新潟県十日町市新町新田", "K013": "新潟県十日町市新町新田", "K014": "新潟県十日町市新町新田", "K019": "新潟県十日町市仁田", "K022": "新潟県十日町市上野甲", "K023": "新潟県十日町市上野甲", "K033": "新潟県十日町市上野甲", "K034": "新潟県十日町市霜条", "K107": "新潟県十日町市上新井", "M001": "新潟県中魚沼郡津南町大字上郷上田", "M002": "新潟県中魚沼郡津南町大字上郷上田", "M003": "新潟県中魚沼郡津南町大字上郷上田", "M005": "新潟県中魚沼郡津南町大字上郷上田", "M011": "新潟県中魚沼郡津南町大字上郷上田", "M019": "新潟県中魚沼郡津南町大字上郷寺石", "M024": "新潟県中魚沼郡津南町大字上郷上田", "M026": "新潟県中魚沼郡津南町大字上郷上田", "M028": "新潟県中魚沼郡津南町大字上郷寺石", "M052": "新潟県中魚沼郡津南町大字上郷宮野原", "M057": "新潟県中魚沼郡津南町大字上郷宮野原", "M063": "新潟県中魚沼郡津南町大字上郷宮野原", "M064": "新潟県中魚沼郡津南町大字上郷宮野原", "M065": "新潟県中魚沼郡津南町大字上郷宮野原", "M074": "新潟県中魚沼郡津南町大字大赤沢", "M076": "新潟県中魚沼郡津南町大字結東", "M083": "新潟県中魚沼郡津南町大字上郷宮野原", "M090": "新潟県中魚沼郡津南町大字上郷宮野原", "M091": "新潟県中魚沼郡津南町大字大赤沢", "M092": "新潟県中魚沼郡津南町大字大赤沢", "M093": "新潟県中魚沼郡津南町大字大赤沢", "M094": "新潟県中魚沼郡津南町大字大赤沢", "M095": "新潟県中魚沼郡津南町大字大赤沢", "M097": "新潟県中魚沼郡津南町大字大赤沢", "N001": "新潟県十日町市堀之内", "N002": "新潟県十日町市堀之内", "N003": "新潟県十日町市堀之内", "N004": "新潟県十日町市宮中", "N005": "新潟県十日町市宮中", "N006": "新潟県十日町市宮中", "N009": "新潟県十日町市上山", "N010": "新潟県十日町市桔梗原", "N012": "新潟県十日町市東田尻", "N017": "新潟県十日町市白羽毛", "N019": "新潟県十日町市倉俣", "N021": "新潟県十日町市田代", "N028": "新潟県十日町市桔梗原", "N046": "新潟県十日町市小原", "N058": "新潟県十日町市芋川", "N071": "新潟県十日町市白羽毛", "N072": "新潟県十日町市角間", "N079": "新潟県十日町市葎沢", "N082": "新潟県十日町市角間", "N088": "新潟県十日町市角間", "N089": "新潟県十日町市角間", "T020": "新潟県十日町市下条四丁目", "T021": "新潟県十日町市下条四丁目", "T025": "新潟県十日町市本町六の一丁目", "T026": "新潟県十日町市本町六の一丁目", "T027": "新潟県十日町市本町六の一丁目", "T028": "新潟県十日町市本町六の一丁目", "T067": "新潟県十日町市西本町三丁目", "T074": "新潟県十日町市川治", "T076": "新潟県十日町市伊達庚", "T112": "新潟県十日町市下組", "T120": "新潟県十日町市東下組", "T121": "新潟県十日町市東下組", "T122": "新潟県十日町市東下組", "T123": "新潟県十日町市東下組", "T124": "新潟県十日町市東下組", "T134": "新潟県十日町市東下組", "T139": "新潟県十日町市中条戊", "T154": "新潟県十日町市伊達庚", "T173": "新潟県十日町市真田甲", "T207": "新潟県十日町市戌", "T214": "新潟県十日町市戊", "T221": "新潟県十日町市本町六の一丁目", "T222": "新潟県十日町市本町六の一丁目", "T226": "新潟県十日町市本町六の一丁目", "T230": "新潟県十日町市本町六の一丁目", "T253": "新潟県十日町市下条四丁目", "T268": "新潟県十日町市中条丁", "T280": "新潟県十日町市本町六の一丁目", "T304": "新潟県十日町市本町六の一丁目", "T305": "新潟県十日町市本町六の一丁目", "T309": "新潟県十日町市本町五丁目", "T317": "新潟県十日町市本町六の一丁目", "T320": "新潟県十日町市旭町", "T323": "新潟県十日町市伊達庚", "T351": "新潟県十日町市中条甲", "T352": "新潟県十日町市本町六の一丁目", "T388": "新潟県十日町市本町一丁目上", "T390": "新潟県十日町市本町一丁目上", "T411": "新潟県十日町市本町六の一丁目", "T412": "新潟県十日町市本町六の一丁目", "T413": "新潟県十日町市本町六の一丁目", "T414": "新潟県十日町市本町六の一丁目", "T415": "新潟県十日町市本町六の一丁目", "T416": "新潟県十日町市本町六の一丁目", "T419": "新潟県十日町市本町六の一丁目", "T421": "新潟県十日町市本町六の一丁目", "T450": "新潟県十日町市中条乙", "T451": "新潟県十日町市真田甲", "T457": "新潟県十日町市本町六の一丁目", "T461": "新潟県十日町市本町六の一丁目", "T466": "新潟県十日町市本町六の一丁目", "T467": "新潟県十日町市本町六の一丁目", "T468": "新潟県十日町市本町六の一丁目", "T469": "新潟県十日町市本町六の一丁目", "T470": "新潟県十日町市真田甲", "T471": "新潟県十日町市本町六の一丁目", "Y002": "新潟県十日町市浦田", "Y003": "新潟県十日町市松之山天水越", "Y005": "新潟県十日町市松之山天水越", "Y006": "新潟県十日町市浦田", "Y011": "新潟県十日町市松之山湯本", "Y012": "新潟県十日町市松之山湯本", "Y013": "新潟県十日町市松之山湯本", "Y019": "新潟県十日町市松之山松口", "Y020": "新潟県十日町市松之山松口", "Y021": "新潟県十日町市松之山松口", "Y022": "新潟県十日町市松之山松口", "Y023": "新潟県十日町市松之山松口", "Y025": "新潟県十日町市松之山松口", "Y026": "新潟県十日町市松之山小谷", "Y027": "新潟県十日町市松之山小谷", "Y029": "新潟県十日町市松之山", "Y041": "新潟県十日町市松之山松口", "Y045": "新潟県十日町市松之山小谷", "Y052": "新潟県十日町市松之山東川", "Y065": "新潟県十日町市浦田", "Y068": "新潟県十日町市松之山天水越", "Y072": "新潟県十日町市松之山下鰕池", "Y082": "新潟県十日町市浦田", "Y083": "新潟県十日町市浦田", "Y101": "新潟県十日町市松之山東川", "Y106": "新潟県十日町市松之山湯本", "Y107": "新潟県十日町市浦田", "Y109": "新潟県十日町市松之山小谷", "Y110": "新潟県十日町市松之山松口", "Y122": "新潟県十日町市松之山小谷"};
@@ -2591,6 +2630,83 @@ START_POINTS.forEach(p => { if (p.kind === "station" && p.ll) PLACES[p.name] = p
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 const $ = id => document.getElementById(id);
 const BY = {}; DATA.forEach(d => BY[d.作品編號] = d);
+/* VENUE-PURE-BEGIN */
+/* 被併進主據點、但要自己一組的設置地點。外構跟主據點的戶外合在一組，不在這裡 */
+const SITE_ZH = {"まつだい郷土資料館":"松代鄉土資料館", "手をたずさえる塔":"攜手之塔", "ポケットパーク":"口袋公園", "明石の湯エントランス":"明石之湯入口", "うぶすなの家周辺":"產土神之家周邊", "ミオン中里周辺":"中里周邊", "ミオン中里周辺/黃桜の丘":"黃櫻之丘", "ナカゴ/節黒城":"節黑城", "ナカゴ/キャンプ場導線":"露營場路線", "香港ハウス":"香港屋"};
+/* 膠囊短名：Gina 核定的短名（venues.json short）優先；MonET 是唯一保留英文的例外；其餘 10 字內用全名，超過交給 cluVenueShort */
+function venueCapName(name){
+  const t = String(name || "");
+  const v = Object.values(VENUES.v).find(x => x.n === t);
+  if (v && v.sn) return v.sn;
+  if (t.startsWith("MonET（")) return "MonET";
+  if (t.length <= 10) return t;
+  return cluVenueShort(t);
+}
+/* 防重疊合併成一顆的膠囊，名稱後面加「等」；只有一個據點的不加 */
+function venueCapLabel(name, multi){ return String(name || "") + (multi ? "等" : ""); }
+function venueWorks(v){ return (v && v.w || []).map(c => BY[c]).filter(Boolean); }
+function venueMain(v){
+  const ws = venueWorks(v);
+  return ws.find(d => d.設置地點 === v.ja) || ws[0] || null;
+}
+function venueGroupWorks(v){
+  const indoor = [], outdoor = [], buckets = new Map();
+  for (const d of venueWorks(v)){
+    const site = d.設置地點 || "";
+    if (site === v.ja || /外構/.test(site)){ (d.類型 === "室內" ? indoor : outdoor).push(d); continue; }
+    if (!buckets.has(site)) buckets.set(site, []);
+    buckets.get(site).push(d);
+  }
+  const groups = [];
+  if (indoor.length) groups.push({title:"館內", works:indoor});
+  if (outdoor.length) groups.push({title:outdoor.some(d => /棚田/.test((d.中文名 || "") + (d.作品名稱 || ""))) ? "戶外・棚田周邊" : "戶外", works:outdoor});
+  for (const [site, works] of buckets) groups.push({title:SITE_ZH[site] || (works[0] && (works[0].中文名 || works[0].作品名稱)) || site, works});
+  return groups;
+}
+/* 據點入場費覆寫只在 ff～ft（含兩端）有效；day 是地圖選的日期 */
+function venueFeeOn(v, day){
+  day = day || (typeof curDay === "function" ? curDay() : "");
+  return !!(v && v.f && v.ff && v.ft && day >= v.ff && day <= v.ft);
+}
+function venueFeeLine(v, day){
+  day = day || (typeof curDay === "function" ? curDay() : "");
+  if (venueFeeOn(v, day)) return v.f;
+  const ws = venueWorks(v);
+  if (!ws.length) return "";
+  if (ws.every(d => { const s = feeShort(d, day); return !s || s === "免費"; })) return "免費";
+  const main = venueMain(v);
+  return main ? feeShort(main, day) : "";
+}
+function venueFeeNote(v, day){
+  return venueFeeOn(v, day) && v.fn ? v.fn : "";
+}
+function opensVenueCard(code){
+  const v = VENUES.v[VENUE_OF[code] || ""];
+  return !!(v && v.w.length >= 2);
+}
+function venueAlreadyInRoute(v, stops){
+  const ids = new Set(v && v.w || []);
+  return (stops || []).some(s => s && ids.has(s.c));
+}
+function venueKindLabel(v){
+  const ws = venueWorks(v);
+  const inn = ws.some(d => d.類型 === "室內"), out = ws.some(d => d.類型 !== "室內");
+  if (inn && out) return "據點・室內＋戶外";
+  if (inn) return "據點・室內";
+  return "據點・戶外";
+}
+/* 多件據點的作品卡已有「停留算在據點裡」，作品自己的停留那行就不再寫 */
+function venueStayCovers(code){
+  const v = VENUES.v[VENUE_OF[code] || ""];
+  return !!(v && v.w.length >= 2 && venueStayText(v.s));
+}
+function venueStayText(min){
+  if (min === 120) return "停留約 2 小時（含午餐）";
+  if (min === 60) return "停留約 1 小時";
+  if (min === 15) return "停留約 15 分";
+  return "";
+}
+/* VENUE-PURE-END */
 /* 搜尋用正規化：全形半形統一、小寫，繁體字對到日文新字體（兩邊都轉），讓「光之館」找得到「光の館」 */
 const NORM_PAIRS = "峽峡繪絵舘館產産與与圖図樂楽廣広櫻桜澤沢邊辺藝芸學学國国會会鐵鉄驛駅龍竜之の" +
   "黃黄黑黒舊旧鄉郷濱浜實実燈灯觀観縣県區区號号發発傳伝圓円臺台聲声體体獨独讀読賣売豐豊溫温綠緑歷歴萬万稻稲戶戸寫写莊荘兒児條条變変樓楼" +
@@ -3535,7 +3651,7 @@ function facilityTagHtml(d){
   return ["廁所", "賣店", "餐廳", "住宿"].filter(k => d[k]).map(k => `<span class="wtag">${esc(k)}</span>`).join("");
 }
 function workStayFacBlock(d){
-  const stay = stayVisitLabel(d);
+  const stay = venueStayCovers(d.作品編號) ? "" : stayVisitLabel(d);
   const fac = facilityTagHtml(d);
   if (!stay && !fac) return "";
   let h = stay ? `<p class="wstay">${esc(stay)}</p>` : "";
@@ -3634,7 +3750,7 @@ function popupHtml(d){
   const di = d._day || {state:"unknown", tags:[]}, day = curDay();
   const c = d.作品編號, sv = isSaved(c), nm = d.中文名 || d.作品名稱;
   const who = [d.藝術家, d.設置地點].filter(Boolean).map(esc).join("｜");
-  let h = `<div class="pp-head">${stampBadge(d)}<div class="pp-tt"><div class="pp-name">${titleInner(d, nm, "pp-nt")}</div>${who ? `<div class="pp-ja" lang="ja">${who}</div>` : ""}${areaLine(d)}<div class="waddr" lang="ja">${esc(jaAddr(d))}</div>${jaBtn(c)}</div></div>`;
+  let h = venueBackHtml(d) + `<div class="pp-head">${stampBadge(d)}<div class="pp-tt"><div class="pp-name">${titleInner(d, nm, "pp-nt")}</div>${who ? `<div class="pp-ja" lang="ja">${who}</div>` : ""}${areaLine(d)}<div class="waddr" lang="ja">${esc(jaAddr(d))}</div>${jaBtn(c)}</div></div>`;
   h += photoHtml(d, "pop");
   h += dayTableHtml(d, di, day);
   h += workStayFacBlock(d);
@@ -3795,7 +3911,7 @@ if ($("legendpop")){
   pop.innerHTML = `<div class="lph"><b>圖例</b><button class="lpx" type="button" aria-label="關閉圖例">✕</button></div>` +
     `<div class="lps">點的顏色代表地區</div><div class="lpa">${ORDER.map(a => `<span><i style="background:${COLORS[a]}"></i>${a}</span>`).join("")}</div>` +
     `<div class="lps">點的樣式代表上方所選日期的狀態</div><ul>${LEGEND_ITEMS.map(([k, t, x]) => `<li>${legendSw(k)}<span>${t}<small>${x}</small></span></li>`).join("")}</ul>` +
-    `<div class="lps">有數字的圓圈是同一處的多件作品，點一下放大。</div>` +
+    `<div class="lps">有名稱的膠囊是同一據點的多件作品，點一下看據點。放大後才看得到每一件。</div>` +
     `<div class="lps">當日統計</div><div id="lp-daystat" class="lp-daystat" aria-live="polite"></div>` +
     (ILL ? "" : `<fieldset class="lpbase"><legend>底圖</legend>${Object.entries(BASES).map(([k, b]) => `<label><input type="radio" name="lpbase" value="${k}">${b.label}</label>`).join("")}<small id="lpbase-n" aria-live="polite"></small></fieldset>`);
   pop.addEventListener("change", e => { if (e.target.name !== "lpbase") return; store(BASE_KEY, e.target.value); baseWarned = false; setBase(e.target.value); });
@@ -5170,7 +5286,12 @@ function openQr(preset){
   refreshOpenQr = () => { if ($("qrm") && $("qrm").isConnected) show(); };
   if (qrBefore) qrBefore(body, show, closeQr); else show();
 }
-const stopQuery = s => s.c ? gmQuery(BY[s.c]) : llq(s.lat, s.lng);
+/* 多件據點的站導到據點的 nav（地標名稱或指定點）。據點的平均 lat／lng 只用在地圖膠囊位置，不拿來導航。單件據點與沒有據點的站照舊 */
+const stopQuery = s => {
+  const v = VENUES.v[stopVenueId(s)];
+  if (v && v.w.length > 1 && v.nav) return v.nav;
+  return s.c ? gmQuery(BY[s.c]) : llq(s.lat, s.lng);
+};
 /* 導航網址：起點、中途點、終點都走 gmQuery，室內作品帶場所名稱。每段最多 10 站：起點＋8 個中途點＋終點 */
 function gmDirUrls(stops, mode){
   const nav = gmNavStops(stops);
@@ -5595,6 +5716,29 @@ document.addEventListener("click", e => {
   if (r){ e.stopPropagation(); saved = saved.filter(x => x !== r.dataset.rm); persist(); refreshAll(r.dataset.rm); return; }
   const op = e.target.closest("[data-open]");
   if (op && BY[op.dataset.open]){ e.preventDefault(); e.stopPropagation(); zoomTo(BY[op.dataset.open]); return; }
+  const vn = e.target.closest("[data-venue]");
+  if (vn && VENUES.v[vn.dataset.venue]){ e.preventDefault(); e.stopPropagation(); openVenue(vn.dataset.venue); return; }
+  const more = e.target.closest("[data-vmore]");
+  if (more){
+    e.preventDefault(); e.stopPropagation();
+    const box = more.closest(".vn-group");
+    const extras = box ? [...box.querySelectorAll(".vn-extra")] : [];
+    const opening = extras.some(li => li.hidden);
+    extras.forEach(li => { li.hidden = !opening; });
+    more.textContent = opening ? "收合 ▴" : `＋ 另外 ${more.dataset.vmore} 件 ▾`;
+    return;
+  }
+  const av = e.target.closest("[data-addvenue]");
+  if (av){
+    e.preventDefault(); e.stopPropagation();
+    const v = VENUES.v[av.dataset.addvenue];
+    if (!v || routeLockedSay() || venueAlreadyInRoute(v, route.stops)) return;
+    const main = venueMain(v); if (!main) return;
+    addStop({c:main.作品編號});
+    av.disabled = true; av.innerHTML = '<span aria-hidden="true">✓</span>已在行程'; av.removeAttribute("data-addvenue");
+    toast(`已加入行程，共 ${route.stops.length} 站`);
+    return;
+  }
   const sc = e.target.closest("[data-start]");
   if (sc){ e.stopPropagation(); setStart(sc.dataset.start); return; }
   const ulk = e.target.closest("[data-unlock]");
@@ -5659,7 +5803,7 @@ $("clear").onclick = () => {
 /* ===== breathing zoom (plain version only) ===== */
 var zoomUpdate = null, areaRedraw = null;
 if (!ILL){
-  const CLOSE_Z = 14, NOCLU_Z = 17;
+  const CLOSE_Z = 14, NOCLU_Z = 18;
   const areaLbl = L.layerGroup().addTo(map), cluLayer = L.layerGroup().addTo(map), lblLayer = L.layerGroup().addTo(map);
   const areaCenters = {};
   boundary.eachLayer(l => { areaCenters[l.feature.properties.area] = {ll:l.getBounds().getCenter(), b:l.getBounds()}; });
@@ -5758,17 +5902,18 @@ if (!ILL){
   let groups = [];
   const CLU_CAP_H = 26;
   let cluProbe = null;
-  function measureCluCap(text){
+  function measureCluCap(name, n){
     if (!cluProbe){
       cluProbe = document.createElement("div");
       cluProbe.className = "clu clu-cap";
       cluProbe.setAttribute("aria-hidden", "true");
       cluProbe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none";
-      cluProbe.innerHTML = "<span></span>";
+      cluProbe.innerHTML = "<span><b></b> <i></i></span>";
       document.body.appendChild(cluProbe);
     }
     const inner = cluProbe.firstChild;
-    inner.textContent = text;
+    inner.firstChild.textContent = name;
+    inner.lastChild.textContent = String(n);
     return Math.max(CLU_CAP_H, Math.ceil(inner.getBoundingClientRect().width));
   }
   function cluster(lv, pins){
@@ -5776,42 +5921,31 @@ if (!ILL){
     const z = map.getZoom();
     DATA.forEach(d => { d._clu = false; });
     if (routePreview) return;
-    /* 全區只留地區卡，不畫數字圈。路線站點在 pins 裡，不進叢集，任何層級都單獨顯示。放大到地區卡消失才合併 */
+    /* 全區只留地區卡。多件據點在這以下收成一顆膠囊，放大到不合併才看到每一件。路線站點不進膠囊 */
     if (lv === "over" || z >= NOCLU_Z) return;
-    const R = lv === "over" ? 72 : lv === "mid" ? 40 : 28, MIN = 2;
     const cand = DATA.filter(d => d.marker && map.hasLayer(d.marker) && !pins.has(d.作品編號));
-    cand.forEach(d => { d._pt = map.project(d.marker.getLatLng(), z); });
-    const cell = new Map();
-    const ck = (x, y) => Math.floor(x / R) + ":" + Math.floor(y / R);
-    cand.forEach(d => { const k = ck(d._pt.x, d._pt.y); if (!cell.has(k)) cell.set(k, []); cell.get(k).push(d); });
-    const used = new Set(), seeds = [];
+    const byVid = new Map();
     cand.forEach(d => {
-      if (used.has(d)) return;
-      const cx = Math.floor(d._pt.x / R), cy = Math.floor(d._pt.y / R), g = [];
-      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++){
-        const bucket = cell.get((cx + dx) + ":" + (cy + dy));
-        if (!bucket) continue;
-        bucket.forEach(e => { if (!used.has(e) && Math.abs(e._pt.x - d._pt.x) < R && Math.abs(e._pt.y - d._pt.y) < R) g.push(e); });
-      }
-      if (g.length < MIN) return;
-      g.forEach(e => used.add(e));
-      seeds.push(g);
+      const vid = VENUE_OF[d.作品編號];
+      const v = vid && VENUES.v[vid];
+      if (!v || v.w.length < 2) return;
+      if (!byVid.has(vid)) byVid.set(vid, []);
+      byVid.get(vid).push(d);
     });
-    const sizeOf = n => Math.min(34, 20 + Math.round(Math.sqrt(n) * 3));
-    /* 三件以上畫成「主要設置地點 件數」膠囊，兩件仍是數字圈；寬度用實際量到的 */
-    const packOf = (g, lat, lng) => {
-      const p = map.project([lat, lng], z);
-      const vc = {}; g.forEach(d => { const v = d.設置地點.replace("越後妻成", "越後妻有"); vc[v] = (vc[v] || 0) + 1; });
-      const top = Object.entries(vc).sort((a, b) => b[1] - a[1])[0];
-      const venue = top ? top[0] + (Object.keys(vc).length > 1 ? "等" : "") : "";
-      const cap = g.length > 2 && top ? `${cluVenueShort(top[0])} ${g.length}` : "";
-      const size = sizeOf(g.length);
-      const w = cap ? measureCluCap(cap) : size, h = cap ? CLU_CAP_H : size;
-      return {g, lat, lng, x:p.x, y:p.y, size, w, h, venue, cap};
+    const seeds = [];
+    byVid.forEach((g, vid) => { g.forEach(d => { d._clu = true; }); g._vids = [vid]; seeds.push(g); });
+    const packOf = g => {
+      const vids = g._vids || [];
+      const primary = vids.slice().sort((a, b) => VENUES.v[b].w.length - VENUES.v[a].w.length)[0];
+      const v = VENUES.v[primary], multi = vids.length > 1;
+      const lat = !multi && v && typeof v.lat === "number" ? v.lat : g.reduce((a, d) => a + d.marker.getLatLng().lat, 0) / g.length;
+      const lng = !multi && v && typeof v.lng === "number" ? v.lng : g.reduce((a, d) => a + d.marker.getLatLng().lng, 0) / g.length;
+      const name = venueCapLabel(venueCapName(v.n), multi), n = g.length, p = map.project([lat, lng], z);
+      const w = measureCluCap(name, n), h = CLU_CAP_H;
+      return {g, vids, primary, multi, name, n, lat, lng, x:p.x, y:p.y, w, h};
     };
-    const center = g => [g.reduce((a, d) => a + d.marker.getLatLng().lat, 0) / g.length, g.reduce((a, d) => a + d.marker.getLatLng().lng, 0) / g.length];
-    let packs = seeds.map(g => packOf(g, ...center(g)));
-    /* 兩個膠囊（或數字圈）的外框相距不到 6px 就合併，不要半透明疊在一起 */
+    let packs = seeds.map(packOf);
+    /* 兩顆據點膠囊外框相距不到 6px 就合併，不要疊在一起。合併後的膠囊點了是分開，不是打開據點卡 */
     let again = true;
     while (again){
       again = false;
@@ -5819,25 +5953,28 @@ if (!ILL){
         const A = packs[i], B = packs[j];
         if (Math.abs(A.x - B.x) >= (A.w + B.w) / 2 + 6 || Math.abs(A.y - B.y) >= (A.h + B.h) / 2 + 6) continue;
         const g = A.g.concat(B.g);
+        g._vids = [...new Set(A.vids.concat(B.vids))];
         packs.splice(j, 1);
-        packs[i] = packOf(g, ...center(g));
+        packs[i] = packOf(g);
         again = true; break;
       }
     }
     packs.forEach(pk => {
       const g = pk.g;
-      g.forEach(d => { d._clu = true; });
       groups.push(g);
-      const area = g[0].地區, c = COLORS[area] || "#888";
-      const open = g.some(d => !dimState(d._day.state));
-      const size = pk.size, venue = pk.venue, w = pk.w, h = pk.h;
-      const html = pk.cap ? `<span style="height:${h}px;background:${c}">${esc(pk.cap)}</span>` : `<span style="width:${size}px;height:${size}px;background:${c}">${g.length}</span>`;
-      const m = L.marker([pk.lat, pk.lng], {zIndexOffset:400, icon:L.divIcon({className:"clu" + (pk.cap ? " clu-cap" : "") + (open ? "" : " clu-closed"), html, iconSize:[w, h], iconAnchor:[w / 2, h / 2]})});
-      m.bindTooltip(`${venue ? esc(venue) + "，" : ""}${g.length} 件，點一下放大`, {direction:"top", offset:[0, -h / 2]});
-      m.on("click", () => { const b = L.latLngBounds(g.map(d => d.marker.getLatLng())); if (b.getNorthEast().equals(b.getSouthWest()) || map.getBoundsZoom(b) <= z) map.setView([pk.lat, pk.lng], Math.min(z + 2, 18)); else map.flyToBounds(b.pad(0.3), Object.assign(anim(.5), {maxZoom:18})); });
+      const area = (VENUES.v[pk.primary] || {}).a || g[0].地區, c = COLORS[area] || "#888";
+      const open = g.some(d => !dimState((d._day || {}).state));
+      const html = `<span style="height:${pk.h}px;background:${c}"><b>${esc(pk.name)}</b> <i>${pk.n}</i></span>`;
+      const m = L.marker([pk.lat, pk.lng], {zIndexOffset:400, icon:L.divIcon({className:"clu clu-cap" + (open ? "" : " clu-closed"), html, iconSize:[pk.w, pk.h], iconAnchor:[pk.w / 2, pk.h / 2]})});
+      m.bindTooltip(pk.multi ? `${esc(pk.name)}，${pk.n} 件，點一下分開` : `${esc(pk.name)}，${pk.n} 件`, {direction:"top", offset:[0, -pk.h / 2]});
+      m.on("click", () => {
+        if (!pk.multi){ openVenue(pk.primary); return; }
+        const b = L.latLngBounds(g.map(d => d.marker.getLatLng()));
+        if (b.getNorthEast().equals(b.getSouthWest()) || map.getBoundsZoom(b) <= z) map.setView([pk.lat, pk.lng], Math.min(z + 2, 18));
+        else map.flyToBounds(b.pad(0.3), Object.assign(anim(.5), {maxZoom:18}));
+      });
       m.addTo(cluLayer);
-      if (lv === "close" && venue && !pk.cap) g._venue = venue;
-      g._ll = [pk.lat, pk.lng]; g._size = size; g._w = w; g._h = h;
+      g._ll = [pk.lat, pk.lng]; g._w = pk.w; g._h = pk.h; g._size = pk.h;
     });
     keepClustersOffCards();
   }
@@ -6014,6 +6151,123 @@ if (SHEET){
 /* ===== 手機作品浮動卡：點地圖圓點從底部滑出，不換頁。收合約螢幕 1/4，往上拉展開，往下滑或點地圖空白處關閉 ===== */
 let cardCheckin = d => "";
 let cardExtra = d => ({detail:"", body:""});
+function venueBackHtml(d){
+  const vid = VENUE_OF[d.作品編號];
+  const v = vid && VENUES.v[vid];
+  if (!v || v.w.length < 2) return "";
+  const stay = v.s === 120 ? "約 2 小時" : v.s === 60 ? "約 1 小時" : v.s === 15 ? "約 15 分" : "";
+  const q = String(v.n || "").match(/「([^」]+)」/);
+  const short = q ? q[1] : v.n;
+  const note = stay ? `<p class="vn-backnote">停留算在據點裡（${esc(short)}${stay}）</p>` : "";
+  return `<button type="button" class="vn-back" data-venue="${esc(vid)}">‹ ${esc(v.n)}（${v.w.length} 件之一）</button>${note}`;
+}
+function fmtHM(m){ return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`; }
+function groupHoursLabel(works){
+  const day = curDay();
+  const hrs = works.map(d => dayHours(d, day)).filter(Boolean);
+  if (hrs.length){
+    let a = null, b = null;
+    for (const h of hrs){
+      const p = String(h).split("–");
+      const am = hmMin(p[0]), bm = hmMin(p[1]);
+      if (am != null && (a == null || am < a)) a = am;
+      if (bm != null && (b == null || bm > b)) b = bm;
+    }
+    const span = a != null && b != null ? `${fmtHM(a)}–${fmtHM(b)}` : hrs[0];
+    const raw = works.map(d => d.開放時間 || "").join("；");
+    const hit = raw.match(/(\d{1,2})月起/);
+    if (hit && span){
+      const mon = +String(day).slice(5, 7), start = +hit[1];
+      if (mon >= start || mon <= 3) return `${start}月起 ${span}`;
+    }
+    return span;
+  }
+  if (!works.every(d => d.類型 !== "室內")) return "";
+  const free = works.every(d => { const s = feeShort(d); return !s || s === "免費"; });
+  return free ? "白天可看・免費" : "白天可看";
+}
+function venueOpenFace(v){
+  const day = curDay(), ws = venueWorks(v);
+  const indoor = ws.filter(d => d.類型 === "室內"), outdoor = ws.filter(d => d.類型 !== "室內");
+  const states = ws.map(d => (d._day || dayInfo(d, day)).state);
+  const anyVisit = states.some(s => s === "open" || s === "view");
+  let openM = null, closeM = null, lastM = null;
+  for (const d of indoor){
+    const h = dayHours(d, day); if (!h) continue;
+    const p = h.split("–"), a = hmMin(p[0]), b = hmMin(p[1]);
+    if (a != null && (openM == null || a < openM)) openM = a;
+    if (b != null && (closeM == null || b > closeM)) closeM = b;
+    const last = lastEntry(d, h, day), lm = last && hmMin(last);
+    if (lm != null && (lastM == null || lm > lastM)) lastM = lm;
+  }
+  const indoorHrs = openM != null && closeM != null ? `${fmtHM(openM)}–${fmtHM(closeM)}` : "";
+  const bits = [];
+  if (indoor.length && indoorHrs) bits.push("館內 " + indoorHrs);
+  if (!indoor.length && outdoor.length) bits.push("白天可看");
+  else if (outdoor.length) bits.push("戶外白天可看");
+  const today = day === tokyoToday();
+  const head = anyVisit ? (today ? "今天開放" : "這天開放") : (today ? "今天休館" : "這天休館");
+  return {head, sub:bits.join("・"), last:lastM != null ? fmtHM(lastM) : "", shut:!anyVisit};
+}
+function venueThumb(d){
+  const p = PHOTOS[d.作品編號], nm = esc(d.中文名 || d.作品名稱);
+  if (!p) return `<span class="vn-ph vn-empty">照片待補</span>`;
+  const u = esc(encodeURI(p.s).replace(/,/g, "%2C"));
+  return `<span class="vn-ph"><img src="${u}" alt="${nm} 的作品照片" loading="lazy" decoding="async" onerror="var s=document.createElement('span');s.className='vn-empty';s.textContent='照片待補';this.replaceWith(s)"></span>`;
+}
+function venueListHtml(v){
+  const anyPhoto = v.w.some(c => PHOTOS[c]);
+  const html = venueGroupWorks(v).map(g => {
+    const hrs = groupHoursLabel(g.works);
+    const rows = g.works.map((d, i) => `<li class="vn-li${i >= 3 ? " vn-extra" : ""}"${i >= 3 ? " hidden" : ""}><button type="button" class="vn-row" data-open="${esc(d.作品編號)}">${venueThumb(d)}<span class="vn-tx"><b>${esc(d.中文名 || d.作品名稱)}</b><small>${esc(d.藝術家 || "")}</small></span><span class="vn-go" aria-hidden="true">›</span></button></li>`).join("");
+    const more = g.works.length > 3 ? `<button type="button" class="vn-more" data-vmore="${g.works.length - 3}">＋ 另外 ${g.works.length - 3} 件 ▾</button>` : "";
+    return `<section class="vn-group"><header><b>${esc(g.title)} ${g.works.length} 件</b>${hrs ? `<span>${esc(hrs)}</span>` : ""}</header><ul>${rows}</ul>${more}</section>`;
+  }).join("");
+  return html + (anyPhoto ? `<p class="vn-credit">${PHOTO_CREDIT}</p>` : "");
+}
+function venueCardParts(vid, where){
+  const v = VENUES.v[vid]; if (!v) return {head:"", more:""};
+  const day = curDay(), main = venueMain(v), n = v.w.length, face = venueOpenFace(v), fee = venueFeeLine(v, day), feeNote = venueFeeNote(v, day);
+  const feeRef = venueFeeOn(v, day) ? "" : feeWinterRef(day);
+  const fac = ["廁所", "賣店", "餐廳"].filter(k => venueWorks(v).some(d => d[k]));
+  const routed = venueAlreadyInRoute(v, route.stops);
+  const b = where === "pop" ? "pp-btn" : "wc-btn";
+  const addr = main ? jaAddr(main) : "";
+  const color = COLORS[v.a] || "#888";
+  const acts = `<div class="${where === "pop" ? "pp-acts" : "wc-acts"}">` +
+    (main ? favBtn(main.作品編號, isSaved(main.作品編號), b) : "") +
+    (routed ? `<button type="button" class="${b} sec" disabled aria-label="已在行程"><span aria-hidden="true">✓</span>已在行程</button>`
+      : `<button type="button" class="${b} sec" data-addvenue="${esc(vid)}" aria-label="加入行程"><span aria-hidden="true">＋</span>行程</button>`) +
+    (v.nav ? `<a class="${b} pri" href="${esc(gmUrl(v.nav))}" target="_blank" rel="noopener" aria-label="導航：在 Google 地圖開啟">${IC_NAV}導航</a>` : "") +
+    `</div>`;
+  const notes = (v.notes || []).length ? `<ul class="vn-notes">${v.notes.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : "";
+  const peek = `<div class="vn-peek"><div class="vn-top"><span class="vn-badge" style="background:${color}"><small>${esc(v.a)}</small><b>${n}件</b></span><div class="vn-ti"><b class="vn-name">${esc(v.n)}</b><p class="vn-sub" lang="ja">${esc(v.ja || "")}${addr ? "｜" + esc(addr) : ""}</p><span class="wtag vn-kind">${esc(venueKindLabel(v))}</span></div></div>` +
+    `<div class="ttable${face.shut ? " closed" : ""}" role="group" aria-label="${esc(face.head + (face.sub ? "，" + face.sub : "") + (face.last ? "，最後入場 " + face.last : ""))}"><div class="tt-l" aria-hidden="true"><span>${esc(face.head)}</span>${face.sub ? `<em>${esc(face.sub)}</em>` : ""}</div>${face.last ? `<div class="tt-r" aria-hidden="true"><span>最後入場</span><b>${esc(face.last)}</b></div>` : ""}</div>` +
+    (venueStayText(v.s) ? `<p class="wstay">${esc(venueStayText(v.s))}</p>` : "") +
+    (fac.length ? `<p class="wfac">${fac.map(k => `<span class="wtag">${k}</span>`).join("")}</p><p class="wfac-note muted">設施依場館資訊整理，以現場為準</p>` : "") +
+    (fee ? `<div class="wfee"><span>入場費</span><b>${esc(fee)}</b>${feeRef ? ` <small class="muted">${esc(feeRef)}</small>` : ""}</div>` : "") +
+    (feeNote ? `<p class="vn-feenote">${esc(feeNote)}</p>` : "") +
+    notes + acts +
+    (where === "card" ? `<button type="button" class="vn-foot" data-wcgo="full">往上滑看 ${n} 件作品　作品清單 ▴</button>` : "") +
+    `</div>`;
+  const listHead = where === "card" ? `<div class="vn-fullhead"><b>${esc(v.n)}・${n} 件</b><button type="button" class="vn-x" data-vnclose aria-label="回到據點概要">×</button></div>` : "";
+  return {head:peek, more:listHead + `<div class="vn-list">${venueListHtml(v)}</div>`};
+}
+function openVenuePopup(vid){
+  const v = VENUES.v[vid]; if (!v || typeof v.lat !== "number") return;
+  const parts = venueCardParts(vid, "pop");
+  map.closePopup();
+  const pop = L.popup({maxWidth:360, minWidth:300, className:"pp-area", autoPanPaddingTopLeft:PP_TL, autoPanPaddingBottomRight:L.point(20, 80)})
+    .setLatLng([v.lat, v.lng]).setContent(`<div class="vn-card">${parts.head}${parts.more}</div>`);
+  pop.openOn(map);
+  const el = pop.getElement();
+  if (el) el.style.setProperty("--ac", COLORS[v.a] || "#888");
+}
+function openVenue(vid){
+  if (!VENUES.v[vid]) return;
+  if (useSheet() && wcard && wcard.openVenue){ wcard.openVenue(vid); return; }
+  openVenuePopup(vid);
+}
 function workCardHtml(d){
   const c = d.作品編號, day = curDay(), di = d._day || dayInfo(d, day), nm = d.中文名 || d.作品名稱, sv = isSaved(c);
   const who = [d.藝術家, d.設置地點].filter(Boolean).map(esc).join("｜");
@@ -6028,7 +6282,7 @@ function workCardHtml(d){
   const ns = nearbyOf(d);
   const notes = (d._rule && d._rule.stayIn ? `<div class="pp-note">館內僅限住宿者，外觀可自由觀看</div>` : "") +
     (d.座標來源 === "同場館推定" ? `<div class="pp-note">位置依同場館推定，現場請再確認</div>` : "");
-  return `<div class="wc-head"><div class="wc-t">${stampBadge(d)}<div class="wc-tt"><b class="wc-name">${titleInner(d, nm, "wc-nt")}</b>${who ? `<div class="wc-who" lang="ja">${who}</div>` : ""}${areaLine(d)}<div class="waddr" lang="ja">${esc(jaAddr(d))}</div></div>${jaBtn(c)}</div>` +
+  return venueBackHtml(d) + `<div class="wc-head"><div class="wc-t">${stampBadge(d)}<div class="wc-tt"><b class="wc-name">${titleInner(d, nm, "wc-nt")}</b>${who ? `<div class="wc-who" lang="ja">${who}</div>` : ""}${areaLine(d)}<div class="waddr" lang="ja">${esc(jaAddr(d))}</div></div>${jaBtn(c)}</div>` +
     photoHtml(d, "card") +
     dayTableHtml(d, di, day) +
     workStayFacBlock(d) +
@@ -6066,9 +6320,22 @@ if (SHEET){
   const isOpen = () => !el.hidden;
   const render = d => {
     box.innerHTML = workCardHtml(d);
+    el.dataset.kind = "work";
     el.style.setProperty("--ac", COLORS[d.地區] || "#888");
     el.classList.toggle("wc-closed", (d._day || dayInfo(d, curDay())).state === "closed");
     if (isOpen()){ pk = peekH(); if (st === "peek") apply(pk); } };
+  const openVenueCard = vid => {
+    const v = VENUES.v[vid]; if (!v) return;
+    const parts = venueCardParts(vid, "card");
+    box.innerHTML = `<div class="wc-head">${parts.head}</div><div class="wc-more">${parts.more}</div>`;
+    el.dataset.kind = "venue";
+    el.style.setProperty("--ac", COLORS[v.a] || "#888");
+    el.classList.remove("wc-closed");
+    el.setAttribute("aria-label", v.n);
+    if (!isOpen()){ if (sheetState !== "peek") setSheet("peek"); el.hidden = false; document.body.classList.add("wc-on"); }
+    setState("peek");
+    detailCode = null;
+  };
   const open = d => {
     render(d);
     if (!isOpen()){ if (sheetState !== "peek") setSheet("peek"); el.hidden = false; document.body.classList.add("wc-on"); }
@@ -6077,7 +6344,7 @@ if (SHEET){
   };
   const hide = () => { if (!isOpen()) return; el.hidden = true; document.body.classList.remove("wc-on"); setSheet(sheetState); scheduleAdmit(); };
   const close = () => { if (detailCode) selMarker(null); detailCode = null; hide(); if (zoomUpdate) zoomUpdate(); };
-  wcard = {open, render, hide, close, isOpen, refit(){ if (st === "peek") setState("peek"); }};
+  wcard = {open, render, hide, close, isOpen, openVenue:openVenueCard, refit(){ if (st === "peek") setState("peek"); }};
   const begin = y => { drag = {y0:y, h0:el.getBoundingClientRect().height, t0:performance.now(), moved:false}; };
   const move = y => {
     const dy = drag.y0 - y;
@@ -6116,7 +6383,9 @@ if (SHEET){
   grip.addEventListener("pointerup", e => { if (e.pointerType !== "touch" && drag) skipClick = finish(e.clientY); });
   grip.addEventListener("click", () => { if (skipClick){ skipClick = false; return; } setState(st === "full" ? "peek" : "full"); });
   box.addEventListener("click", e => {
+    if (e.target.closest("[data-vnclose]")){ setState("peek"); return; }
     const go = e.target.closest("[data-wcgo]");
+    if (go && go.dataset.wcgo === "full"){ setState("full"); return; }
     if (go){
       const det = go.dataset.wcgo === "det", t = box.querySelector(det ? ".wc-det" : ".wc-near");
       if (det && t && !t.hidden){ t.hidden = true; go.setAttribute("aria-expanded", "false"); return; }
@@ -6129,7 +6398,7 @@ if (SHEET){
   map.on("click", e => {
     if (!useSheet()) return;
     const t = e.originalEvent && e.originalEvent.target;
-    if (t && t.closest && t.closest("path.mk,.wlabel.wl-go")) return;
+    if (t && t.closest && t.closest("path.mk,.wlabel.wl-go,.leaflet-marker-icon.clu")) return;
     if (routePreview){ clearRoutePreview(); return; }
     if (isOpen()) close(); else if (sheetState !== "peek") setSheet("peek");
   });
