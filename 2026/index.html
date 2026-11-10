@@ -6741,6 +6741,8 @@ function migrateTrips(){
       if (hit){ trip = hit[0]; editing = hit[1]; } else { trip = newTrip(route); editing = 0; }
     }
   } else if (!trip && trips.length){ trip = trips[0]; editing = 0; }
+  /* 重新整理還原：行程裡有今天那一天就停在那天，沒有就回到上次看的那一天 */
+  if (trip){ const ti = todayDayIndex(trip); if (ti >= 0) editing = ti; }
   if (trip) route.name = baseName(trip.name) || trip.name;
   syncTV(); saveTrip(); store(LS_MODEL, 3);
   if (trip && trip.days[editing] && dayRouteKey(trip, trip.days[editing]) !== routeKey(route)){ tripLoading = true; setRoute(Object.assign({name:baseName(trip.name) || trip.name, stops:trip.days[editing].stops, mode:trip.mode}, dayLockMeta(trip.days[editing])), false); tripLoading = false; }
@@ -6883,6 +6885,12 @@ document.addEventListener("click", e => {
   else if (ds.tvclear){ if (confirm("從這台裝置移除這份行程？")) deleteTrip(trip); }
 }, true);
 document.addEventListener("change", e => { const t = e.target.closest && e.target.closest("[data-tdate]"); if (!t || !trip) return; const D = trip.days[+t.dataset.tdate]; if (!D || !/^\d{4}-\d{2}-\d{2}$/.test(t.value)) return; if (!tripDayOk(t.value, tripYearOf(trip))){ t.value = D.date; toast("這天不在這份行程的日期範圍"); return; } D.date = t.value; saveTrip(); renderTripBox(); });
+/* 行程裡有一天是日本時間今天，就停在那一天；沒有就回 -1 */
+function todayDayIndex(t){
+  const today = typeof tokyoToday === "function" ? tokyoToday() : "";
+  return today && t && t.days ? t.days.findIndex(D => D && D.date === today) : -1;
+}
+const openDayIndex = t => Math.max(0, todayDayIndex(t));
 function openTripOnMap(t){
   const D = t && t.days && t.days[0]; if (!D) return;
   const inT = t.days.some(X => routeKey({stops:X.stops, mode:t.mode}) === routeKey(route));
@@ -6890,7 +6898,7 @@ function openTripOnMap(t){
   const hit = trips.find(x => tripKey(x) === tripKey(t));
   const T = hit || Object.assign(cpy(t), {id:newId(), from:"shared"});
   if (!hit) trips.push(T);
-  showDay(T, 0, true, true);
+  showDay(T, openDayIndex(T), true, true);
   const n = $("rnote"); if (n) n.textContent = "";
   return !!hit;
 }
