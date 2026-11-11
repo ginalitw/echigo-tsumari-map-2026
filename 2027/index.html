@@ -1939,6 +1939,78 @@ body:not(.redit-on) .rlist .sl1 code,body:not(.redit-on) .rlist .tja{display:non
   body.has-offs #mrain{top:calc(112px + env(safe-area-inset-top))}
   body.has-offs #mtitle.season-below ~ #mrain{top:calc(154px + env(safe-area-inset-top))}
 }
+/* ===== 六區拼圖 ===== */
+.pz-put{margin-top:8px}
+.pz-put button{flex:1 1 100%}
+.pz{position:fixed;inset:0;z-index:3000;background:var(--paper);display:flex;flex-direction:column}
+.pz[hidden],.pz [hidden]{display:none!important}
+body.pz-on{overflow:hidden}
+.pz-box{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;box-sizing:border-box;padding:calc(6px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+.pz-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none}
+.pz-head h2{margin:0;font-size:18px;outline:none}
+.pz-x{width:44px;height:44px;border:none;background:none;font-size:20px;color:var(--ink);cursor:pointer}
+.pz-body{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.pz-prev{flex:none;display:flex;justify-content:center;background:var(--wash);border-radius:10px;padding:8px}
+.pz-prev canvas{display:block;height:min(46vh,480px);width:auto;max-width:100%;aspect-ratio:3/4;border-radius:4px;box-shadow:var(--shadow-float);cursor:pointer}
+.pz-side{display:flex;flex-direction:column;gap:10px;min-width:0}
+.pz-caps{display:flex;flex-wrap:wrap;gap:6px}
+.pz-cap{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px;border:1px dashed var(--ac,var(--line));border-radius:999px;background:var(--paper);font:inherit;font-size:14px;color:var(--ink);cursor:pointer;box-sizing:border-box}
+.pz-cap.has{border-style:solid;border-width:2px}
+.pz-cap.on{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:700}
+.pz-trayn{border-color:var(--line);color:var(--ink-soft);cursor:default}
+.pz-guess{font-style:normal;font-size:12px;font-weight:700;padding:1px 6px;border-radius:999px;background:var(--gold-bg);color:var(--ink);margin-left:6px;white-space:nowrap}
+.pz-tray{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.pz-th{flex:none;width:56px;height:56px;padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;background:var(--wash);cursor:pointer}
+.pz-th.on{border-color:var(--ink)}
+.pz-th img{width:100%;height:100%;object-fit:cover;display:block}
+.pz-sel:empty{display:none}
+.pz-sel{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.pz-one{display:flex;align-items:center;gap:10px}
+.pz-one img,.pz-br img{flex:none;width:56px;height:56px;object-fit:cover;border-radius:8px;background:var(--wash)}
+.pz-one>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;align-items:flex-start}
+.pz-row,.pz-acts,.pz-lacts,.pz-ask-acts{display:flex;gap:8px;flex-wrap:wrap}
+.pz .b,.pz-ask .b{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font:inherit;font-size:15px;color:var(--ink);cursor:pointer;box-sizing:border-box}
+.pz-acts .b,.pz-lacts .b,.pz-ask-acts .b{flex:1 1 0;white-space:nowrap}
+.pz .pz-go,.pz-ask .pz-go{background:var(--gold);border-color:var(--gold);font-weight:700}
+.pz-mute{color:var(--ink-soft);font-size:13px;margin:0}
+.pz-up,.pz-keep,.pz-hold,.pz-note{margin:0;font-size:12px;line-height:1.6;color:var(--ink-soft)}
+.pz-up a{color:inherit}
+.pz-hold{font-size:14px;color:var(--ink);text-align:center}
+.pz-reset{align-self:flex-start;min-height:44px;padding:0;border:none;background:none;font:inherit;font-size:13px;color:var(--ink-soft);text-decoration:underline;cursor:pointer}
+.pz-ch{display:flex;flex-direction:column;gap:6px;flex-basis:100%}
+.pz-ch b{font-size:13px}
+.pz-chl,.pz-cha{display:flex;flex-wrap:wrap;gap:6px}
+.pz-ch button{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border:1px solid var(--ac,var(--line));border-radius:999px;background:var(--paper);font:inherit;font-size:14px;color:var(--ink);cursor:pointer}
+.pz-chv.on{border-color:var(--ink);font-weight:700}
+.pz-chv i{width:10px;height:10px;border-radius:50%}
+.pz-chv small{color:var(--ink-soft)}
+.pz-layer{position:absolute;inset:0;z-index:2;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center}
+.pz-lbox{width:min(560px,100%);max-height:92%;overflow-y:auto;box-sizing:border-box;background:var(--paper);border-radius:14px 14px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+.pz-lbox h3{margin:0;font-size:16px;outline:none}
+.pz-lbox label{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.pz-lbox input[type=text]{min-height:44px;padding:0 10px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:16px;box-sizing:border-box}
+.pz-bl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.pz-br{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.pz-br.off img{opacity:.4}
+.pz-bi{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14px}
+.pz-bb{display:flex;gap:6px;flex-wrap:wrap}
+.pz-bb .b{min-height:40px;padding:0 10px;font-size:14px}
+.pz-saved img{display:block;max-width:100%;max-height:60vh;width:auto;height:auto;margin:0 auto;border-radius:4px;box-shadow:var(--shadow-float);-webkit-touch-callout:default}
+.pz-file{position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+.pz-ask{position:fixed;inset:0;z-index:3200;background:var(--scrim);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+.pz-ask-box{width:100%;max-width:360px;box-sizing:border-box;background:var(--paper);border-radius:14px;padding:18px 18px 14px;box-shadow:var(--shadow-panel)}
+.pz-ask-box p{margin:0 0 14px;font-size:15px;line-height:1.6}
+#pztoast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translate(-50%,-8px);z-index:3300;max-width:calc(100% - 32px);box-sizing:border-box;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--snow);font-size:14px;line-height:1.5;padding:6px 8px 6px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#pztoast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#pztoast button{min-height:36px;padding:0 12px;border:1px solid var(--snow);border-radius:8px;background:none;color:var(--snow);font:inherit;font-weight:700;white-space:nowrap;cursor:pointer}
+@media (min-width:768px){
+  .pz-body{flex-direction:row;align-items:flex-start;gap:20px;max-width:980px;width:100%;margin:0 auto}
+  .pz-prev{flex:0 0 auto}
+  .pz-prev canvas{height:min(78vh,720px)}
+  .pz-side{flex:1}
+  .pz-layer{align-items:center}
+  .pz-lbox{border-radius:14px}
+}
 </style>
 </head>
 <body>
@@ -2523,6 +2595,7 @@ const useSheet = () => SHEET && MQ.matches;
 const RM = window.matchMedia("(prefers-reduced-motion: reduce)");
 const anim = d => RM.matches ? {animate:false} : {duration:d};
 const SITE = "public";
+const PUZZLE_ON = SITE !== "private";  // 六區拼圖：公開版與飯團版有，私人版不組進去
 const PAGE_YEAR = 2027;
 const YEARS = {"default": 2026, "legacy": 2026, "years": {"2026": {"label": "2026 通年展", "type": "annual", "status": "live", "season": ["2026-04-25", "2026-11-08"], "weeklyClosed": ["TUE", "WED"], "openExceptions": [], "dateRange": ["2026-04-25", "2027-03-31"], "stampPeriod": ["2026-04-25", "2027-07-16"], "sheetTab": "2026", "sourcePdf": "https://www.echigo-tsumari.jp/assets/uploads/2026/10/%E3%80%8C2026%E5%B9%B4%E3%81%AE%E8%B6%8A%E5%BE%8C%E5%A6%BB%E6%9C%89%E3%80%8D%E4%BD%9C%E5%93%81%E5%85%AC%E9%96%8B%E3%82%AB%E3%83%AC%E3%83%B3%E3%83%80%E3%83%BC%EF%BC%88%E8%8B%B1%EF%BC%89.pdf"}, "2027": {"label": "2027 第 10 屆三年展", "type": "triennale", "status": "preview", "season": ["2027-07-17", "2027-11-07"], "weeklyClosed": ["TUE", "WED"], "openExceptions": ["2027-08-10", "2027-08-11", "2027-11-03"], "dateRange": ["2027-07-17", "2028-03-31"], "stampPeriod": ["2027-07-17", "2028-04-30"], "sheetTab": "2027", "announce": "新作品約 2027 年 1 月公布", "previewCta": "加入富搖小幫手，2027 作品公布時第一時間通知你"}}};
 function loc(){ return typeof location === "undefined" ? null : location; }
@@ -3902,7 +3975,7 @@ function popupHtml(d){
   h += `<div class="pp-acts">${favBtn(c, sv, "pp-btn")}` +
     (!d.marker ? "" : inRoute(c) ? `<button type="button" class="pp-btn pri pp-route" disabled aria-label="已在行程"><span aria-hidden="true">✓</span>已在行程</button>`
       : `<button type="button" class="pp-btn pri pp-route" data-addroute="${esc(c)}" aria-label="加入行程"><span aria-hidden="true">＋</span>加入行程</button>`) +
-    navBtn(d, d.marker ? "pp-btn ter" : "pp-btn pri") + `</div>`;
+    navBtn(d, d.marker ? "pp-btn ter" : "pp-btn pri") + `</div>` + puzzleRow(d, "pop");
   h += transitHtml(d);
   const ns = nearbyOf(d);
   h += `<div class="pp-foot"><details class="pp-det"><summary>詳細資訊</summary>${detailSections(d)}</details>` +
@@ -6344,6 +6417,12 @@ document.addEventListener("keydown", e => {
   if (detailCode){ if (wcard && wcard.isOpen()) wcard.close(); else showTab(lastTab); }
 });
 
+/* ===== 六區拼圖：作品卡動作列下方的〔放進拼圖〕（點了由 puzzle.js 開選圖） ===== */
+function puzzleRow(d, where){
+  if (!PUZZLE_ON || IS_PREVIEW || !d || !COLORS[d.地區]) return "";
+  return `<div class="${where === "pop" ? "pp-acts" : "wc-acts"} pz-put"><button type="button" class="${where === "pop" ? "pp-btn" : "wc-btn"}" data-pzput="${esc(d.作品編號)}">放進拼圖</button></div>`;
+}
+
 /* ===== toast ===== */
 function toast(t){
   let el = $("toast"); if (!el){ el = document.createElement("div"); el.id = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
@@ -6553,7 +6632,7 @@ function workCardHtml(d){
     (IS_PREVIEW ? "" : feeHtml(d)) +
     (alerts.length ? `<ul class="wc-alert">${alerts.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : "") + notes +
     `<div class="wave" aria-hidden="true"></div>` + blurbHtml(d) +
-    `<div class="wc-acts">${acts}</div>` +
+    `<div class="wc-acts">${acts}</div>` + puzzleRow(d, "card") +
     `<div class="wc-foot">${ns.length ? `<button type="button" data-wcgo="near">附近 ${NEAR_M} 公尺內還有 ${ns.length} 件</button>` : `<span>附近 ${NEAR_M} 公尺內沒有其他作品</span>`}<button type="button" class="wc-go-det" data-wcgo="det" aria-expanded="false" aria-controls="wcdet">詳細資訊</button></div></div>` +
     `<div class="wc-more">` + ex.body +
     `<div class="wc-det" id="wcdet" hidden>${detailSections(d, ex.detail)}</div>` +
@@ -7033,6 +7112,7 @@ function onbClose(){
     const fill = () => {
       const fanLink = ($("mtitle") && $("mtitle").querySelector("a")) ? $("mtitle").querySelector("a") : null;
       const items = [
+        ...(PUZZLE_ON && !IS_PREVIEW ? [["puzzle", "六區拼圖"]] : []),
         ["legend", "圖例"],
         ["bd", bdOn ? "區域界線（開）" : "區域界線"],
         ["stat", "統計"],
@@ -7052,7 +7132,8 @@ function onbClose(){
     menuPop.addEventListener("click", e => {
       const b = e.target.closest("[data-mm]"); if (!b) { if (e.target.closest("a")) setMenu(false); return; }
       const k = b.dataset.mm; setMenu(false);
-      if (k === "legend"){ const lg = $("mlegend"); if (lg) lg.click(); }
+      if (k === "puzzle"){ if (typeof pzOpen === "function") pzOpen(); }
+      else if (k === "legend"){ const lg = $("mlegend"); if (lg) lg.click(); }
       else if (k === "bd"){ if ($("bd")) $("bd").click(); fill(); }
       else if (k === "stat"){ const lg = $("mlegend"); if (lg) lg.click(); const ds = $("lp-daystat"); if (ds) ds.scrollIntoView({block: "nearest"}); }
       else if (k === "etq"){ toast(ETIQUETTE); }
@@ -7481,6 +7562,1154 @@ function bootTrips(){
   migrateTrips(); openHashTrip(); renderTripBox();
 }
 bootTrips();
+/* 圖卡共用：打卡圖（飯團版）與六區拼圖卡（公開版、飯團版）都用這裡的字型、紙色與存圖流程。
+   圖片只在這台裝置用 canvas 產生，不上傳。 */
+const SOCIAL_HANDLE = "@echigo.fan";  // IG 與 Threads 帳號：打卡圖頁尾、分享文字、標記提示、拼圖卡頁尾都用這個，要換只改這裡
+const FC_FONT = '"PingFang TC","Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei","Heiti TC",system-ui,sans-serif';
+const FC_INK = "#1d1d1b", FC_PAPER = "#f7f6f2";
+/* 這個瀏覽器能不能用 navigator.share 分享圖片檔 */
+function cardCanShareFiles(type){
+  return !!(navigator.canShare && window.File && (() => { try { return navigator.canShare({files:[new File([""], type === "image/jpeg" ? "a.jpg" : "a.png", {type:type || "image/png"})]}); } catch(e){ return false; } })());
+}
+/* 下載圖片檔。LINE 內建瀏覽器常常不能下載，呼叫端要同時顯示大圖讓人長按儲存。 */
+function cardDownload(blob, name){
+  if (!blob) return false;
+  const a = document.createElement("a"), u = URL.createObjectURL(blob);
+  a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+  return true;
+}
+/* 分享圖片檔。回傳 "ok"、"image-only"（文字帶不過去，只分享了圖）、"abort"（使用者取消）、"fail"。 */
+async function cardShareFiles(blob, name, o){
+  if (!blob) return "fail";
+  o = o || {};
+  const f = new File([blob], name, {type:blob.type || "image/png"});
+  const data = {files:[f], title:o.title || ""};
+  if (o.text) data.text = o.text;
+  const ok = !navigator.canShare || (() => { try { return navigator.canShare(data); } catch(e){ return false; } })();
+  try { await navigator.share(ok ? data : {files:[f], title:o.title || ""}); return ok ? "ok" : "image-only"; }
+  catch(e){ return e && e.name === "AbortError" ? "abort" : "fail"; }
+}
+/* 存成圖片：能分享檔案就分享，否則下載。回傳 "ok"、"image-only"、"abort"、"download"、"fail"。 */
+async function cardSaveImage(blob, name, o){
+  if (!blob) return "fail";
+  if (navigator.share && cardCanShareFiles(blob.type)){
+    const r = await cardShareFiles(blob, name, o);
+    if (r !== "fail") return r;
+  }
+  return cardDownload(blob, name) ? "download" : "fail";
+}
+/* 照片 EXIF：純計算（拍攝日期、位置、長邊縮放尺寸）。三版共用。
+   沒有 DOM、沒有網路、沒有儲存。readExifGps 只回傳座標給呼叫端當下使用，
+   呼叫端不得把位置寫進照片資料。 */
+function photoBytes(input){
+  if (input instanceof Uint8Array) return input;
+  if (input instanceof ArrayBuffer) return new Uint8Array(input);
+  return null;
+}
+
+function readExifDate(input){
+  try {
+    const u8 = photoBytes(input);
+    if (!u8 || u8.length < 16) return null;
+    const marked = exifMarkedDate(u8);
+    if (marked) return marked;
+    return exifNearExifBox(u8);
+  } catch (e) {
+    return null;
+  }
+}
+
+function exifMarkedDate(u8){
+  const sig = [0x45, 0x78, 0x69, 0x66, 0x00, 0x00];
+  for (let i = 0; i + 14 < u8.length; i++){
+    let ok = true;
+    for (let k = 0; k < sig.length; k++) if (u8[i + k] !== sig[k]){ ok = false; break; }
+    if (!ok) continue;
+    const d = tiffDate(u8, i + 6);
+    if (d) return d;
+  }
+  return null;
+}
+
+/* HEIC 的 Exif 盒子有時是 "Exif" 後面幾個位元組才是 TIFF，不是緊接 Exif\\0\\0 */
+function exifNearExifBox(u8){
+  const sig = [0x45, 0x78, 0x69, 0x66];
+  for (let i = 0; i + 16 < u8.length; i++){
+    let ok = true;
+    for (let k = 0; k < sig.length; k++) if (u8[i + k] !== sig[k]){ ok = false; break; }
+    if (!ok) continue;
+    const end = Math.min(u8.length - 8, i + 64);
+    for (let j = i + 4; j <= end; j++){
+      const d = tiffDate(u8, j);
+      if (d) return d;
+    }
+  }
+  return null;
+}
+
+function tiffDate(u8, base){
+  if (base < 0 || base + 8 > u8.length) return null;
+  let le = null;
+  if (u8[base] === 0x49 && u8[base + 1] === 0x49 && u8[base + 2] === 0x2a && u8[base + 3] === 0x00) le = true;
+  else if (u8[base] === 0x4d && u8[base + 1] === 0x4d && u8[base + 2] === 0x00 && u8[base + 3] === 0x2a) le = false;
+  else return null;
+  const u16 = off => {
+    const i = base + off;
+    if (off < 0 || i + 1 >= u8.length) return null;
+    return le ? u8[i] | (u8[i + 1] << 8) : (u8[i] << 8) | u8[i + 1];
+  };
+  const u32 = off => {
+    const i = base + off;
+    if (off < 0 || i + 3 >= u8.length) return null;
+    if (le) return (u8[i] | (u8[i + 1] << 8) | (u8[i + 2] << 16) | (u8[i + 3] << 24)) >>> 0;
+    return ((u8[i] << 24) | (u8[i + 1] << 16) | (u8[i + 2] << 8) | u8[i + 3]) >>> 0;
+  };
+  const readAscii = (off, count) => {
+    if (count < 19 || off < 0 || base + off + 19 > u8.length) return "";
+    let s = "";
+    for (let i = 0; i < 19; i++) s += String.fromCharCode(u8[base + off + i]);
+    return s;
+  };
+  let original = null, digitized = null, dateTime = null;
+  const walk = (ifdOff, depth) => {
+    if (depth > 4 || ifdOff == null || ifdOff < 8) return;
+    const n = u16(ifdOff);
+    if (n == null || n < 1 || n > 80) return;
+    for (let i = 0; i < n; i++){
+      const e = ifdOff + 2 + i * 12;
+      const tag = u16(e), typ = u16(e + 2), cnt = u32(e + 4);
+      if (tag == null || typ == null || cnt == null) return;
+      const typeSize = typ === 2 ? 1 : typ === 3 ? 2 : typ === 4 ? 4 : typ === 5 ? 8 : 0;
+      if (!typeSize) continue;
+      const bytes = typeSize * cnt;
+      let valOff = e + 8;
+      if (bytes > 4) valOff = u32(e + 8);
+      if (valOff == null) continue;
+      if (tag === 0x8769 && typ === 4) walk(u32(e + 8), depth + 1);
+      if (typ === 2 && cnt >= 19){
+        const s = readAscii(valOff, cnt);
+        if (/^\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}/.test(s)){
+          if (tag === 0x9003) original = s;
+          else if (tag === 0x9004) digitized = s;
+          else if (tag === 0x0132) dateTime = s;
+        }
+      }
+    }
+  };
+  walk(u32(4), 0);
+  return normExifDate(original || digitized || dateTime);
+}
+
+/* 壓縮前讀原檔。緯度、經度已依 N/S、E/W 參考轉成有正負的十進位。 */
+function readExifGps(input){
+  try {
+    const u8 = photoBytes(input);
+    if (!u8 || u8.length < 16) return null;
+    const sig = [0x45, 0x78, 0x69, 0x66, 0x00, 0x00];
+    for (let i = 0; i + 14 < u8.length; i++){
+      let ok = true;
+      for (let k = 0; k < sig.length; k++) if (u8[i + k] !== sig[k]){ ok = false; break; }
+      if (!ok) continue;
+      const gps = tiffGpsCoord(u8, i + 6);
+      if (gps) return gps;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function tiffGpsCoord(u8, base){
+  if (base < 0 || base + 8 > u8.length) return null;
+  let le = null;
+  if (u8[base] === 0x49 && u8[base + 1] === 0x49 && u8[base + 2] === 0x2a && u8[base + 3] === 0x00) le = true;
+  else if (u8[base] === 0x4d && u8[base + 1] === 0x4d && u8[base + 2] === 0x00 && u8[base + 3] === 0x2a) le = false;
+  else return null;
+  const u16 = off => {
+    const i = base + off;
+    if (off < 0 || i + 1 >= u8.length) return null;
+    return le ? u8[i] | (u8[i + 1] << 8) : (u8[i] << 8) | u8[i + 1];
+  };
+  const u32 = off => {
+    const i = base + off;
+    if (off < 0 || i + 3 >= u8.length) return null;
+    if (le) return (u8[i] | (u8[i + 1] << 8) | (u8[i + 2] << 16) | (u8[i + 3] << 24)) >>> 0;
+    return ((u8[i] << 24) | (u8[i + 1] << 16) | (u8[i + 2] << 8) | u8[i + 3]) >>> 0;
+  };
+  const rational = off => {
+    const n = u32(off), d = u32(off + 4);
+    if (n == null || d == null || d === 0) return null;
+    return n / d;
+  };
+  const asciiAt = (off, count) => {
+    if (count < 1 || off == null || off < 0) return "";
+    let s = "";
+    const n = Math.min(count, 8);
+    for (let i = 0; i < n; i++){
+      if (base + off + i >= u8.length) break;
+      const c = u8[base + off + i];
+      if (!c) break;
+      s += String.fromCharCode(c);
+    }
+    return s;
+  };
+  const dms = off => {
+    const d = rational(off), m = rational(off + 8), s = rational(off + 16);
+    if (d == null || m == null || s == null) return null;
+    return d + m / 60 + s / 3600;
+  };
+  let gpsOff = null;
+  const walk = (ifdOff, depth) => {
+    if (gpsOff != null || depth > 4 || ifdOff == null || ifdOff < 8) return;
+    const n = u16(ifdOff);
+    if (n == null || n < 1 || n > 80) return;
+    for (let i = 0; i < n; i++){
+      const e = ifdOff + 2 + i * 12;
+      const tag = u16(e), typ = u16(e + 2), cnt = u32(e + 4);
+      if (tag == null || typ == null || cnt == null) return;
+      if (tag === 0x8825 && typ === 4 && cnt === 1) gpsOff = u32(e + 8);
+      if (tag === 0x8769 && typ === 4 && cnt === 1) walk(u32(e + 8), depth + 1);
+    }
+  };
+  walk(u32(4), 0);
+  if (gpsOff == null || gpsOff < 8) return null;
+  const n = u16(gpsOff);
+  if (n == null || n < 1 || n > 40) return null;
+  let latRef = "", lngRef = "", lat = null, lng = null;
+  for (let i = 0; i < n; i++){
+    const e = gpsOff + 2 + i * 12;
+    const tag = u16(e), typ = u16(e + 2), cnt = u32(e + 4);
+    if (tag == null || typ == null || cnt == null) return null;
+    const typeSize = typ === 2 ? 1 : typ === 3 ? 2 : typ === 4 ? 4 : typ === 5 ? 8 : 0;
+    if (!typeSize || !cnt) continue;
+    const bytes = typeSize * cnt;
+    let off = e + 8;
+    if (bytes > 4){
+      off = u32(e + 8);
+      if (off == null) continue;
+    }
+    if ((tag === 1 || tag === 3) && typ === 2){
+      const s = asciiAt(off, cnt).toUpperCase();
+      if (tag === 1) latRef = s;
+      else lngRef = s;
+    } else if ((tag === 2 || tag === 4) && typ === 5 && cnt === 3){
+      const v = dms(off);
+      if (tag === 2) lat = v;
+      else lng = v;
+    }
+  }
+  if (lat == null || lng == null) return null;
+  if (latRef === "S") lat = -Math.abs(lat);
+  else if (latRef === "N" || latRef === "") lat = Math.abs(lat);
+  else return null;
+  if (lngRef === "W") lng = -Math.abs(lng);
+  else if (lngRef === "E" || lngRef === "") lng = Math.abs(lng);
+  else return null;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  return {lat, lng, latRef, lngRef};
+}
+
+function normExifDate(s){
+  if (!s) return null;
+  const m = /^(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/.exec(s);
+  if (!m) return null;
+  const y = +m[1], mo = +m[2], d = +m[3], h = +m[4], mi = +m[5], se = +m[6];
+  if (y < 1990 || y > 2100 || mo < 1 || mo > 12 || d < 1 || d > 31 || h > 23 || mi > 59 || se > 60) return null;
+  const p = n => String(n).padStart(2, "0");
+  return y + "-" + p(mo) + "-" + p(d) + "T" + p(h) + ":" + p(mi) + ":" + p(se);
+}
+
+function fitLongEdge(w, h, edge){
+  w = Math.max(1, Math.round(+w || 0));
+  h = Math.max(1, Math.round(+h || 0));
+  edge = Math.max(1, Math.round(+edge || 0));
+  const long = Math.max(w, h);
+  if (long <= edge) return {w, h};
+  const s = edge / long;
+  return {w: Math.max(1, Math.round(w * s)), h: Math.max(1, Math.round(h * s))};
+}
+/* 六區拼圖：純計算與存取層（分區、找最近作品、借前後照片、比對行程、上限、卡片版面）。
+   沒有 DOM、沒有網路。照片只存在這支手機的 IndexedDB，不上傳、不需登入。
+   位置只在分區當下使用：存進去的只有 area、code、vid，不存經緯度。
+   trail 是 4-3 共用的足跡（地圖、拼圖、阿飯遊戲），拼圖〔重新開始〕不清它。
+   官網作品照不進拼圖，只收使用者自己選的照片。 */
+const PUZZLE_PER_AREA = 1;  // 每區幾張：公開版 1。飯團版每區 5 張疊放是下一張單，這裡先都 1
+const PUZZLE_AREAS = ["十日町", "川西", "中里", "松代", "松之山", "津南"];
+const PUZZLE_TRAY_MAX = 10;      // 「還沒分區」托盤另計
+const PUZZLE_EDGE = 1600;        // 照片長邊
+const PUZZLE_Q = 0.85;
+const PUZZLE_THUMB_EDGE = 320;
+const PUZZLE_NEAR_M = 300;       // 這個距離內有作品就掛那件
+const PUZZLE_BORROW_MIN = 30;    // 拍攝時間差在這之內，借另一張的位置
+const PUZZLE_TITLE_MAX = 20;
+const PUZZLE_CARD_W = 1080, PUZZLE_CARD_H = 1440;
+const PZ_STORES = {photos:"id", trail:["year", "code"]};
+
+/* 介面固定文案都放這裡，測試會檢查禁詞、半形逗號與破折號 */
+const PUZZLE_TEXT = {
+  menu:"六區拼圖",
+  put:"放進拼圖",
+  see:"看拼圖",
+  title:"越後妻有",
+  later:"下次見",
+  tray:"還沒分區",
+  add:"＋ 加照片",
+  meta:"標題與日期",
+  save:"存成圖片",
+  swap:"換一張",
+  del:"刪除",
+  ok:"換",
+  cancel:"取消",
+  close:"關閉",
+  confirm:"確認",
+  change:"改",
+  guess:"請確認",
+  reset:"重新開始",
+  resetAsk:"要重新開始嗎？這張拼圖的照片都會清掉。",
+  keep:"照片只存在這支手機的瀏覽器，換手機或清除資料會不見，記得存成圖片。",
+  upsell:"想一區放很多張？加入富搖小幫手，用飯團專頁。",
+  hold:"手機也可以長按圖片儲存",
+  tripList:"行程裡的據點",
+  tripNone:"這支手機還沒有行程，請直接選地區。",
+  areaList:"或直接選地區",
+  where:"放到哪裡？",
+  noTime:"沒有拍攝時間",
+  noWork:"沒有指定作品",
+  reading:"讀取照片中…",
+  bad:"這張照片無法讀取，請換一張",
+  notImage:"請選擇照片檔",
+  noStore:"這個瀏覽器現在不能存照片，關掉頁面後拼圖會不見，請先存成圖片。",
+  trayFull:"「還沒分區」最多放 10 張，請先把裡面的照片分區或刪除。",
+  batchTitle:"加照片",
+  batchSkip:"這張不放",
+  batchUse:"改放這張",
+  metaTitle:"標題（20 字內）",
+  metaDate:"日期",
+  metaAuto:"用照片日期",
+  metaDone:"完成",
+  saved:"圖片好了",
+  empty:"還沒有照片，先按「＋ 加照片」或在作品卡按「放進拼圖」。",
+  handle:"越後飯",
+  one:fan => fan ? "每區一張，同一區只留一張。" : "公開版每區一張，同一區只留一張。",
+  replaceAsk:area => `「${area}」已經有一張，要換成這張嗎？`,
+  placed:area => `放進「${area}」了`,
+  walked:(n, all) => `走過 ${n}／${all} 區`,
+  cap:(area, n, per) => `${area} ${n}／${per}`,
+  trayCap:n => `還沒分區 ${n}`,
+  areaEmpty:area => `「${area}」還沒有照片`,
+  batchDone:n => `放進 ${n} 張了`,
+  batchSkipped:n => `有 ${n} 張沒有放進去`,
+  readingN:(i, n) => `讀取照片中 ${i}／${n}`,
+  cardAlt:(n, all) => `六區拼圖預覽：走過 ${n}／${all} 區`
+};
+
+/* ===== 幾何 ===== */
+function pzInRing(x, y, ring){
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++){
+    const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function pzPolys(geom){
+  if (!geom) return [];
+  if (geom.type === "Polygon") return [geom.coordinates];
+  if (geom.type === "MultiPolygon") return geom.coordinates;
+  return [];
+}
+function pzInGeom(lng, lat, geom){
+  return pzPolys(geom).some(rings => rings.length && pzInRing(lng, lat, rings[0]) && !rings.slice(1).some(h => pzInRing(lng, lat, h)));
+}
+/* 這個點在六區的哪一區；都不在回 null */
+function pzAreaOf(geo, lat, lng){
+  lat = +lat; lng = +lng;
+  if (!geo || !isFinite(lat) || !isFinite(lng)) return null;
+  for (const f of geo.features || []){
+    const a = f.properties && f.properties.area;
+    if (PUZZLE_AREAS.includes(a) && pzInGeom(lng, lat, f.geometry)) return a;
+  }
+  return null;
+}
+function pzDistM(lat1, lng1, lat2, lng2){
+  const R = 6371000, r = x => x * Math.PI / 180, dp = r(lat2 - lat1), dl = r(lng2 - lng1);
+  const a = Math.sin(dp / 2) ** 2 + Math.cos(r(lat1)) * Math.cos(r(lat2)) * Math.sin(dl / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(a)));
+}
+/* works：[{code, lat, lng, area}]。回傳 maxM 內最近的一件 {code, area, m}，沒有回 null */
+function pzNearestWork(works, lat, lng, maxM){
+  let best = null;
+  for (const w of works || []){
+    if (w == null || w.lat == null || w.lng == null || !isFinite(+w.lat) || !isFinite(+w.lng)) continue;
+    const m = pzDistM(lat, lng, +w.lat, +w.lng);
+    if (m <= maxM && (!best || m < best.m)) best = {code:w.code, area:w.area, m};
+  }
+  return best;
+}
+/* 有位置的照片：先看在哪一區，區內 300 m 內有作品就掛最近那件。六區外回 null（當作沒有位置）。
+   掛上作品時地區跟著作品走，跟作品卡〔放進拼圖〕一致。回傳值不帶經緯度。 */
+function pzLocate(env, lat, lng){
+  const area = pzAreaOf(env.geo, lat, lng);
+  if (!area) return null;
+  const near = pzNearestWork(env.works, +lat, +lng, PUZZLE_NEAR_M);
+  if (!near) return {area, code:null, vid:null};
+  return {area:PUZZLE_AREAS.includes(near.area) ? near.area : area, code:near.code, vid:(env.venueOf && env.venueOf[near.code]) || null};
+}
+
+/* ===== 時間 ===== */
+function pzMinutes(takenAt){
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/.exec(String(takenAt || ""));
+  if (!m) return null;
+  return Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0)) / 60000;
+}
+function pzDay(takenAt){
+  const m = /^(\d{4}-\d{2}-\d{2})/.exec(String(takenAt || ""));
+  return m ? m[1] : null;
+}
+function pzTimeLabel(takenAt){
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(String(takenAt || ""));
+  return m ? `${+m[2]}/${+m[3]} ${m[4]}:${m[5]}` : PUZZLE_TEXT.noTime;
+}
+/* 卡片預設日期：照片拍攝日的最早～最晚，例如「2026/11/12～11/14」 */
+function pzDateRange(photos){
+  const days = (photos || []).filter(p => p && p.area).map(p => pzDay(p.takenAt)).filter(Boolean).sort();
+  if (!days.length) return "";
+  const a = days[0].split("-"), b = days[days.length - 1].split("-");
+  const full = p => `${p[0]}/${p[1]}/${p[2]}`;
+  if (days[0] === days[days.length - 1]) return full(a);
+  return full(a) + "～" + (a[0] === b[0] ? `${b[1]}/${b[2]}` : full(b));
+}
+
+/* ===== 行程 ===== */
+function pzTripOk(t, year){ return !!t && Array.isArray(t.days) && (!t.year || !year || +t.year === +year); }
+/* 一天的站點換成據點（同據點只算一次）：[{vid, code, name, area}] */
+function pzStopsVenues(stops, env){
+  const out = [], seen = {};
+  for (const s of stops || []){
+    const code = s && s.c, vid = code && env.venueOf ? env.venueOf[code] : null;
+    if (!vid || seen[vid]) continue;
+    const v = env.venues && env.venues[vid];
+    if (!v || !PUZZLE_AREAS.includes(v.a)) continue;
+    seen[vid] = 1;
+    out.push({vid, code, name:v.n || code, area:v.a});
+  }
+  return out;
+}
+/* 拍攝那天，行程裡排了哪些據點 */
+function pzDayVenues(env, day){
+  if (!day) return [];
+  const stops = [];
+  for (const t of env.trips || []){
+    if (!pzTripOk(t, env.year)) continue;
+    for (const D of t.days) if (D && D.date === day) stops.push(...(D.stops || []));
+  }
+  return pzStopsVenues(stops, env);
+}
+/* 手動清單「行程裡的據點」：拍攝那天的排最前面（today:true），其餘照行程順序。只列這支手機行程裡的據點。 */
+function pzManualList(env, takenAt){
+  const first = pzDayVenues(env, pzDay(takenAt)).map(v => ({...v, today:true}));
+  const seen = {}; first.forEach(v => seen[v.vid] = 1);
+  const stops = [];
+  for (const t of env.trips || []){
+    if (!pzTripOk(t, env.year)) continue;
+    for (const D of t.days) stops.push(...((D && D.stops) || []));
+  }
+  const rest = pzStopsVenues(stops, env).filter(v => !seen[v.vid]).map(v => ({...v, today:false}));
+  return first.concat(rest);
+}
+
+/* ===== 一次加多張：自動分區 =====
+   items：[{id, takenAt, gps:{lat,lng}|null}]
+   env：{geo, works, venueOf, venues, trips, year, saved:[已存照片]}
+   回傳：[{id, takenAt, area, code, vid, guess, how}]，how 是 gps、borrow、trip、none。不帶經緯度。 */
+function pzAssignBatch(items, env){
+  const out = (items || []).map(it => {
+    const r = {id:it.id, takenAt:it.takenAt || null, area:null, code:null, vid:null, guess:false, how:"none"};
+    const g = it.gps, loc = g && g.lat != null && g.lng != null ? pzLocate(env, g.lat, g.lng) : null;
+    if (loc){ r.area = loc.area; r.code = loc.code; r.vid = loc.vid; r.how = "gps"; }
+    return r;
+  });
+  /* 備案 1：借前後照片。同批有位置的，或已存、已確認分區的 */
+  const anchors = out.filter(r => r.how === "gps")
+    .concat((env.saved || []).filter(p => p && p.area && !p.guess))
+    .map(p => ({t:pzMinutes(p.takenAt), area:p.area, code:p.code || null, vid:p.vid || null}))
+    .filter(a => a.t != null);
+  for (const r of out){
+    if (r.how !== "none") continue;
+    const t = pzMinutes(r.takenAt);
+    if (t == null) continue;
+    let best = null;
+    for (const a of anchors){
+      const d = Math.abs(a.t - t);
+      if (d <= PUZZLE_BORROW_MIN && (!best || d < best.d)) best = {d, a};
+    }
+    if (best){ r.area = best.a.area; r.code = best.a.code; r.vid = best.a.vid; r.guess = true; r.how = "borrow"; }
+  }
+  /* 備案 2：比對行程。那天只有一個據點才猜；多個不自動放，交給手動清單 */
+  for (const r of out){
+    if (r.how !== "none") continue;
+    const vs = pzDayVenues(env, pzDay(r.takenAt));
+    if (vs.length === 1){ r.area = vs[0].area; r.code = vs[0].code; r.vid = vs[0].vid; r.guess = true; r.how = "trip"; }
+  }
+  return out;
+}
+/* 同一區超過上限時：沒有 guess（有 EXIF 位置或手動指定）的優先；同樣都有或都沒有，才留最新的幾張。回傳要放的 id 陣列（沒分區的都留，托盤上限存的時候再擋） */
+function pzKeepDefaults(rows, per){
+  per = per || PUZZLE_PER_AREA;
+  const keep = [], by = {};
+  (rows || []).forEach((r, i) => {
+    if (!r.area){ keep.push(r.id); return; }
+    (by[r.area] = by[r.area] || []).push({id:r.id, t:pzMinutes(r.takenAt), i, guess:!!r.guess});
+  });
+  for (const list of Object.values(by)){
+    const firm = list.filter(x => !x.guess);
+    const pool = firm.length ? firm : list;
+    pool.sort((a, b) => (a.t == null ? Infinity : a.t) - (b.t == null ? Infinity : b.t) || a.i - b.i);
+    pool.slice(-per).forEach(x => keep.push(x.id));
+  }
+  return keep;
+}
+
+/* ===== 存取層 =====
+   db 介面（可注入）：getAll(store)、put(store, rec)、del(store, key)，都回 Promise。
+   瀏覽器用 IndexedDB，測試用 pzMemDb()。 */
+function pzKeyOf(store, rec){
+  const kp = PZ_STORES[store];
+  return Array.isArray(kp) ? kp.map(k => rec[k]) : rec[kp];
+}
+function pzMemDb(){
+  const data = {photos:new Map(), trail:new Map()};
+  const k = key => JSON.stringify(key);
+  return {
+    getAll:store => Promise.resolve(Array.from(data[store].values())),
+    put:(store, rec) => { data[store].set(k(pzKeyOf(store, rec)), rec); return Promise.resolve(); },
+    del:(store, key) => { data[store].delete(k(key)); return Promise.resolve(); }
+  };
+}
+function pzNewId(){ return "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function pzToday(){
+  const d = new Date(), p = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+}
+/* 只留規格裡的欄位。位置欄位不在白名單裡，傳進來也不會被存。 */
+function pzCleanPhoto(rec, year){
+  rec = rec || {};
+  const area = PUZZLE_AREAS.includes(rec.area) ? rec.area : null;
+  const pl = rec.place && typeof rec.place === "object" ? {x:+rec.place.x || 0, y:+rec.place.y || 0, s:+rec.place.s || 1, r:+rec.place.r || 0, z:+rec.place.z || 0} : null;
+  return {
+    id:typeof rec.id === "string" && rec.id ? rec.id : pzNewId(),
+    year:+year,
+    blob:rec.blob || null,
+    thumb:rec.thumb || null,
+    takenAt:pzMinutes(rec.takenAt) == null ? null : String(rec.takenAt).slice(0, 19),
+    area,
+    code:area && rec.code ? String(rec.code) : null,
+    vid:area && rec.vid ? String(rec.vid) : null,
+    guess:!!(area && rec.guess),
+    place:pl,
+    addedAt:+rec.addedAt || Date.now()
+  };
+}
+function pzStore(db, o){
+  o = o || {};
+  const year = +o.year, per = o.perArea || PUZZLE_PER_AREA, trayMax = o.trayMax || PUZZLE_TRAY_MAX;
+  const list = async () => (await db.getAll("photos")).filter(p => p.year === year).sort((a, b) => a.addedAt - b.addedAt);
+  /* 足跡：一件作品一筆，已經有的留較早的日期 */
+  const mark = async p => {
+    if (!p.area || !p.code || p.guess) return false;
+    const visited = pzDay(p.takenAt) || pzToday();
+    const old = (await db.getAll("trail")).find(t => t.year === year && t.code === p.code);
+    if (old && old.visited && old.visited <= visited) return false;
+    await db.put("trail", {code:p.code, vid:p.vid || null, year, visited, via:"puzzle"});
+    return true;
+  };
+  /* 放進某區前的檢查：滿了就回 area-full，由介面問要不要換 */
+  const room = async (target, opt, selfId) => {
+    const all = (await list()).filter(p => p.id !== selfId);
+    if (!target){
+      if (all.filter(p => !p.area).length >= trayMax) return {ok:false, why:"tray-full"};
+      return {ok:true, drop:[]};
+    }
+    const same = all.filter(p => p.area === target);
+    if (same.length < per) return {ok:true, drop:[]};
+    if (!(opt && opt.replace)) return {ok:false, why:"area-full", area:target, existing:same};
+    return {ok:true, drop:same.slice(0, same.length - per + 1)};
+  };
+  return {
+    year, perArea:per, max:per * PUZZLE_AREAS.length, trayMax,
+    list,
+    trail:async () => (await db.getAll("trail")).filter(t => t.year === year),
+    async counts(){
+      const c = {tray:0, placed:0, areas:0};
+      PUZZLE_AREAS.forEach(a => c[a] = 0);
+      (await list()).forEach(p => { if (p.area){ c[p.area]++; c.placed++; } else c.tray++; });
+      c.areas = PUZZLE_AREAS.filter(a => c[a] > 0).length;
+      return c;
+    },
+    async add(rec, opt){
+      const p = pzCleanPhoto(rec, year);
+      const r = await room(p.area, opt, p.id);
+      if (!r.ok) return r;
+      for (const x of r.drop) await db.del("photos", x.id);
+      await db.put("photos", p);
+      await mark(p);
+      return {ok:true, photo:p, removed:r.drop.map(x => x.id)};
+    },
+    /* 改分區（托盤指定地區、確認或改掉猜的） */
+    async assign(id, to, opt){
+      const cur = (await list()).find(p => p.id === id);
+      if (!cur) return {ok:false, why:"missing"};
+      const p = pzCleanPhoto({...cur, area:to && to.area, code:to && to.code, vid:to && to.vid, guess:!!(to && to.guess)}, year);
+      const r = await room(p.area, opt, id);
+      if (!r.ok) return r;
+      for (const x of r.drop) await db.del("photos", x.id);
+      await db.put("photos", p);
+      await mark(p);
+      return {ok:true, photo:p, removed:r.drop.map(x => x.id)};
+    },
+    async confirm(id){
+      const cur = (await list()).find(p => p.id === id);
+      if (!cur) return {ok:false, why:"missing"};
+      const p = {...cur, guess:false};
+      await db.put("photos", p);
+      await mark(p);
+      return {ok:true, photo:p};
+    },
+    async remove(id){ await db.del("photos", id); return {ok:true}; },
+    /* 重新開始：只清這一年的照片，足跡留著 */
+    async reset(){
+      const all = await list();
+      for (const p of all) await db.del("photos", p.id);
+      return {ok:true, removed:all.length};
+    }
+  };
+}
+
+/* ===== 卡片版面 =====
+   把六區輪廓投影到 box（{x, y, w, h}）裡，置中。經度乘 cosφ 修正。
+   回傳 {areas:[{area, rings:[[[x,y]…]…], box:[x0,y0,x1,y1], at:[x,y]}]}，at 是地名標籤位置。 */
+function pzLayout(geo, box){
+  const feats = (geo && geo.features || []).filter(f => PUZZLE_AREAS.includes(f.properties && f.properties.area));
+  let la0 = Infinity, la1 = -Infinity;
+  feats.forEach(f => pzPolys(f.geometry).forEach(rs => rs[0].forEach(q => { la0 = Math.min(la0, q[1]); la1 = Math.max(la1, q[1]); })));
+  const k = Math.cos((la0 + la1) / 2 * Math.PI / 180);
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  feats.forEach(f => pzPolys(f.geometry).forEach(rs => rs[0].forEach(q => {
+    const x = q[0] * k, y = -q[1];
+    x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+  })));
+  const s = Math.min(box.w / (x1 - x0), box.h / (y1 - y0));
+  const ox = box.x + (box.w - (x1 - x0) * s) / 2, oy = box.y + (box.h - (y1 - y0) * s) / 2;
+  const pt = q => [ox + (q[0] * k - x0) * s, oy + (-q[1] - y0) * s];
+  const areas = PUZZLE_AREAS.map(area => {
+    const f = feats.find(x => x.properties.area === area);
+    if (!f) return null;
+    const rings = pzPolys(f.geometry).map(rs => rs[0].map(pt));
+    let bx0 = Infinity, bx1 = -Infinity, by0 = Infinity, by1 = -Infinity;
+    rings.forEach(r => r.forEach(q => { bx0 = Math.min(bx0, q[0]); bx1 = Math.max(bx1, q[0]); by0 = Math.min(by0, q[1]); by1 = Math.max(by1, q[1]); }));
+    const main = rings.slice().sort((a, b) => Math.abs(pzRingArea(b)) - Math.abs(pzRingArea(a)))[0];
+    return {area, rings, box:[bx0, by0, bx1, by1], at:pzLabelPoint(main)};
+  }).filter(Boolean);
+  return {areas, box};
+}
+function pzRingArea(r){
+  let a = 0;
+  for (let i = 0, j = r.length - 1; i < r.length; j = i++) a += r[j][0] * r[i][1] - r[i][0] * r[j][1];
+  return a / 2;
+}
+/* 標籤位置：重心；重心落在形狀外時，改用同一條橫線上最寬那段的中點 */
+function pzLabelPoint(r){
+  let a = 0, cx = 0, cy = 0;
+  for (let i = 0, j = r.length - 1; i < r.length; j = i++){
+    const f = r[j][0] * r[i][1] - r[i][0] * r[j][1];
+    a += f; cx += (r[j][0] + r[i][0]) * f; cy += (r[j][1] + r[i][1]) * f;
+  }
+  if (!a) return r[0].slice();
+  cx /= 3 * a; cy /= 3 * a;
+  if (pzInRing(cx, cy, r)) return [cx, cy];
+  const xs = [];
+  for (let i = 0, j = r.length - 1; i < r.length; j = i++){
+    const yi = r[i][1], yj = r[j][1];
+    if ((yi > cy) !== (yj > cy)) xs.push((r[j][0] - r[i][0]) * (cy - yi) / (yj - yi) + r[i][0]);
+  }
+  xs.sort((p, q) => p - q);
+  let best = null;
+  for (let i = 0; i + 1 < xs.length; i += 2) if (!best || xs[i + 1] - xs[i] > best[1] - best[0]) best = [xs[i], xs[i + 1]];
+  return best ? [(best[0] + best[1]) / 2, cy] : [cx, cy];
+}
+/* 卡片上的點落在哪一區（預覽點選用） */
+function pzHit(layout, x, y){
+  const a = (layout && layout.areas || []).find(A => A.rings.some(r => pzInRing(x, y, r)));
+  return a ? a.area : null;
+}
+/* 照片填滿某個方框（cover）：回傳畫到卡片上的 {x, y, w, h} */
+function pzCover(sw, sh, box){
+  const bw = box[2] - box[0], bh = box[3] - box[1], s = Math.max(bw / sw, bh / sh);
+  const w = sw * s, h = sh * s;
+  return {x:box[0] + (bw - w) / 2, y:box[1] + (bh - h) / 2, w, h};
+}
+function pzCleanTitle(s){ return Array.from(String(s == null ? "" : s).replace(/\s+/g, " ").trim()).slice(0, PUZZLE_TITLE_MAX).join(""); }
+/* 六區拼圖：介面（編輯頁、一次加多張、作品卡〔放進拼圖〕、卡片繪製、存成圖片）。
+   計算與存取在 puzzle-core.js；EXIF 在 exif-core.js；字型、紙色與存圖流程在 card-core.js。
+   照片只存在這支手機的 IndexedDB，不上傳、不需登入；位置只在分區當下使用，不存。
+   官網作品照不進拼圖，只收使用者自己選的照片。 */
+const PZ_AFAN = "";  // 阿飯背影圖（static/common/afan-back.png）。沒有檔時是空字串，卡片不畫、版面不留空洞
+const PZ_MUTE = "#6b6962";
+const PZ_MAP_BOX = {x:70, y:280, w:940, h:900};
+const PZ_DB_NAME = isFan() ? "etmapfan_puzzle" : "etmap_puzzle";
+const PZ_META_KEY = lsHead() + "puzzle_meta";
+const PZ_T = PUZZLE_TEXT;
+const pzLay = pzLayout(AREAS_GEO, PZ_MAP_BOX);
+const pzWorks = DATA.filter(d => d.緯度 != null && d.經度 != null && isFinite(+d.緯度) && isFinite(+d.經度)).map(d => ({code:d.作品編號, lat:+d.緯度, lng:+d.經度, area:d.地區}));
+const pz = {photos:[], sel:null, layer:null, batch:null, pickFor:null, blob:null, bmp:new Map(), url:new Map(), seq:0, mem:false, persisted:false, back:null, afan:null, savedUrl:""};
+
+/* IndexedDB 存取層；打不開時改用記憶體（關掉頁面就沒了，介面會提醒） */
+function pzIdb(name){
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    const rq = indexedDB.open(name, 1);
+    rq.onupgradeneeded = () => { const db = rq.result; for (const [s, kp] of Object.entries(PZ_STORES)) if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, {keyPath:kp}); };
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => rej(rq.error);
+    rq.onblocked = () => rej(new Error("blocked"));
+  }));
+  const run = (store, mode, fn) => open().then(db => new Promise((res, rej) => {
+    const tx = db.transaction(store, mode), rq = fn(tx.objectStore(store));
+    tx.oncomplete = () => res(rq ? rq.result : undefined);
+    tx.onerror = tx.onabort = () => rej(tx.error);
+  }));
+  return {open, getAll:s => run(s, "readonly", os => os.getAll()), put:(s, r) => run(s, "readwrite", os => os.put(r)), del:(s, k) => run(s, "readwrite", os => os.delete(k))};
+}
+let pzStoreP = null;
+function pzGetStore(){
+  return pzStoreP || (pzStoreP = (async () => {
+    let db = null;
+    try { if (!window.indexedDB) throw 0; db = pzIdb(PZ_DB_NAME); await db.open(); }
+    catch(e){ db = pzMemDb(); pz.mem = true; }
+    return pzStore(db, {year:YEAR, perArea:PUZZLE_PER_AREA});
+  })());
+}
+function pzEnv(){
+  return {geo:AREAS_GEO, works:pzWorks, venueOf:VENUE_OF, venues:VENUES.v, trips:typeof trips === "undefined" ? [] : trips, year:YEAR, saved:pz.photos};
+}
+/* 第一次存照片時請瀏覽器不要自動清掉資料；失敗不管 */
+function pzPersist(){
+  if (pz.persisted) return; pz.persisted = true;
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch(e){}
+}
+const pzMeta = () => { const m = load(PZ_META_KEY, {}) || {}; return {title:pzCleanTitle(m.title), date:String(m.date || "").slice(0, 30)}; };
+const pzCardTitle = () => pzMeta().title || PZ_T.title;
+const pzCardDate = () => pzMeta().date || pzDateRange(pz.photos);
+
+/* ===== 讀檔：先讀 EXIF（日期、位置），再用 canvas 重新編碼成 JPEG（不帶 EXIF） ===== */
+async function pzDecode(file){
+  let bm = null;
+  try { bm = window.createImageBitmap ? await createImageBitmap(file, {imageOrientation:"from-image"}) : null; } catch(e){ bm = null; }
+  if (!bm) bm = await new Promise(res => { const u = URL.createObjectURL(file), im = new Image(); im.onload = () => { URL.revokeObjectURL(u); res(im); }; im.onerror = () => { URL.revokeObjectURL(u); res(null); }; im.src = u; });
+  return bm;
+}
+function pzEncode(src, edge, q){
+  const sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height, f = fitLongEdge(sw, sh, edge);
+  const cv = document.createElement("canvas"); cv.width = f.w; cv.height = f.h;
+  const g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, f.w, f.h); g.drawImage(src, 0, 0, f.w, f.h);
+  return new Promise(res => cv.toBlob(res, "image/jpeg", q));
+}
+/* 回傳 {id, takenAt, gps, blob, thumb}；gps 只給呼叫端當下分區，不會存。讀不了回 null */
+async function pzReadFile(file){
+  if (!file || (file.type && !/^image\//.test(file.type))) return null;
+  let takenAt = null, gps = null;
+  try { const u8 = new Uint8Array(await file.arrayBuffer()); takenAt = readExifDate(u8); gps = readExifGps(u8); } catch(e){}
+  const bm = await pzDecode(file);
+  if (!bm) return null;
+  const blob = await pzEncode(bm, PUZZLE_EDGE, PUZZLE_Q), thumb = await pzEncode(bm, PUZZLE_THUMB_EDGE, 0.8);
+  if (bm.close) bm.close();
+  if (!blob || !thumb) return null;
+  return {id:pzNewId(), takenAt, gps:gps ? {lat:gps.lat, lng:gps.lng} : null, blob, thumb};
+}
+function pzThumbUrl(p){
+  if (!p || !p.thumb) return "";
+  if (!pz.url.has(p.id)) pz.url.set(p.id, URL.createObjectURL(p.thumb));
+  return pz.url.get(p.id);
+}
+function pzForget(ids){
+  ids.forEach(id => {
+    const u = pz.url.get(id); if (u){ URL.revokeObjectURL(u); pz.url.delete(id); }
+    const b = pz.bmp.get(id); if (b){ if (b.close) b.close(); pz.bmp.delete(id); }
+  });
+}
+async function pzReload(){
+  const st = await pzGetStore();
+  pz.photos = await st.list();
+  const live = new Set(pz.photos.map(p => p.id));
+  pzForget(Array.from(new Set([...pz.url.keys(), ...pz.bmp.keys()])).filter(id => !live.has(id) && !(pz.batch && pz.batch.rows.some(r => r.id === id))));
+  return pz.photos;
+}
+const pzIn = area => pz.photos.filter(p => p.area === area);
+const pzTray = () => pz.photos.filter(p => !p.area);
+const pzWorkName = c => { const d = c && BY[c]; return d ? (d.中文名 || d.作品名稱 || c) : ""; };
+const pzPlaceLabel = r => !r.area ? PZ_T.tray : r.area + "・" + (r.vid && VENUES.v[r.vid] ? VENUES.v[r.vid].n : pzWorkName(r.code) || PZ_T.noWork);
+
+/* ===== 卡片（1080×1440）===== */
+function pzText(g, t, x, y, px, o){ o = o || {}; g.font = `${o.w || 400} ${px}px ${FC_FONT}`; g.fillStyle = o.c || FC_INK; g.textAlign = o.align || "left"; g.textBaseline = o.base || "alphabetic"; g.fillText(t, x, y); return g.measureText(t).width; }
+function pzPath(g, A){ g.beginPath(); A.rings.forEach(r => { r.forEach((q, i) => i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.closePath(); }); }
+function pzPill(g, t, x, y, col, solid){
+  g.font = `700 30px ${FC_FONT}`;
+  const w = g.measureText(t).width + 32, h = 46, r = 23, x0 = x - w / 2, y0 = y - h / 2;
+  g.beginPath(); g.moveTo(x0 + r, y0); g.arcTo(x0 + w, y0, x0 + w, y0 + h, r); g.arcTo(x0 + w, y0 + h, x0, y0 + h, r); g.arcTo(x0, y0 + h, x0, y0, r); g.arcTo(x0, y0, x0 + w, y0, r); g.closePath();
+  g.fillStyle = solid ? col : "#fff"; g.fill();
+  if (!solid){ g.strokeStyle = col; g.lineWidth = 2; g.stroke(); }
+  pzText(g, t, x, y + 1, 30, {w:700, c:solid ? "#fff" : col, align:"center", base:"middle"});
+}
+/* photos：這一年的照片；imgs：id → 已解碼的圖。沒有圖的區留白、地區色虛線外框、寫「下次見」。 */
+function pzDrawCard(cv, photos, imgs, o){
+  o = o || {};
+  const W = PUZZLE_CARD_W, H = PUZZLE_CARD_H, g = cv.getContext("2d");
+  cv.width = W; cv.height = H;
+  g.fillStyle = FC_PAPER; g.fillRect(0, 0, W, H);
+  pzText(g, o.title || PZ_T.title, 72, 156, 84, {w:700});
+  if (o.date) pzText(g, o.date, 74, 222, 40, {w:500, c:PZ_MUTE});
+  const filled = [];
+  pzLay.areas.forEach(A => {
+    const p = photos.filter(x => x.area === A.area).slice(-1)[0], im = p && imgs.get(p.id);
+    if (im){
+      const c = pzCover(im.naturalWidth || im.width, im.naturalHeight || im.height, A.box);
+      g.save(); pzPath(g, A); g.clip(); g.drawImage(im, c.x, c.y, c.w, c.h); g.restore();
+      filled.push(A.area);
+    } else {
+      pzPath(g, A); g.fillStyle = "#fff"; g.fill();
+    }
+  });
+  /* 外框：有照片的用紙色細縫隔開，沒照片的用地區色虛線 */
+  pzLay.areas.forEach(A => {
+    const has = filled.includes(A.area);
+    g.save(); g.lineJoin = "round"; pzPath(g, A);
+    if (has){ g.strokeStyle = FC_PAPER; g.lineWidth = 8; }
+    else { g.strokeStyle = COLORS[A.area] || FC_INK; g.lineWidth = 4; g.setLineDash([14, 10]); }
+    g.stroke(); g.restore();
+  });
+  /* 地名標籤永遠在最上層 */
+  pzLay.areas.forEach(A => {
+    const col = COLORS[A.area] || FC_INK, has = filled.includes(A.area);
+    if (has) pzPill(g, A.area, A.at[0], A.at[1], col, true);
+    else { pzPill(g, A.area, A.at[0], A.at[1] - 22, col, false); pzText(g, PZ_T.later, A.at[0], A.at[1] + 36, 30, {w:500, c:col, align:"center", base:"middle"}); }
+  });
+  pzText(g, PZ_T.walked(filled.length, PUZZLE_AREAS.length), 72, H - 96, 60, {w:700});
+  pzText(g, PZ_T.handle + " " + SOCIAL_HANDLE, W - 72, H - 96, 32, {w:700, c:PZ_MUTE, align:"right"});
+  if (o.afan){
+    const ih = 190, iw = ih * (o.afan.naturalWidth || o.afan.width) / (o.afan.naturalHeight || o.afan.height);
+    g.drawImage(o.afan, W - 72 - iw, H - 150 - ih, iw, ih);
+  }
+  return filled.length;
+}
+function pzLoadAfan(){
+  if (!PZ_AFAN || pz.afan !== null) return Promise.resolve(pz.afan || null);
+  return new Promise(res => { const im = new Image(); im.onload = () => { pz.afan = im; res(im); }; im.onerror = () => { pz.afan = false; res(null); }; im.src = PZ_AFAN; });
+}
+async function pzDraw(){
+  const seq = ++pz.seq, cv = $("pz-cv");
+  if (!cv) return;
+  for (const p of pz.photos){
+    if (!p.area || pz.bmp.has(p.id) || !p.blob) continue;
+    const bm = await pzDecode(p.blob);
+    if (bm) pz.bmp.set(p.id, bm);
+  }
+  const afan = await pzLoadAfan();
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  if (seq !== pz.seq) return;
+  const n = pzDrawCard(cv, pz.photos, pz.bmp, {title:pzCardTitle(), date:pzCardDate(), afan});
+  cv.setAttribute("aria-label", PZ_T.cardAlt(n, PUZZLE_AREAS.length));
+  pz.blob = null;
+  const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.92));
+  if (seq === pz.seq) pz.blob = blob;
+}
+const pzFileName = () => `echigo-puzzle-${YEAR}-${pzToday().replace(/-/g, "")}.jpg`;
+
+/* ===== 小元件：詢問、帶按鈕的提示 ===== */
+function pzAsk(text, okLabel){
+  return new Promise(res => {
+    const m = document.createElement("div"); m.className = "pz-ask";
+    m.innerHTML = `<div class="pz-ask-box" role="alertdialog" aria-modal="true" aria-label="${esc(text)}"><p>${esc(text)}</p><div class="pz-ask-acts"><button type="button" class="b" data-a="0">${esc(PZ_T.cancel)}</button><button type="button" class="b pz-go" data-a="1">${esc(okLabel)}</button></div></div>`;
+    const done = v => { document.removeEventListener("keydown", key, true); m.remove(); res(v); };
+    const key = e => { if (e.key === "Escape"){ e.stopPropagation(); done(false); } };
+    m.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b) done(b.dataset.a === "1"); else if (e.target === m) done(false); });
+    document.addEventListener("keydown", key, true);
+    document.body.appendChild(m); m.querySelector(".pz-go").focus();
+  });
+}
+function pzToast(text, btn, fn){
+  let el = $("pztoast"); if (!el){ el = document.createElement("div"); el.id = "pztoast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
+  el.innerHTML = `<span>${esc(text)}</span>` + (btn ? `<button type="button">${esc(btn)}</button>` : "");
+  const b = el.querySelector("button"); if (b) b.onclick = () => { el.classList.remove("on"); fn(); };
+  el.classList.add("on"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("on"), 6000);
+}
+const pzMsg = t => { const m = $("pz-msg"); if (m) m.textContent = t || (pz.mem ? PZ_T.noStore : ""); };
+
+/* ===== 作品卡〔放進拼圖〕、〔換一張〕、空區〔加照片〕：選一張圖直接放 ===== */
+function pzPick(target){ pz.pickFor = target; const inp = $("pz-file"); inp.value = ""; inp.click(); }
+async function pzPicked(file){
+  const t = pz.pickFor; pz.pickFor = null;
+  if (!t || !file) return;
+  const say = s => { if ($("pz") && !$("pz").hidden) pzMsg(s); else toast(s); };
+  if (file.type && !/^image\//.test(file.type)){ say(PZ_T.notImage); return; }
+  const st = await pzGetStore();
+  let area = t.area, code = null, vid = null;
+  if (t.code){ const d = BY[t.code]; if (!d || !PUZZLE_AREAS.includes(d.地區)) return; area = d.地區; code = t.code; vid = VENUE_OF[t.code] || null; }
+  /* 公開版那區已有照片時先問；在編輯頁按〔換一張〕的已經表明要換，不再問 */
+  if (!t.swap && (await st.counts())[area] >= st.perArea && !(await pzAsk(PZ_T.replaceAsk(area), PZ_T.ok))) return;
+  say(PZ_T.reading);
+  const f = await pzReadFile(file);
+  if (!f){ say(PZ_T.bad); return; }
+  if (!t.code && f.gps){ const loc = pzLocate(pzEnv(), f.gps.lat, f.gps.lng); if (loc && loc.area === area){ code = loc.code; vid = loc.vid; } }
+  pzPersist();
+  const r = await st.add({id:f.id, blob:f.blob, thumb:f.thumb, takenAt:f.takenAt, area, code, vid, guess:false}, {replace:true});
+  if (!r.ok){ say(PZ_T.bad); return; }
+  await pzReload();
+  if ($("pz") && !$("pz").hidden){ pz.sel = {area}; pzRender(); pzMsg(PZ_T.placed(area)); }
+  else pzToast(PZ_T.placed(area), PZ_T.see, () => pzOpen(area));
+}
+
+/* ===== 編輯頁 ===== */
+function pzChooser(takenAt){
+  const list = pzManualList(pzEnv(), takenAt);
+  return `<div class="pz-ch"><b>${esc(PZ_T.tripList)}</b>` +
+    (list.length ? `<div class="pz-chl">${list.map(v => `<button type="button" class="pz-chv${v.today ? " on" : ""}" data-pz-to="v" data-vid="${esc(v.vid)}" data-code="${esc(v.code)}" data-area="${esc(v.area)}"><i style="background:${COLORS[v.area] || "#888"}"></i>${esc(v.name)}<small>${esc(v.area)}</small></button>`).join("")}</div>` : `<p class="pz-mute">${esc(PZ_T.tripNone)}</p>`) +
+    `<b>${esc(PZ_T.areaList)}</b><div class="pz-cha">${PUZZLE_AREAS.map(a => `<button type="button" data-pz-to="a" data-area="${esc(a)}" style="--ac:${COLORS[a] || "#888"}">${esc(a)}</button>`).join("")}<button type="button" data-pz-to="none">${esc(PZ_T.tray)}</button></div></div>`;
+}
+const pzToOf = b => b.dataset.pzTo === "v" ? {area:b.dataset.area, code:b.dataset.code, vid:b.dataset.vid} : b.dataset.pzTo === "a" ? {area:b.dataset.area, code:null, vid:null} : {area:null, code:null, vid:null};
+function pzSelHtml(){
+  const s = pz.sel;
+  if (!s) return pz.photos.length ? "" : `<p class="pz-mute">${esc(PZ_T.empty)}</p>`;
+  if (s.tray){
+    const p = pz.photos.find(x => x.id === s.tray); if (!p) return "";
+    return `<div class="pz-one"><img src="${pzThumbUrl(p)}" alt=""><div><b>${esc(PZ_T.where)}</b><span class="pz-mute">${esc(pzTimeLabel(p.takenAt))}</span></div><button type="button" class="b" data-pz="del" data-id="${esc(p.id)}">${esc(PZ_T.del)}</button></div>` + pzChooser(p.takenAt);
+  }
+  const p = pzIn(s.area).slice(-1)[0];
+  if (!p) return `<div class="pz-one"><div><b>${esc(PZ_T.areaEmpty(s.area))}</b></div><button type="button" class="b pz-go" data-pz="fill" data-area="${esc(s.area)}">${esc(PZ_T.add)}</button></div>`;
+  return `<div class="pz-one"><img src="${pzThumbUrl(p)}" alt=""><div><b>${esc(pzPlaceLabel(p))}</b>${p.guess ? `<em class="pz-guess">${esc(PZ_T.guess)}</em>` : ""}<span class="pz-mute">${esc(pzTimeLabel(p.takenAt))}</span></div></div>` +
+    `<div class="pz-row">${p.guess ? `<button type="button" class="b pz-go" data-pz="confirm" data-id="${esc(p.id)}">${esc(PZ_T.confirm)}</button><button type="button" class="b" data-pz="rechoose" data-id="${esc(p.id)}">${esc(PZ_T.change)}</button>` : ""}<button type="button" class="b" data-pz="swap" data-area="${esc(s.area)}">${esc(PZ_T.swap)}</button><button type="button" class="b" data-pz="del" data-id="${esc(p.id)}">${esc(PZ_T.del)}</button></div>` +
+    (s.choose ? pzChooser(p.takenAt) : "");
+}
+function pzRender(){
+  const el = $("pz"); if (!el || el.hidden) return;
+  const per = PUZZLE_PER_AREA, tray = pzTray();
+  if (pz.sel && pz.sel.tray && !tray.some(p => p.id === pz.sel.tray)) pz.sel = null;
+  $("pz-caps").innerHTML = PUZZLE_AREAS.map(a => { const n = pzIn(a).length, on = pz.sel && pz.sel.area === a, g = pzIn(a).some(p => p.guess);
+    return `<button type="button" class="pz-cap${on ? " on" : ""}${n ? " has" : ""}" data-pz-area="${esc(a)}" aria-pressed="${on ? "true" : "false"}" style="--ac:${COLORS[a] || "#888"}">${esc(PZ_T.cap(a, n, per))}${g ? `<em class="pz-guess">${esc(PZ_T.guess)}</em>` : ""}</button>`; }).join("") +
+    `<span class="pz-cap pz-trayn">${esc(PZ_T.trayCap(tray.length))}</span>`;
+  $("pz-tray").hidden = !tray.length;
+  $("pz-tray").innerHTML = tray.map(p => `<button type="button" class="pz-th${pz.sel && pz.sel.tray === p.id ? " on" : ""}" data-pz-tray="${esc(p.id)}" aria-label="${esc(PZ_T.tray + "：" + pzTimeLabel(p.takenAt))}"><img src="${pzThumbUrl(p)}" alt=""></button>`).join("");
+  $("pz-sel").innerHTML = pzSelHtml();
+  pzMsg("");
+  pzDraw();
+}
+function pzLayer(html){
+  const l = $("pz-layer");
+  if (html == null){ l.hidden = true; l.innerHTML = ""; pz.layer = null; return; }
+  l.innerHTML = html; l.hidden = false;
+  const f = l.querySelector("[data-focus]") || l.querySelector("button,input"); if (f) f.focus();
+}
+async function pzOpen(area){
+  const el = $("pz"); if (!el) return;
+  pz.back = document.activeElement;
+  el.hidden = false; document.body.classList.add("pz-on");
+  pz.sel = area ? {area} : null;
+  await pzGetStore(); await pzReload();
+  pzRender();
+  $("pz-t").focus();
+}
+function pzClose(){
+  const el = $("pz"); if (!el || el.hidden) return;
+  pzBatchDrop(); pzLayer(null);
+  el.hidden = true; document.body.classList.remove("pz-on");
+  if (pz.savedUrl){ URL.revokeObjectURL(pz.savedUrl); pz.savedUrl = ""; }
+  const b = pz.back; pz.back = null; if (b && document.contains(b) && b.focus) b.focus();
+}
+/* 改分區：滿了先問要不要換 */
+async function pzMove(id, to){
+  const st = await pzGetStore();
+  let r = await st.assign(id, to);
+  if (!r.ok && r.why === "area-full"){
+    if (!(await pzAsk(PZ_T.replaceAsk(to.area), PZ_T.ok))) return false;
+    r = await st.assign(id, to, {replace:true});
+  }
+  await pzReload();
+  if (!r.ok){ pzRender(); pzMsg(r.why === "tray-full" ? PZ_T.trayFull : PZ_T.bad); return false; }
+  pz.sel = to.area ? {area:to.area} : null; pzRender();
+  if (to.area) pzMsg(PZ_T.placed(to.area));
+  return true;
+}
+
+/* ===== 一次加多張 ===== */
+function pzBatchDrop(){
+  if (!pz.batch) return;
+  const ids = pz.batch.rows.map(r => r.id); pz.batch = null;
+  pzForget(ids.filter(id => !pz.photos.some(p => p.id === id)));
+}
+async function pzBatchStart(files){
+  files = Array.from(files || []).slice(0, 40);
+  if (!files.length) return;
+  const read = [];
+  for (let i = 0; i < files.length; i++){
+    pzMsg(PZ_T.readingN(i + 1, files.length));
+    const f = await pzReadFile(files[i]);
+    if (f) read.push(f);
+  }
+  if (!read.length){ pzMsg(files.length === 1 && files[0].type && !/^image\//.test(files[0].type) ? PZ_T.notImage : PZ_T.bad); return; }
+  /* 位置只在這裡用來分區；分完就丟，rows 裡沒有經緯度 */
+  const got = pzAssignBatch(read.map(f => ({id:f.id, takenAt:f.takenAt, gps:f.gps})), pzEnv());
+  const rows = got.map((r, i) => ({...r, blob:read[i].blob, thumb:read[i].thumb, keep:false}));
+  read.forEach(f => { f.gps = null; });
+  const keep = pzKeepDefaults(rows, PUZZLE_PER_AREA);
+  rows.forEach(r => { r.keep = keep.includes(r.id); });
+  pz.batch = {rows, edit:null};
+  pzMsg("");
+  pzBatchRender();
+}
+function pzBatchRender(){
+  const B = pz.batch; if (!B) return;
+  const crowd = PUZZLE_AREAS.some(a => B.rows.filter(r => r.area === a).length > PUZZLE_PER_AREA);
+  const rows = B.rows.map(r => `<li class="pz-br${r.keep ? "" : " off"}"><img src="${pzThumbUrl(r)}" alt=""><div class="pz-bi"><span class="pz-mute">${esc(pzTimeLabel(r.takenAt))}</span><b>${esc(pzPlaceLabel(r))}${r.guess ? `<em class="pz-guess">${esc(PZ_T.guess)}</em>` : ""}</b>${r.keep ? "" : `<span class="pz-mute">${esc(PZ_T.batchSkip)}</span>`}</div>` +
+    `<div class="pz-bb">${r.guess ? `<button type="button" class="b" data-pzb="ok" data-id="${esc(r.id)}">${esc(PZ_T.confirm)}</button>` : ""}<button type="button" class="b" data-pzb="edit" data-id="${esc(r.id)}">${esc(PZ_T.change)}</button>${r.keep ? "" : `<button type="button" class="b" data-pzb="use" data-id="${esc(r.id)}">${esc(PZ_T.batchUse)}</button>`}</div>` +
+    (B.edit === r.id ? pzChooser(r.takenAt) : "") + `</li>`).join("");
+  pz.layer = "batch";
+  pzLayer(`<div class="pz-lbox"><h3 data-focus tabindex="-1">${esc(PZ_T.batchTitle)}</h3>${crowd ? `<p class="pz-note">${esc(PZ_T.one(isFan()))}</p>` : ""}<ul class="pz-bl">${rows}</ul><div class="pz-lacts"><button type="button" class="b" data-pzb="cancel">${esc(PZ_T.cancel)}</button><button type="button" class="b pz-go" data-pzb="go">${esc(PZ_T.put)}</button></div></div>`);
+}
+/* 同一區放的張數不超過上限：把 id 這張設成要放，同區其他較舊的改成不放 */
+function pzBatchUse(id){
+  const B = pz.batch, r = B.rows.find(x => x.id === id); if (!r) return;
+  r.keep = true;
+  if (r.area){
+    const same = B.rows.filter(x => x.area === r.area && x.keep && x.id !== id);
+    while (same.length > PUZZLE_PER_AREA - 1) same.shift().keep = false;
+  }
+}
+async function pzBatchGo(){
+  const B = pz.batch; if (!B) return;
+  const st = await pzGetStore(), counts = await st.counts();
+  let done = 0, skipped = 0, trayFull = false;
+  const asked = {};
+  for (const r of B.rows){
+    if (!r.keep) continue;
+    let replace = false;
+    if (r.area && counts[r.area] >= st.perArea){
+      if (!(r.area in asked)) asked[r.area] = await pzAsk(PZ_T.replaceAsk(r.area), PZ_T.ok);
+      if (!asked[r.area]){ skipped++; continue; }
+      replace = true;
+    }
+    pzPersist();
+    const res = await st.add({id:r.id, blob:r.blob, thumb:r.thumb, takenAt:r.takenAt, area:r.area, code:r.code, vid:r.vid, guess:r.guess}, {replace});
+    if (res.ok) done++; else { skipped++; if (res.why === "tray-full") trayFull = true; }
+  }
+  await pzReload();
+  pzBatchDrop(); pzLayer(null); pz.sel = null; pzRender();
+  pzMsg([done ? PZ_T.batchDone(done) : "", skipped ? PZ_T.batchSkipped(skipped) : "", trayFull ? PZ_T.trayFull : ""].filter(Boolean).join("，"));
+}
+
+/* ===== 標題與日期、存成圖片 ===== */
+function pzMetaOpen(){
+  const m = pzMeta(); pz.layer = "meta";
+  pzLayer(`<div class="pz-lbox"><h3>${esc(PZ_T.meta)}</h3><label>${esc(PZ_T.metaTitle)}<input type="text" id="pz-mt" data-focus maxlength="${PUZZLE_TITLE_MAX}" value="${esc(m.title || PZ_T.title)}"></label><label>${esc(PZ_T.metaDate)}<input type="text" id="pz-md" maxlength="30" value="${esc(m.date || pzDateRange(pz.photos))}"></label><div class="pz-lacts"><button type="button" class="b" data-pzm="auto">${esc(PZ_T.metaAuto)}</button><button type="button" class="b pz-go" data-pzm="done">${esc(PZ_T.metaDone)}</button></div></div>`);
+}
+function pzMetaDone(){
+  const t = pzCleanTitle($("pz-mt").value), d = $("pz-md").value.trim().slice(0, 30);
+  store(PZ_META_KEY, {title:t === PZ_T.title ? "" : t, date:d === pzDateRange(pz.photos) ? "" : d});
+  pzLayer(null); pzRender();
+}
+/* 存成圖片：能分享就分享，否則下載；一律同時顯示大圖讓人長按儲存。navigator.share 要在點擊當下同步呼叫。 */
+function pzSave(){
+  if (!pz.blob){ pzMsg(PZ_T.reading); return; }
+  const blob = pz.blob;
+  cardSaveImage(blob, pzFileName(), {title:PZ_T.menu});
+  if (pz.savedUrl) URL.revokeObjectURL(pz.savedUrl);
+  pz.savedUrl = URL.createObjectURL(blob); pz.layer = "saved";
+  pzLayer(`<div class="pz-lbox pz-saved"><h3 data-focus tabindex="-1">${esc(PZ_T.saved)}</h3><img src="${pz.savedUrl}" alt="${esc(PZ_T.cardAlt(PUZZLE_AREAS.filter(a => pzIn(a).length).length, PUZZLE_AREAS.length))}"><p class="pz-hold">${esc(PZ_T.hold)}</p><p class="pz-keep">${esc(PZ_T.keep)}</p><div class="pz-lacts"><button type="button" class="b pz-go" data-pzm="back">${esc(PZ_T.close)}</button></div></div>`);
+}
+async function pzReset(){
+  if (!(await pzAsk(PZ_T.resetAsk, PZ_T.reset))) return;
+  const st = await pzGetStore();
+  await st.reset();  // 只清照片，足跡（trail）留著
+  try { localStorage.removeItem(PZ_META_KEY); } catch(e){}
+  await pzReload(); pz.sel = null; pzRender();
+}
+
+(function(){
+  if (!PUZZLE_ON) return;
+  const upsell = isFan() || !LINE_OK ? "" : `<p class="pz-up"><a href="${esc(LINE_ADD_FRIEND_URL)}" target="_blank" rel="noopener">${esc(PZ_T.upsell)}</a></p>`;
+  document.body.insertAdjacentHTML("beforeend", `<div id="pz" class="pz" hidden><div class="pz-box" role="dialog" aria-modal="true" aria-labelledby="pz-t">
+    <div class="pz-head"><h2 id="pz-t" tabindex="-1">${esc(PZ_T.menu)}</h2><button type="button" class="pz-x" data-pz="close" aria-label="${esc(PZ_T.close)}">✕</button></div>
+    <div class="pz-body"><div class="pz-prev"><canvas id="pz-cv" width="${PUZZLE_CARD_W}" height="${PUZZLE_CARD_H}" role="img" aria-label="${esc(PZ_T.menu)}"></canvas></div>
+    <div class="pz-side"><div class="pz-caps" id="pz-caps"></div><div class="pz-tray" id="pz-tray" hidden></div><div class="pz-sel" id="pz-sel"></div>
+      <div class="pz-acts"><button type="button" class="b" data-pz="add">${esc(PZ_T.add)}</button><button type="button" class="b" data-pz="meta">${esc(PZ_T.meta)}</button><button type="button" class="b pz-go" data-pz="save">${esc(PZ_T.save)}</button></div>
+      ${upsell}<p class="pz-keep">${esc(PZ_T.keep)}</p><div id="pz-msg" class="okmsg" role="status"></div>
+      <button type="button" class="pz-reset" data-pz="reset">${esc(PZ_T.reset)}</button></div></div>
+    <div class="pz-layer" id="pz-layer" hidden></div></div></div>
+    <input type="file" id="pz-file" class="pz-file" accept="image/*" tabindex="-1" aria-hidden="true"><input type="file" id="pz-files" class="pz-file" accept="image/*" multiple tabindex="-1" aria-hidden="true">`);
+  const el = $("pz");
+  $("pz-file").addEventListener("change", e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; pzPicked(f); });
+  $("pz-files").addEventListener("change", e => { const fs = Array.from(e.target.files || []); e.target.value = ""; pzBatchStart(fs); });
+  /* 作品卡與彈窗的〔放進拼圖〕 */
+  document.addEventListener("click", e => { const b = e.target.closest("[data-pzput]"); if (b){ e.preventDefault(); pzPick({code:b.dataset.pzput}); } });
+  el.addEventListener("click", async e => {
+    const to = e.target.closest("[data-pz-to]");
+    if (to){
+      const t = pzToOf(to);
+      if (pz.layer === "batch" && pz.batch){
+        const r = pz.batch.rows.find(x => x.id === pz.batch.edit);
+        if (r){ r.area = t.area; r.code = t.code; r.vid = t.vid; r.guess = false; r.how = "manual"; r.keep = false; pz.batch.edit = null; pzBatchUse(r.id); pzBatchRender(); }
+        return;
+      }
+      const id = pz.sel && (pz.sel.tray || (pz.sel.choose && (pzIn(pz.sel.area).slice(-1)[0] || {}).id));
+      if (id) await pzMove(id, t);
+      return;
+    }
+    const bb = e.target.closest("[data-pzb]");
+    if (bb && pz.batch){
+      const k = bb.dataset.pzb, id = bb.dataset.id, r = pz.batch.rows.find(x => x.id === id);
+      if (k === "cancel"){ pzBatchDrop(); pzLayer(null); }
+      else if (k === "go") await pzBatchGo();
+      else if (k === "ok" && r){ r.guess = false; pzBatchRender(); }
+      else if (k === "edit"){ pz.batch.edit = pz.batch.edit === id ? null : id; pzBatchRender(); }
+      else if (k === "use"){ pzBatchUse(id); pzBatchRender(); }
+      return;
+    }
+    const mm = e.target.closest("[data-pzm]");
+    if (mm){
+      const k = mm.dataset.pzm;
+      if (k === "auto"){ $("pz-mt").value = PZ_T.title; $("pz-md").value = pzDateRange(pz.photos); }
+      else if (k === "done") pzMetaDone();
+      else if (k === "back") pzLayer(null);
+      return;
+    }
+    const cap = e.target.closest("[data-pz-area]");
+    if (cap){ const a = cap.dataset.pzArea; pz.sel = pz.sel && pz.sel.area === a ? null : {area:a}; pzRender(); return; }
+    const th = e.target.closest("[data-pz-tray]");
+    if (th){ const id = th.dataset.pzTray; pz.sel = pz.sel && pz.sel.tray === id ? null : {tray:id}; pzRender(); return; }
+    if (e.target.id === "pz-cv"){
+      const cv = e.target, r = cv.getBoundingClientRect();
+      const a = pzHit(pzLay, (e.clientX - r.left) * PUZZLE_CARD_W / r.width, (e.clientY - r.top) * PUZZLE_CARD_H / r.height);
+      if (a){ pz.sel = {area:a}; pzRender(); }
+      return;
+    }
+    const b = e.target.closest("[data-pz]"); if (!b) return;
+    /* 選檔與分享都要在點擊當下同步呼叫，這幾個分支前面不能有 await */
+    const k = b.dataset.pz;
+    if (k === "close") pzClose();
+    else if (k === "add"){ const inp = $("pz-files"); inp.value = ""; inp.click(); }
+    else if (k === "meta") pzMetaOpen();
+    else if (k === "save") pzSave();
+    else if (k === "reset") await pzReset();
+    else if (k === "fill") pzPick({area:b.dataset.area, swap:true});
+    else if (k === "swap") pzPick({area:b.dataset.area, swap:true});
+    else if (k === "del"){ await (await pzGetStore()).remove(b.dataset.id); await pzReload(); if (pz.sel && pz.sel.tray) pz.sel = null; pzRender(); }
+    else if (k === "confirm"){ await (await pzGetStore()).confirm(b.dataset.id); await pzReload(); pzRender(); }
+    else if (k === "rechoose"){ pz.sel = {area:pz.sel.area, choose:!pz.sel.choose}; pzRender(); }
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape" || el.hidden || document.querySelector(".pz-ask")) return;
+    e.stopPropagation();
+    if (pz.layer){ pzBatchDrop(); pzLayer(null); } else pzClose();
+  }, true);
+})();
 </script>
 </body>
 </html>
