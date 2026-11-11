@@ -8634,7 +8634,7 @@ async function pzReset(){
 
 (function(){
   if (!PUZZLE_ON) return;
-  const upsell = isFan() || !LINE_OK ? "" : `<p class="pz-up"><a href="${esc(LINE_ADD_FRIEND_URL)}" target="_blank" rel="noopener">${esc(PZ_T.upsell)}</a></p>`;
+  const upsell = isFan() || !LINE_OK ? "" : `<p class="pz-up"><a href="${esc("https://liff.line.me/" + LIFF_ID + "/?pz=1")}">${esc(PZ_T.upsell)}</a></p>`;
   document.body.insertAdjacentHTML("beforeend", `<div id="pz" class="pz" hidden><div class="pz-box" role="dialog" aria-modal="true" aria-labelledby="pz-t">
     <div class="pz-head"><h2 id="pz-t" tabindex="-1">${esc(PZ_T.menu)}</h2><button type="button" class="pz-x" data-pz="close" aria-label="${esc(PZ_T.close)}">✕</button></div>
     <div class="pz-body"><div class="pz-prev"><canvas id="pz-cv" width="${PUZZLE_CARD_W}" height="${PUZZLE_CARD_H}" role="img" aria-label="${esc(PZ_T.menu)}"></canvas></div>
