@@ -7879,6 +7879,17 @@ const PUZZLE_ROT_MAX = 6;                               // 單區卡照片微旋
 const PUZZLE_PHOTO_W = 0.35;                            // 單區卡照片預設寬：卡寬的 35%
 const PUZZLE_PHOTO_S_MIN = 0.5, PUZZLE_PHOTO_S_MAX = 2.5;
 const PUZZLE_ALL = "all";                               // 總覽卡的代號；單區卡的代號就是地區名
+/* 吸附拍立得（每區多張的版本）：底圖是該區第一張，第 2 張以後做成拍立得貼在地圖外圍，位置全部自動算。
+   map：有拍立得時地圖可用範圍佔卡寬的比例（置中）；w：拍立得寬佔卡寬；per：一邊最多幾張；max：一張卡最多幾張；
+   over：可以壓進地圖可用範圍多少（框寬的比例）；line：畫不畫連接線。 */
+const PUZZLE_SNAP = {
+  all:{map:0.6, w:0.16, per:4, max:8, over:0, line:false},
+  area:{map:0.5, w:0.28, per:2, max:4, over:0.15, line:true}
+};
+const PUZZLE_SNAP_Y = [266, 1186];                      // 拍立得上下範圍：標題日期之下、紅帽與底部文字之上
+const PUZZLE_SNAP_PAD = 10, PUZZLE_SNAP_GAP = 16;       // 離卡片左右邊、拍立得之間的間距
+const PUZZLE_POL_M = 0.04, PUZZLE_POL_MB = 0.12;        // 白邊：上左右各框寬 4%，下緣 12%
+const PUZZLE_POL_TAPE = 1 / 3, PUZZLE_POL_LAP = 0.1;    // 膠帶寬：框寬 1/3；拍立得之間最多重疊框寬 10%
 const PZ_STORES = {photos:"id", trail:["year", "code"], cards:"year"};
 
 /* 介面固定文案都放這裡，測試會檢查禁詞、半形逗號與破折號 */
@@ -7941,13 +7952,12 @@ const PUZZLE_TEXT = {
   modePhoto:"調整照片",
   modeMap:"調整地圖",
   fit:"回到全圖",
-  top:"移到最上",
   look:"看這區",
   first:"排第一",
   download:"下載",
   hintMap:"拖曳可以移動地圖，雙指或滾輪可以縮放。",
-  hintPhoto:"點照片選取後可以拖曳，雙指或滾輪可以縮放。",
-  hintOrder:"縮圖可以拖曳排順序，第一張會放在總覽卡。",
+  hintSnap:"第一張是底圖，其他照片會自動貼在地圖外圍。點縮圖可以換一張或刪除。",
+  hintOrder:"縮圖可以拖曳排順序，第一張是這一區的底圖。",
   tabs:"切換卡片",
   modes:"調整方式",
   strip:"這一區的照片",
@@ -8223,7 +8233,7 @@ function pzStore(db, o){
   return {
     year, perArea:per, max:per * PUZZLE_AREAS.length, trayMax,
     list, card, setCard,
-    /* 單區卡上的位置（拖曳、縮放、移到最上） */
+    /* 舊版單區卡的手動位置。現在版面自動排，介面不再呼叫；留著讓舊資料與舊測試相容 */
     async place(id, place){
       const cur = (await list()).find(p => p.id === id);
       if (!cur) return {ok:false, why:"missing"};
@@ -8385,13 +8395,17 @@ function pzViewLay(lay, view, frame){
 }
 const pzInFrame = (frame, q, pad) => q[0] >= frame.x + (pad || 0) && q[0] <= frame.x + frame.w - (pad || 0) && q[1] >= frame.y + (pad || 0) && q[1] <= frame.y + frame.h - (pad || 0);
 
-/* ===== 單區卡：照片的位置 place:{x, y, s, r, z} =====
-   x、y 是照片中心在可用範圍 frame 裡的比例（全圖座標），s 是大小倍率，r 是旋轉角（度），z 是疊放順序。 */
+/* ===== 單區卡：照片的位置 place:{x, y, s, r, z}（舊版手動排版，現在不再使用，舊資料留著不刪）=====
+   x、y 是照片中心在可用範圍 frame 裡的比例（全圖座標），s 是大小倍率，r 是旋轉角（度），z 是疊放順序。
+   新的版面見下面「吸附拍立得」；pzRot、pzClampToArea 兩邊共用。 */
 /* 旋轉角依照片 id 固定，±6° 內 */
-function pzRot(id){
+function pzHash(id){
   let h = 2166136261;
   for (const ch of String(id)){ h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); }
-  return Math.round(((h >>> 0) % (PUZZLE_ROT_MAX * 200 + 1)) - PUZZLE_ROT_MAX * 100) / 100;
+  return h >>> 0;
+}
+function pzRot(id){
+  return Math.round((pzHash(id) % (PUZZLE_ROT_MAX * 200 + 1)) - PUZZLE_ROT_MAX * 100) / 100;
 }
 /* 把點留在這一區裡：在區外就移到最近的邊界內側 */
 function pzClampToArea(A, x, y){
@@ -8441,6 +8455,126 @@ function pzBoxHit(b, x, y){
   return Math.abs(lx) <= b.w / 2 && Math.abs(ly) <= b.h / 2;
 }
 
+/* ===== 吸附拍立得 =====
+   版面只由照片順序、錨點、照片比例算出來，同樣的資料每次結果都一樣；照片的 place 不再使用（舊資料留著不動）。 */
+/* 這張卡的地圖可用範圍與地圖方框。snap：這張卡有沒有拍立得。沒有時就是原本的滿寬版面。 */
+function pzSnapFrame(key, snap){
+  const all = key === PUZZLE_ALL;
+  if (!snap) return {frame:PUZZLE_FRAME, box:all ? PUZZLE_MAP_BOX : PUZZLE_AREA_BOX};
+  const w = Math.round(PUZZLE_CARD_W * PUZZLE_SNAP[all ? "all" : "area"].map), x = (PUZZLE_CARD_W - w) / 2, pad = all ? 14 : 22;
+  return {frame:{x, y:PUZZLE_FRAME.y, w, h:PUZZLE_FRAME.h}, box:{x:x + pad, y:PUZZLE_FRAME.y + 40, w:w - pad * 2, h:PUZZLE_FRAME.h - 80}};
+}
+/* 這張卡哪些照片做成拍立得，依優先順序。
+   單區卡：該區第 2～5 張。總覽卡：各區第 2 張先輪一輪（依六區順序），還有名額再輪第 3 張，以此類推，最多 8 張。 */
+function pzSnapPick(key, photos, order){
+  if (key !== PUZZLE_ALL) return pzOrdered(photos, key, order).slice(1, 1 + PUZZLE_SNAP.area.max);
+  const lists = PUZZLE_AREAS.map(a => pzOrdered(photos, a, order)), out = [], max = PUZZLE_SNAP.all.max;
+  for (let k = 1; out.length < max && lists.some(l => l.length > k); k++) for (const l of lists) if (l[k] && out.length < max) out.push(l[k]);
+  return out;
+}
+/* 錨點（拍立得對應的地點，全圖座標）：有作品用作品座標的投影；只有地區的用區內一個依 id 固定的點，不會全部疊在中心。
+   n 是前面已經有幾張同一件作品的，之後的依序錯開。一律留在該區裡面。 */
+function pzAnchor(p, lay, work, n){
+  const A = (lay.areas || []).find(a => a.area === p.area);
+  if (!A) return null;
+  const size = Math.min(A.box[2] - A.box[0], A.box[3] - A.box[1]);
+  const has = work && work.lat != null && work.lng != null && isFinite(+work.lat) && isFinite(+work.lng);
+  let c;
+  if (has) c = lay.pt([+work.lng, +work.lat]);
+  else { const h = pzHash("at:" + p.id), rad = size * (0.06 + 0.12 * ((h >>> 12) % 1000) / 1000), ang = (h % 3600) / 3600 * 2 * Math.PI; c = [A.at[0] + rad * Math.cos(ang), A.at[1] + rad * Math.sin(ang)]; }
+  if (n){ const rad = Math.max(14, size * 0.07) * Math.sqrt(n), ang = n * 2.39996; c = [c[0] + rad * Math.cos(ang), c[1] + rad * Math.sin(ang)]; }
+  return pzClampToArea(A, c[0], c[1]);
+}
+/* 拍立得外框：寬 w 時的各部分尺寸。照片照原比例完整放進去（不裁切），框的比例跟著照片。 */
+function pzPolFrame(iw, ih, w){
+  const m = w * PUZZLE_POL_M, mb = w * PUZZLE_POL_MB, pw = w - m * 2, ph = pw * ih / iw;
+  return {w, h:m + ph + mb, m, mb, pw, ph, tw:w * PUZZLE_POL_TAPE, th:w * 0.085};
+}
+/* 旋轉 r 度之後，寬 w 的拍立得要多大的正放方框才裝得下；回傳在 aw × ah 的格子裡最大可以多寬（不超過 wMax）。
+   over 是可以多佔的寬度（框寬的比例）。 */
+function pzPolFit(iw, ih, r, wMax, aw, ah, over){
+  const rho = PUZZLE_POL_M + PUZZLE_POL_MB + (1 - PUZZLE_POL_M * 2) * ih / iw, a = Math.abs(r) * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+  return Math.max(1, Math.min(wMax, aw / Math.max(0.01, c + rho * s - (over || 0)), ah / (s + rho * c)));
+}
+/* 四個角（卡片座標） */
+function pzPolCorners(b){
+  const a = b.r * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+  return [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(k => { const x = k[0] * b.w / 2, y = k[1] * b.h / 2; return [b.cx + x * c - y * s, b.cy + x * s + y * c]; });
+}
+/* 兩條線段有沒有相交（碰到端點也算） */
+function pzSegCross(a, b, c, d){
+  const o = (p, q, r) => { const v = (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]); return Math.abs(v) < 1e-9 ? 0 : v > 0 ? 1 : -1; };
+  const on = (p, q, r) => Math.min(p[0], q[0]) - 1e-9 <= r[0] && r[0] <= Math.max(p[0], q[0]) + 1e-9 && Math.min(p[1], q[1]) - 1e-9 <= r[1] && r[1] <= Math.max(p[1], q[1]) + 1e-9;
+  const o1 = o(a, b, c), o2 = o(a, b, d), o3 = o(c, d, a), o4 = o(c, d, b);
+  if (o1 !== o2 && o3 !== o4) return true;
+  return (!o1 && on(a, b, c)) || (!o2 && on(a, b, d)) || (!o3 && on(c, d, a)) || (!o4 && on(c, d, b));
+}
+function pzCrossCount(list){
+  let n = 0;
+  for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) if (pzSegCross(list[i].from, list[i].at, list[j].from, list[j].at)) n++;
+  return n;
+}
+/* 一邊的拍立得：照給的上下順序排。高度盡量對齊錨點，擠在一起就上下推開，不超出上下範圍。 */
+function pzSnapSide(kind, list, left, frame){
+  const C = PUZZLE_SNAP[kind], W = PUZZLE_CARD_W, y0 = PUZZLE_SNAP_Y[0], y1 = PUZZLE_SNAP_Y[1];
+  const room = (left ? frame.x : W - frame.x - frame.w) - PUZZLE_SNAP_PAD, free = y1 - y0 - PUZZLE_SNAP_GAP * (list.length - 1);
+  /* 先照預設寬度排；這一邊加起來太高，就整邊等比例縮小（照片不裁切） */
+  const rot = it => Math.abs(pzRot(it.id)) * Math.PI / 180, tall = (f, a) => f.w * Math.sin(a) + f.h * Math.cos(a);
+  const ws = list.map(it => pzPolFit(it.iw, it.ih, pzRot(it.id), W * C.w, room, free, C.over));
+  const sum = list.reduce((t, it, i) => t + tall(pzPolFrame(it.iw, it.ih, ws[i]), rot(it)), 0), k = sum > free ? free / sum : 1;
+  const out = list.map((it, i) => {
+    const r = pzRot(it.id), f = pzPolFrame(it.iw, it.ih, ws[i] * k);
+    const a = Math.abs(r) * Math.PI / 180, aw = f.w * Math.cos(a) + f.h * Math.sin(a), ah = f.w * Math.sin(a) + f.h * Math.cos(a);
+    const off = aw <= room ? PUZZLE_SNAP_PAD + room / 2 : PUZZLE_SNAP_PAD + aw / 2;
+    return {...f, id:it.id, area:it.area, side:left ? "L" : "R", r, aw, ah, cx:left ? off : W - off, cy:it.at[1], at:it.at};
+  });
+  let top = y0;
+  for (const b of out){ b.cy = Math.max(b.cy, top + b.ah / 2); top = b.cy + b.ah / 2 + PUZZLE_SNAP_GAP; }
+  let bot = y1;
+  for (let i = out.length - 1; i >= 0; i--){ const b = out[i]; b.cy = Math.min(b.cy, bot - b.ah / 2); bot = b.cy - b.ah / 2 - PUZZLE_SNAP_GAP; }
+  /* 連接線起點：靠地圖那一側的邊緣中點 */
+  for (const b of out){ const a = b.r * Math.PI / 180, k = left ? 1 : -1; b.from = [b.cx + k * b.w / 2 * Math.cos(a), b.cy + k * b.w / 2 * Math.sin(a)]; }
+  return out;
+}
+/* 自動排版。items：[{id, area, iw, ih, at:[x, y]}]，依優先順序；frame：這張卡的地圖可用範圍。
+   回傳每張拍立得 {id, area, side, cx, cy, w, h, r, m, mb, pw, ph, tw, th, aw, ah, at, from}，at 是錨點、from 是連接線起點（全圖座標）。
+   分左右：錨點在地圖中線左邊的放左欄、右邊的放右欄。
+   總覽卡：左右相差超過 1 張時，把多的那邊最靠下面的移到另一邊。
+   單區卡：一邊最多 2 張，多的（錨點最靠中線的）移到另一邊；同一邊依錨點上下排。排完檢查連接線，有相交就換順序重算。 */
+function pzSnap(kind, items, frame){
+  const C = PUZZLE_SNAP[kind], mid = frame.x + frame.w / 2;
+  items = (items || []).filter(it => it && it.at && it.iw > 0 && it.ih > 0).slice(0, C.max);
+  const byY = (a, b) => (a.at[1] - b.at[1]) || (a.at[0] - b.at[0]) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+  let L = items.filter(it => it.at[0] < mid), R = items.filter(it => it.at[0] >= mid);
+  if (C.line){
+    const inner = (a, b) => (Math.abs(a.at[0] - mid) - Math.abs(b.at[0] - mid)) || byY(a, b);
+    while (L.length > C.per){ L.sort(inner); R.push(L.shift()); }
+    while (R.length > C.per){ R.sort(inner); L.push(R.shift()); }
+  } else while (Math.abs(L.length - R.length) > 1){
+    const from = L.length > R.length ? L : R, to = from === L ? R : L;
+    from.sort(byY); to.push(from.pop());
+  }
+  L.sort(byY); R.sort(byY);
+  const build = (l, r) => { const out = pzSnapSide(kind, l, true, frame).concat(pzSnapSide(kind, r, false, frame)); return {out, cross:C.line ? pzCrossCount(out) : 0}; };
+  let best = build(L, R);
+  if (best.cross){
+    /* 先試同一邊交換順序；還是相交，再試所有分法（一邊最多 per 張），挑不相交、線最短的 */
+    const tries = [[L.slice().reverse(), R], [L, R.slice().reverse()], [L.slice().reverse(), R.slice().reverse()]];
+    for (const t of tries){ const b = build(t[0], t[1]); if (b.cross < best.cross) best = b; if (!best.cross) break; }
+    if (best.cross){
+      const perms = [], walk = (rest, cur) => { if (!rest.length){ perms.push(cur); return; } rest.forEach((x, i) => walk(rest.slice(0, i).concat(rest.slice(i + 1)), cur.concat([x]))); };
+      walk(L.concat(R), []);
+      const len = b => b.out.reduce((s, x) => s + Math.hypot(x.from[0] - x.at[0], x.from[1] - x.at[1]), 0);
+      let bl = Infinity;
+      for (const pm of perms) for (let k = Math.max(0, pm.length - C.per); k <= Math.min(C.per, pm.length); k++){
+        const b = build(pm.slice(0, k), pm.slice(k)), l = len(b);
+        if (b.cross < best.cross || (b.cross === best.cross && !b.cross && l < bl)){ best = b; bl = l; }
+      }
+    }
+  }
+  return best.out;
+}
+
 /* ===== 卡片組成 ===== */
 /* 某一區的照片，依卡片設定的順序排；沒排過的照加入先後接在後面。第一張是總覽卡的代表照。 */
 function pzOrdered(photos, area, order){
@@ -8478,10 +8612,20 @@ const pzLay = pzLayout(AREAS_GEO, PUZZLE_MAP_BOX);   // 總覽卡的全圖版面
 const pzAreaLays = {};
 const pzAreaLay = a => pzAreaLays[a] || (pzAreaLays[a] = pzLayout(AREAS_GEO, PUZZLE_AREA_BOX, a));  // 單區卡的全圖版面
 const pzBaseLay = key => key === PUZZLE_ALL ? pzLay : pzAreaLay(key);
+/* 每區多張的版本：有拍立得的卡，地圖縮到中間，左右留給拍立得 */
+const PZ_SNAP = PUZZLE_PER_AREA > 1;
+const pzSnapLays = {};
+const pzSnapLay = key => pzSnapLays[key] || (pzSnapLays[key] = pzLayout(AREAS_GEO, pzSnapFrame(key, true).box, key === PUZZLE_ALL ? null : key));
+/* 這張卡的版面：{frame 地圖可用範圍, lay 全圖版面, pick 做成拍立得的照片}。只看照片與順序，同樣的資料每次都一樣。 */
+function pzGeom(key, photos, order){
+  const pick = PZ_SNAP ? pzSnapPick(key, photos, order) : [];
+  return pick.length ? {frame:pzSnapFrame(key, true).frame, lay:pzSnapLay(key), pick} : {frame:PUZZLE_FRAME, lay:pzBaseLay(key), pick};
+}
+const pzLiveGeom = key => pzGeom(key, pz.photos, pz.card.order);
 const pzWorks = DATA.filter(d => d.緯度 != null && d.經度 != null && isFinite(+d.緯度) && isFinite(+d.經度)).map(d => ({code:d.作品編號, lat:+d.緯度, lng:+d.經度, area:d.地區}));
 const pzWorkAt = Object.fromEntries(pzWorks.map(w => [w.code, w]));
-/* sel：null、{tray:id}、{area}（總覽卡上選一區）、{photo:id}（單區卡上選一張）。cur 是現在看的卡，mode 是 photo 或 map。 */
-const pz = {dirtyView:null, dirtyPlace:null, card:pzCleanCard(null, YEAR), cur:PUZZLE_ALL, mode:"photo", out:[], drag:null, ptrs:new Map(), commitT:0, raf:0, noClick:false, savedUrls:[], photos:[], sel:null, layer:null, batch:null, pickFor:null, blob:null, bmp:new Map(), url:new Map(), seq:0, mem:false, persisted:false, back:null, afan:null};
+/* sel：null、{tray:id}、{area}（總覽卡上選一區）、{photo:id}（單區卡縮圖列選一張）。cur 是現在看的卡，mode 是 photo 或 map（map：手勢移動地圖）。 */
+const pz = {dirtyView:null, card:pzCleanCard(null, YEAR), cur:PUZZLE_ALL, mode:"photo", out:[], drag:null, ptrs:new Map(), commitT:0, raf:0, noClick:false, savedUrls:[], photos:[], sel:null, layer:null, batch:null, pickFor:null, blob:null, bmp:new Map(), url:new Map(), seq:0, mem:false, persisted:false, back:null, afan:null};
 
 /* IndexedDB 存取層；打不開時改用記憶體（關掉頁面就沒了，介面會提醒） */
 function pzIdb(name){
@@ -8518,7 +8662,7 @@ function pzPersist(){
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch(e){}
 }
 const pzMeta = () => ({title:pz.card.title, date:pz.card.date});
-const pzView = key => pzViewClamp(pz.card.views[key], PUZZLE_FRAME, pzLayBox(pzBaseLay(key)));
+const pzView = key => { const G = pzLiveGeom(key); return pzViewClamp(pz.card.views[key], G.frame, pzLayBox(G.lay)); };
 const pzCardList = () => pzCards(pz.photos, PUZZLE_PER_AREA);
 const pzAreaList = a => pzOrdered(pz.photos, a, pz.card.order);
 const pzCardTitle = () => pzMeta().title || PZ_T.title;
@@ -8570,16 +8714,7 @@ async function pzReload(){
     if (!pz.card.title && !pz.card.date && (old.title || old.date)) pz.card = await st.setCard({title:old.title, date:old.date});
     try { localStorage.removeItem(PZ_META_KEY); } catch(e){}
   }
-  /* 多張的版本：還沒有位置的照片，算出單區卡上的初始位置 */
-  if (PUZZLE_PER_AREA > 1) for (const a of PUZZLE_AREAS){
-    const l = pzIn(a);
-    for (const p of l){
-      if (p.place) continue;
-      const same = l.filter(x => x.place && (p.code ? x.code === p.code : !x.code)).length;
-      const r = await st.place(p.id, pzPlaceInit(p, pzAreaLay(a), PUZZLE_FRAME, p.code ? pzWorkAt[p.code] : null, same, 1 + Math.max(0, ...l.map(x => x.place ? x.place.z : 0))));
-      if (r.ok) p.place = r.photo.place;
-    }
-  }
+  /* 單區卡的版面由照片順序與錨點算出來；照片的 place（舊版手動位置）不再使用，舊資料留著不動 */
   const live = new Set(pz.photos.map(p => p.id));
   pzForget(Array.from(new Set([...pz.url.keys(), ...pz.bmp.keys()])).filter(id => !live.has(id) && !(pz.batch && pz.batch.rows.some(r => r.id === id))));
   return pz.photos;
@@ -8629,42 +8764,70 @@ function pzDrawAll(g, lay, photos, imgs, order){
   });
   return filled;
 }
-/* 單區卡照片的繪製順序：z 小的在下面 */
-const pzStack = (photos, area, order) => pzOrdered(photos, area, order).filter(p => p.place).sort((a, b) => (a.place.z - b.place.z) || (a.addedAt - b.addedAt));
-/* 單區卡的地圖層：該區淡色底，照片白邊、微旋轉、互相壓疊，超出該區的裁掉，區界用地區色描邊。回傳畫了幾張。 */
-function pzDrawArea(g, lay, area, photos, imgs, order, sel){
+/* 單區卡的地圖層：該區第一張照片當底圖填滿該區（cover 裁切），區界用地區色描邊。回傳有沒有畫到底圖（1 或 0）。 */
+function pzDrawArea(g, lay, area, photos, imgs, order){
   const A = lay.areas[0], col = COLORS[area] || FC_INK;
-  let n = 0;
+  const p = pzRep(photos, area, order), im = p && imgs.get(p.id);
   pzPath(g, A); g.fillStyle = areaTint(area); g.fill();
-  g.save(); pzPath(g, A); g.clip();
-  pzStack(photos, area, order).forEach(p => {
-    const im = imgs.get(p.id); if (!im) return;
-    const iw = im.naturalWidth || im.width, ih = im.naturalHeight || im.height, b = pzPhotoBox(p.place, iw, ih, PUZZLE_FRAME, lay.view);
-    const w = b.w - b.b * 2, h = b.h - b.b * 2, k = Math.max(w / iw, h / ih), sw = w / k, sh = h / k;
-    g.save(); g.translate(b.cx, b.cy); g.rotate(b.r * Math.PI / 180);
-    g.shadowColor = "rgba(0,0,0,.28)"; g.shadowBlur = 18; g.shadowOffsetY = 6;
-    g.fillStyle = "#fff"; g.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
-    g.shadowColor = "transparent"; g.shadowBlur = 0; g.shadowOffsetY = 0;
-    g.drawImage(im, (iw - sw) / 2, (ih - sh) / 2, sw, sh, -w / 2, -h / 2, w, h);
-    if (sel === p.id){ g.strokeStyle = FC_INK; g.lineWidth = 8; g.setLineDash([22, 14]); g.strokeRect(-b.w / 2, -b.h / 2, b.w, b.h); }
+  if (im){
+    const c = pzCover(im.naturalWidth || im.width, im.naturalHeight || im.height, A.box);
+    g.save(); pzPath(g, A); g.clip(); g.drawImage(im, c.x, c.y, c.w, c.h); g.restore();
+  }
+  g.save(); g.lineJoin = "round"; pzPath(g, A); g.strokeStyle = col; g.lineWidth = 6; g.stroke(); g.restore();
+  return im ? 1 : 0;
+}
+/* 這張卡的拍立得排版：錨點用全圖版面算（地圖縮放時拍立得留在原位）。還沒解碼的照片先不排。 */
+function pzSnapBoxes(key, G, imgs){
+  const seen = {}, items = [];
+  for (const p of G.pick){
+    const im = imgs.get(p.id); if (!im) continue;
+    const k = p.code ? p.area + ":" + p.code : null, n = k ? (seen[k] = (seen[k] || 0) + 1) - 1 : 0;
+    const at = pzAnchor(p, G.lay, p.code ? pzWorkAt[p.code] : null, n);
+    if (at) items.push({id:p.id, area:p.area, iw:im.naturalWidth || im.width, ih:im.naturalHeight || im.height, at});
+  }
+  return pzSnap(key === PUZZLE_ALL ? "all" : "area", items, G.frame);
+}
+/* 連接線（單區卡）：從拍立得靠地圖那一側的邊緣中點到錨點，地區色；錨點畫地區色圓點加白邊。
+   錨點跟著地圖縮放移動，跑出地圖可用範圍就不畫。回傳畫了幾條。 */
+function pzDrawLinks(g, boxes, vw, F){
+  let n = 0;
+  boxes.forEach(b => {
+    const q = pzViewPt(vw, F, b.at); if (!pzInFrame(F, q)) return;
+    const col = COLORS[b.area] || FC_INK;
+    g.save(); g.lineCap = "round"; g.strokeStyle = col; g.lineWidth = 4;
+    g.beginPath(); g.moveTo(b.from[0], b.from[1]); g.lineTo(q[0], q[1]); g.stroke();
+    g.beginPath(); g.arc(q[0], q[1], 11, 0, Math.PI * 2); g.fillStyle = "#fff"; g.fill();
+    g.beginPath(); g.arc(q[0], q[1], 7.5, 0, Math.PI * 2); g.fillStyle = col; g.fill();
     g.restore(); n++;
   });
-  g.restore();
-  g.save(); g.lineJoin = "round"; pzPath(g, A); g.strokeStyle = col; g.lineWidth = 6; g.stroke(); g.restore();
   return n;
+}
+/* 拍立得：白邊、淡陰影、微旋轉，照片照原比例完整畫進去（不裁切），頂端中央一段地區色膠帶。sel 是預覽時選取的那張。 */
+function pzDrawPolaroid(g, b, im, sel){
+  g.save(); g.translate(b.cx, b.cy); g.rotate(b.r * Math.PI / 180);
+  g.shadowColor = "rgba(0,0,0,.22)"; g.shadowBlur = 14; g.shadowOffsetY = 5;
+  g.fillStyle = "#fff"; g.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+  g.shadowColor = "transparent"; g.shadowBlur = 0; g.shadowOffsetY = 0;
+  g.drawImage(im, -b.w / 2 + b.m, -b.h / 2 + b.m, b.pw, b.ph);
+  g.globalAlpha = 0.86; g.fillStyle = COLORS[b.area] || FC_INK; g.fillRect(-b.tw / 2, -b.h / 2 - b.th / 2, b.tw, b.th); g.globalAlpha = 1;
+  if (sel){ g.strokeStyle = FC_INK; g.lineWidth = 6; g.setLineDash([18, 12]); g.strokeRect(-b.w / 2, -b.h / 2, b.w, b.h); }
+  g.restore();
 }
 /* photos：這一年的照片；imgs：id → 已解碼的圖。
    o.card：PUZZLE_ALL（總覽卡）或地區名（單區卡）；o.view：這張卡的地圖縮放；o.order：各區照片順序；o.sel：預覽時選取的照片（輸出不給）。
-   地圖層只畫在可用範圍 PUZZLE_FRAME 裡，超出的切掉；標題、日期、底部文字、浮水印、阿飯背影固定大小與位置，畫在最上面。 */
+   地圖層只畫在可用範圍裡（沒有拍立得時是 PUZZLE_FRAME，有拍立得時縮到中間），超出的切掉。
+   拍立得貼在地圖外圍、不跟地圖縮放；總覽卡不畫連接線，單區卡畫。
+   標題、日期、底部文字、浮水印、阿飯背影固定大小與位置，畫在最上面。回傳 o.stat 給的話會填 {boxes, links, frame}。 */
 function pzDrawCard(cv, photos, imgs, o){
   o = o || {};
-  const W = PUZZLE_CARD_W, H = PUZZLE_CARD_H, g = cv.getContext("2d"), F = PUZZLE_FRAME;
+  const W = PUZZLE_CARD_W, H = PUZZLE_CARD_H, g = cv.getContext("2d");
   const key = o.card || PUZZLE_ALL, all = key === PUZZLE_ALL, order = o.order || {};
+  const G = pzGeom(key, photos, order), F = G.frame;
   cv.width = W; cv.height = H;
   g.fillStyle = FC_PAPER; g.fillRect(0, 0, W, H);
-  const lay = pzViewLay(pzBaseLay(key), o.view, F);
+  const lay = pzViewLay(G.lay, o.view, F);
   g.save(); g.beginPath(); g.rect(F.x, F.y, F.w, F.h); g.clip();
-  const filled = all ? pzDrawAll(g, lay, photos, imgs, order) : [], n = all ? filled.length : pzDrawArea(g, lay, key, photos, imgs, order, o.sel);
+  const filled = all ? pzDrawAll(g, lay, photos, imgs, order) : [], base = all ? filled.length : pzDrawArea(g, lay, key, photos, imgs, order);
   g.restore();
   /* 地名標籤跟著地區移動、字級不變；落在可用範圍外就不畫 */
   if (all) lay.areas.forEach(A => {
@@ -8673,6 +8836,11 @@ function pzDrawCard(cv, photos, imgs, o){
     if (has) pzPill(g, A.area, A.at[0], A.at[1], col, true);
     else { pzPill(g, A.area, A.at[0], A.at[1] - 22, col, false); pzText(g, PZ_T.later, A.at[0], A.at[1] + 36, 30, {w:500, c:col, align:"center", base:"middle"}); }
   });
+  /* 拍立得畫在地圖層之上；單區卡先畫連接線，拍立得再蓋上去 */
+  const boxes = pzSnapBoxes(key, G, imgs), links = all ? 0 : pzDrawLinks(g, boxes, lay.view, F);
+  boxes.forEach(b => pzDrawPolaroid(g, b, imgs.get(b.id), o.sel === b.id));
+  const n = all ? base : base + boxes.length;
+  if (o.stat) Object.assign(o.stat, {boxes, links, frame:F});
   const title = o.title || PZ_T.title;
   pzFit(g, all ? title : PZ_T.areaTitle(title, key), 72, 156, 84, W - 144, {w:700});
   if (o.date) pzText(g, o.date, 74, 222, 40, {w:500, c:PZ_MUTE});
@@ -8696,7 +8864,7 @@ const pzCardOpt = key => ({card:key, title:pzCardTitle(), date:pzCardDate(), afa
 function pzPaint(){
   const cv = $("pz-cv"); if (!cv) return;
   const all = pz.cur === PUZZLE_ALL;
-  const n = pzDrawCard(cv, pz.photos, pz.bmp, {...pzCardOpt(pz.cur), sel:pz.mode === "photo" && pz.sel && pz.sel.photo || null});
+  const n = pzDrawCard(cv, pz.photos, pz.bmp, {...pzCardOpt(pz.cur), sel:pz.sel && pz.sel.photo || null});
   cv.setAttribute("aria-label", all ? PZ_T.cardAlt(n, PUZZLE_AREAS.length) : PZ_T.areaAlt(pz.cur, n));
 }
 /* 重畫預覽，再把每一張卡（總覽＋各單區卡）依當下的 view 輸出成 JPEG，存成圖片時直接用 */
@@ -8793,7 +8961,7 @@ function pzSelHtml(){
   const s = pz.sel, btn = (k, label, attr, go) => `<button type="button" class="b${go ? " pz-go" : ""}" data-pz="${k}" ${attr}>${esc(label)}</button>`;
   if (!s){
     if (pz.mode === "map") return `<p class="pz-mute">${esc(PZ_T.hintMap)}</p>`;
-    if (pz.cur !== PUZZLE_ALL) return `<p class="pz-mute">${esc(PZ_T.hintPhoto)}</p>`;
+    if (pz.cur !== PUZZLE_ALL) return `<p class="pz-mute">${esc(PZ_T.hintSnap)}</p>`;
     return pz.photos.length ? "" : `<p class="pz-mute">${esc(PZ_T.empty)}</p>`;
   }
   if (s.tray){
@@ -8805,7 +8973,7 @@ function pzSelHtml(){
   const id = `data-id="${esc(p.id)}"`, ar = `data-area="${esc(p.area)}"`;
   return `<div class="pz-one"><img src="${pzThumbUrl(p)}" alt=""><div><b>${esc(pzPlaceLabel(p))}</b>${p.guess ? `<em class="pz-guess">${esc(PZ_T.guess)}</em>` : ""}<span class="pz-mute">${esc(pzTimeLabel(p.takenAt))}</span></div></div>` +
     `<div class="pz-row">${p.guess ? btn("confirm", PZ_T.confirm, id, true) + btn("rechoose", PZ_T.change, id) : ""}` +
-    (s.photo ? btn("top", PZ_T.top, id) + (pzAreaList(p.area)[0].id === p.id ? "" : btn("first", PZ_T.first, id)) : "") +
+    (s.photo && pzAreaList(p.area)[0].id !== p.id ? btn("first", PZ_T.first, id) : "") +
     btn("swap", PZ_T.swap, ar + " " + id) + btn("del", PZ_T.del, id) +
     (!s.photo && pzCardList().includes(p.area) ? btn("look", PZ_T.look, ar) : "") + `</div>` +
     (s.choose ? pzChooser(p.takenAt) : "");
@@ -8824,8 +8992,8 @@ function pzRender(){
   tabs.innerHTML = tabs.hidden ? "" : cards.map(k => `<button type="button" class="pz-tab" role="tab" data-pz-card="${esc(k)}" aria-selected="${k === pz.cur ? "true" : "false"}"${k === PUZZLE_ALL ? "" : ` style="--ac:${COLORS[k] || "#888"}"`}>${esc(k === PUZZLE_ALL ? PZ_T.all : k)}</button>`).join("");
   el.querySelectorAll("[data-pz-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.pzMode === pz.mode ? "true" : "false"));
   $("pz-fit").hidden = pz.mode !== "map";
-  $("pz-cv").classList.toggle("pz-drag", pz.mode === "map" || !all);
-  /* 單區卡下方：這一區的縮圖列（拖曳排順序，第一張是總覽卡的代表照）與〔＋〕 */
+  $("pz-cv").classList.toggle("pz-drag", pz.mode === "map");
+  /* 單區卡下方：這一區的縮圖列（拖曳排順序，第一張是底圖，其餘是拍立得）與〔＋〕 */
   const strip = $("pz-strip"), list = all ? [] : pzAreaList(pz.cur);
   strip.hidden = all;
   strip.innerHTML = all ? "" : list.map((p, i) => `<button type="button" class="pz-th${pz.sel && pz.sel.photo === p.id ? " on" : ""}" data-pz-th="${esc(p.id)}" aria-label="${esc(PZ_T.thumb(i + 1))}" aria-pressed="${pz.sel && pz.sel.photo === p.id ? "true" : "false"}"><img src="${pzThumbUrl(p)}" alt="" draggable="false"></button>`).join("") +
@@ -8841,69 +9009,42 @@ function pzRender(){
 }
 
 /* ===== 預覽上的拖曳與縮放 =====
-   調整照片（單區卡）：點照片選取，拖曳移動（中心不離開該區），雙指或滾輪縮放。
-   調整地圖（每張卡）：單指拖曳、雙指或滾輪縮放整個地圖層，view 存在卡片設定裡。 */
+   調整地圖（每張卡）：單指拖曳、雙指或滾輪縮放整個地圖層，view 存在卡片設定裡。
+   照片與拍立得的位置都是自動排的，不能在預覽上拖曳或縮放。 */
 function pzEvPt(e){
   const r = $("pz-cv").getBoundingClientRect();
   return [(e.clientX - r.left) * PUZZLE_CARD_W / r.width, (e.clientY - r.top) * PUZZLE_CARD_H / r.height];
 }
-/* 單區卡上，這個點壓在哪一張照片（最上面那張）；照片被區界裁掉的部分不算 */
-function pzPhotoAt(q){
-  const key = pz.cur, v = pzView(key);
-  if (key === PUZZLE_ALL || !pzInFrame(PUZZLE_FRAME, q) || !pzHit(pzViewLay(pzAreaLay(key), v, PUZZLE_FRAME), q[0], q[1])) return null;
-  const hit = pzStack(pz.photos, key, pz.card.order).reverse().find(p => { const im = pz.bmp.get(p.id); return im && pzBoxHit(pzPhotoBox(p.place, im.naturalWidth || im.width, im.naturalHeight || im.height, PUZZLE_FRAME, v), q[0], q[1]); });
-  return hit ? hit.id : null;
-}
 const pzPaintSoon = () => { if (!pz.raf) pz.raf = requestAnimationFrame(() => { pz.raf = 0; pzPaint(); }); };
-function pzSetView(key, v){ pz.card.views[key] = pzViewClamp(v, PUZZLE_FRAME, pzLayBox(pzBaseLay(key))); pz.dirtyView = key; }
-function pzSetPlace(p, place){ p.place = place; pz.dirtyPlace = p.id; }
-/* 手勢結束：把改過的 view 與照片位置存起來，再重新輸出 */
+function pzSetView(key, v){ const G = pzLiveGeom(key); pz.card.views[key] = pzViewClamp(v, G.frame, pzLayBox(G.lay)); pz.dirtyView = key; }
+/* 手勢結束：把改過的 view 存起來，再重新輸出 */
 async function pzCommit(){
   clearTimeout(pz.commitT); pz.commitT = 0;
-  const st = await pzGetStore(), key = pz.dirtyView, id = pz.dirtyPlace;
-  pz.dirtyView = null; pz.dirtyPlace = null;
+  const st = await pzGetStore(), key = pz.dirtyView;
+  pz.dirtyView = null;
   if (key) await st.setCard({views:{[key]:pz.card.views[key]}});
-  const p = id && pz.photos.find(x => x.id === id);
-  if (p && p.place) await st.place(p.id, p.place);
   pzDraw();
 }
 const pzCommitSoon = () => { clearTimeout(pz.commitT); pz.commitT = setTimeout(pzCommit, 350); };
 function pzGestureStart(){
-  const pts = Array.from(pz.ptrs.values()), key = pz.cur, sel = pz.sel && pz.sel.photo && pz.photos.find(p => p.id === pz.sel.photo);
+  const pts = Array.from(pz.ptrs.values()), key = pz.cur;
   const span = pts.length > 1 ? Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]) || 1 : 0;
   const mid = pts.length > 1 ? [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2] : pts[0];
-  if (pz.mode === "map") pz.drag = {kind:"map", key, mid, span, v:{...pzView(key)}};
-  else if (sel && sel.place){
-    const v = pzView(key), c = pzViewPt(v, PUZZLE_FRAME, [PUZZLE_FRAME.x + sel.place.x * PUZZLE_FRAME.w, PUZZLE_FRAME.y + sel.place.y * PUZZLE_FRAME.h]);
-    pz.drag = {kind:"photo", id:sel.id, v, span, s:sel.place.s, off:[c[0] - mid[0], c[1] - mid[1]]};
-  } else pz.drag = null;
+  pz.drag = pz.mode === "map" ? {key, mid, span, v:{...pzView(key)}, f:pzLiveGeom(key).frame} : null;
 }
 function pzGestureMove(){
   const d = pz.drag, pts = Array.from(pz.ptrs.values()); if (!d || !pts.length) return;
   const span = pts.length > 1 ? Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]) || 1 : 0;
   const mid = pts.length > 1 ? [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2] : pts[0];
-  if (d.kind === "map"){
-    pzSetView(d.key, {s:d.span && span ? d.v.s * span / d.span : d.v.s, x:d.v.x + (mid[0] - d.mid[0]) / PUZZLE_FRAME.w, y:d.v.y + (mid[1] - d.mid[1]) / PUZZLE_FRAME.h});
-  } else {
-    const p = pz.photos.find(x => x.id === d.id); if (!p || !p.place) return;
-    const q = pzViewInv(d.v, PUZZLE_FRAME, [mid[0] + d.off[0], mid[1] + d.off[1]]);
-    let place = pzPlaceMove(p.place, pzAreaLay(pz.cur), PUZZLE_FRAME, q[0], q[1]);
-    if (d.span && span) place = pzPlaceScale(place, d.s * span / d.span);
-    pzSetPlace(p, place);
-  }
+  pzSetView(d.key, {s:d.span && span ? d.v.s * span / d.span : d.v.s, x:d.v.x + (mid[0] - d.mid[0]) / d.f.w, y:d.v.y + (mid[1] - d.mid[1]) / d.f.h});
   pzPaintSoon();
 }
 function pzBindCanvas(cv){
-  const live = () => pz.mode === "map" || pz.cur !== PUZZLE_ALL;
+  const live = () => pz.mode === "map";
   cv.addEventListener("pointerdown", e => {
     if (!live() || (e.pointerType === "mouse" && e.button !== 0)) return;
-    const q = pzEvPt(e);
-    if (pz.mode === "photo" && !pz.ptrs.size){
-      const id = pzPhotoAt(q), was = pz.sel && pz.sel.photo;
-      if (id !== was){ pz.sel = id ? {photo:id} : null; pzRender(); }
-    }
     try { cv.setPointerCapture(e.pointerId); } catch(err){}
-    pz.ptrs.set(e.pointerId, q);
+    pz.ptrs.set(e.pointerId, pzEvPt(e));
     pzGestureStart();
     e.preventDefault();
   });
@@ -8917,20 +9058,15 @@ function pzBindCanvas(cv){
     if (!pz.ptrs.has(e.pointerId)) return;
     pz.ptrs.delete(e.pointerId);
     if (pz.ptrs.size) pzGestureStart();
-    else { pz.drag = null; if (pz.dirtyView || pz.dirtyPlace) pzCommit(); }
+    else { pz.drag = null; if (pz.dirtyView) pzCommit(); }
   };
   cv.addEventListener("pointerup", end);
   cv.addEventListener("pointercancel", end);
-  /* 電腦：滾輪縮放（調整地圖縮放整張，調整照片縮放選取的那張） */
+  /* 電腦：調整地圖時滾輪縮放 */
   cv.addEventListener("wheel", e => {
     if (!live()) return;
-    const k = Math.exp(-e.deltaY * 0.0015), key = pz.cur;
-    if (pz.mode === "map"){ const v = pzView(key); pzSetView(key, {...v, s:v.s * k}); }
-    else {
-      const p = pz.sel && pz.sel.photo && pz.photos.find(x => x.id === pz.sel.photo);
-      if (!p || !p.place) return;
-      pzSetPlace(p, pzPlaceScale(p.place, p.place.s * k));
-    }
+    const k = Math.exp(-e.deltaY * 0.0015), key = pz.cur, v = pzView(key);
+    pzSetView(key, {...v, s:v.s * k});
     e.preventDefault();
     pzPaintSoon(); pzCommitSoon();
   }, {passive:false});
@@ -9118,7 +9254,7 @@ async function pzReset(){
     <div class="pz-head"><h2 id="pz-t" tabindex="-1">${esc(PZ_T.menu)}</h2><button type="button" class="pz-x" data-pz="close" aria-label="${esc(PZ_T.close)}">✕</button></div>
     <div class="pz-body"><div class="pz-prev"><div class="pz-tabs" id="pz-tabs" role="tablist" aria-label="${esc(PZ_T.tabs)}" hidden></div>
       <canvas id="pz-cv" width="${PUZZLE_CARD_W}" height="${PUZZLE_CARD_H}" role="img" aria-label="${esc(PZ_T.menu)}"></canvas>
-      <div class="pz-modes" role="group" aria-label="${esc(PZ_T.modes)}"><button type="button" class="pz-mode" data-pz-mode="photo" aria-pressed="true">${esc(PZ_T.modePhoto)}</button><button type="button" class="pz-mode" data-pz-mode="map" aria-pressed="false">${esc(PZ_T.modeMap)}</button><button type="button" class="pz-mode pz-fit" id="pz-fit" data-pz="fit" hidden>${esc(PZ_T.fit)}</button></div>
+      <div class="pz-modes" role="group" aria-label="${esc(PZ_T.modes)}">${PZ_SNAP ? "" : `<button type="button" class="pz-mode" data-pz-mode="photo" aria-pressed="true">${esc(PZ_T.modePhoto)}</button>`}<button type="button" class="pz-mode" data-pz-mode="map" aria-pressed="false">${esc(PZ_T.modeMap)}</button><button type="button" class="pz-mode pz-fit" id="pz-fit" data-pz="fit" hidden>${esc(PZ_T.fit)}</button></div>
       <div class="pz-strip" id="pz-strip" role="group" aria-label="${esc(PZ_T.strip)}" hidden></div></div>
     <div class="pz-side"><div class="pz-caps" id="pz-caps"></div><div class="pz-tray" id="pz-tray" hidden></div><div class="pz-sel" id="pz-sel"></div>
       <div class="pz-acts"><button type="button" class="b" data-pz="add">${esc(PZ_T.add)}</button><button type="button" class="b" data-pz="meta">${esc(PZ_T.meta)}</button><button type="button" class="b pz-go" data-pz="save">${esc(PZ_T.save)}</button></div>
@@ -9168,15 +9304,15 @@ async function pzReset(){
     const tab = e.target.closest("[data-pz-card]");
     if (tab){ pz.cur = tab.dataset.pzCard; pz.sel = null; pzRender(); return; }
     const md = e.target.closest("[data-pz-mode]");
-    if (md){ pz.mode = md.dataset.pzMode; pzRender(); return; }
+    if (md){ pz.mode = PZ_SNAP ? (pz.mode === "map" ? "photo" : "map") : md.dataset.pzMode; pzRender(); return; }  // 每區多張的版本只有〔調整地圖〕一個開關
     const st2 = e.target.closest("[data-pz-th]");
     if (st2){ if (pz.noClick) return; const id = st2.dataset.pzTh; pz.sel = pz.sel && pz.sel.photo === id ? null : {photo:id}; pzRender(); return; }
     const th = e.target.closest("[data-pz-tray]");
     if (th){ const id = th.dataset.pzTray; pz.sel = pz.sel && pz.sel.tray === id ? null : {tray:id}; pzRender(); return; }
     if (e.target.id === "pz-cv"){
-      /* 總覽卡、調整照片：點一區就選那一區。其他情況由拖曳那一組處理 */
+      /* 總覽卡、沒有在調整地圖：點一區就選那一區。調整地圖時由拖曳那一組處理 */
       if (pz.cur !== PUZZLE_ALL || pz.mode !== "photo") return;
-      const q = pzEvPt(e), a = pzInFrame(PUZZLE_FRAME, q) ? pzHit(pzViewLay(pzLay, pzView(PUZZLE_ALL), PUZZLE_FRAME), q[0], q[1]) : null;
+      const q = pzEvPt(e), G = pzLiveGeom(PUZZLE_ALL), a = pzInFrame(G.frame, q) ? pzHit(pzViewLay(G.lay, pzView(PUZZLE_ALL), G.frame), q[0], q[1]) : null;
       if (a){ pz.sel = {area:a}; pzRender(); }
       return;
     }
@@ -9193,10 +9329,6 @@ async function pzReset(){
     else if (k === "more") pzPick({area:b.dataset.area});
     else if (k === "look"){ pz.cur = b.dataset.area; pz.sel = null; pzRender(); }
     else if (k === "fit"){ const key = pz.cur; pz.card = await (await pzGetStore()).setCard({views:{[key]:{s:1, x:0, y:0}}}); pzRender(); }
-    else if (k === "top"){
-      const p = pz.photos.find(x => x.id === b.dataset.id);
-      if (p && p.place){ const r = await (await pzGetStore()).place(p.id, {...p.place, z:1 + Math.max(0, ...pzIn(p.area).map(x => x.place ? x.place.z : 0))}); if (r.ok) p.place = r.photo.place; pzRender(); }
-    }
     else if (k === "first"){ const p = pz.photos.find(x => x.id === b.dataset.id); if (p) await pzReorder(p.area, p.id, 0); }
     else if (k === "del"){ await (await pzGetStore()).remove(b.dataset.id); await pzReload(); if (pz.sel && (pz.sel.tray || pz.sel.photo)) pz.sel = null; pzRender(); }
     else if (k === "confirm"){ await (await pzGetStore()).confirm(b.dataset.id); await pzReload(); pzRender(); }
